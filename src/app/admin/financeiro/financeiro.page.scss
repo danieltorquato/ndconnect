@@ -1,0 +1,276 @@
+:host {
+  --nd-primary: #FF6B00;
+  --nd-secondary: #1a1a1a;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard h2,
+.section-header h2 {
+  margin: 24px 0 16px 0;
+  color: var(--nd-secondary);
+}
+
+.section-title {
+  margin: 32px 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+// DASHBOARD
+.metricas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metrica-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  &.success {
+    border-left: 4px solid var(--ion-color-success);
+  }
+
+  &.danger {
+    border-left: 4px solid var(--ion-color-danger);
+  }
+
+  &.warning {
+    border-left: 4px solid var(--ion-color-warning);
+  }
+
+  ion-card-content {
+    text-align: center;
+    padding: 24px;
+
+    ion-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 8px 0;
+      color: var(--nd-primary);
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+      margin: 0;
+    }
+  }
+}
+
+// CONTAS
+.contas-lista {
+  margin-top: 16px;
+}
+
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 16px;
+}
+
+.card-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cliente {
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.conta-info {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  ion-icon {
+    color: var(--nd-primary);
+    font-size: 18px;
+  }
+
+  span {
+    font-size: 14px;
+  }
+}
+
+.acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ion-color-light);
+}
+
+// FLUXO DE CAIXA
+.periodo-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.resumo-fluxo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.resumo-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--ion-color-light);
+
+  &.success {
+    background: rgba(var(--ion-color-success-rgb), 0.1);
+
+    ion-icon {
+      color: var(--ion-color-success);
+    }
+  }
+
+  &.danger {
+    background: rgba(var(--ion-color-danger-rgb), 0.1);
+
+    ion-icon {
+      color: var(--ion-color-danger);
+    }
+  }
+
+  ion-icon {
+    font-size: 32px;
+  }
+
+  div {
+    flex: 1;
+
+    p {
+      margin: 0 0 4px 0;
+      font-size: 12px;
+      color: var(--ion-color-medium);
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  }
+}
+
+.movimentacoes-lista {
+  margin-top: 16px;
+}
+
+.movimentacao-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  ion-icon {
+    font-size: 32px;
+  }
+
+  .mov-info {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .mov-valor {
+    text-align: right;
+
+    &.entrada strong {
+      color: var(--ion-color-success);
+    }
+
+    &.saida strong {
+      color: var(--ion-color-danger);
+    }
+
+    strong {
+      font-size: 18px;
+    }
+  }
+}
+
+// GERAL
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+  }
+}
+
+ion-segment {
+  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+  margin-bottom: 16px;
+}
+
+ion-item {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .metricas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .periodo-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-fluxo {
+    grid-template-columns: 1fr;
+  }
+
+  .movimentacao-item {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .mov-valor {
+      text-align: left;
+      width: 100%;
+    }
+  }
+}
+

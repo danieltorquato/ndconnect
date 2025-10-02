@@ -1,0 +1,228 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestão de Orçamentos</ion-title>
+  </ion-toolbar>
+
+  <!-- Segmentação por Status -->
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="statusFiltro" (ionChange)="mudarFiltro($event)" scrollable>
+      <ion-segment-button value="todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pendente">
+        <ion-label>Pendentes</ion-label>
+        <ion-badge *ngIf="contadores.pendentes > 0">{{ contadores.pendentes }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="aprovado">
+        <ion-label>Aprovados</ion-label>
+        <ion-badge *ngIf="contadores.aprovados > 0">{{ contadores.aprovados }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="vendido">
+        <ion-label>Vendidos</ion-label>
+        <ion-badge *ngIf="contadores.vendidos > 0">{{ contadores.vendidos }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="rejeitado">
+        <ion-label>Rejeitados</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="expirado">
+        <ion-label>Expirados</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+
+    <!-- Barra de Pesquisa -->
+    <ion-searchbar
+      [(ngModel)]="termoPesquisa"
+      (ionInput)="pesquisar()"
+      placeholder="Pesquisar por número, cliente, email ou telefone..."
+      debounce="300">
+    </ion-searchbar>
+
+    <!-- Lista de Orçamentos -->
+    <ion-card *ngIf="orcamentosFiltrados.length === 0" class="empty-state">
+      <ion-card-content>
+        <ion-icon name="document-text" color="medium"></ion-icon>
+        <p>Nenhum orçamento encontrado</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngFor="let orcamento of orcamentosFiltrados" class="orcamento-card">
+      <ion-card-header>
+        <div class="card-header-content">
+          <div>
+            <ion-card-title>#{{ orcamento.numero_orcamento }}</ion-card-title>
+            <p class="cliente-nome">{{ orcamento.cliente_nome }}</p>
+          </div>
+          <ion-badge [color]="getStatusColor(orcamento.status)">
+            {{ getStatusLabel(orcamento.status) }}
+          </ion-badge>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="orcamento-info">
+          <div class="info-row">
+            <ion-icon name="calendar"></ion-icon>
+            <span>Data: {{ orcamento.data_orcamento | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-row">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Validade: {{ orcamento.data_validade | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-row">
+            <ion-icon name="cash-outline"></ion-icon>
+            <span>Total: R$ {{ orcamento.total | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <ion-button fill="clear" size="small" (click)="verDetalhes(orcamento)">
+            <ion-icon name="eye" slot="start"></ion-icon>
+            Detalhes
+          </ion-button>
+
+          <ion-button fill="clear" size="small" (click)="visualizarPDF(orcamento)">
+            <ion-icon name="document-text" slot="start"></ion-icon>
+            PDF
+          </ion-button>
+
+          <ion-button fill="clear" size="small" (click)="abrirModalStatus(orcamento)">
+            <ion-icon name="create" slot="start"></ion-icon>
+            Status
+          </ion-button>
+
+          <ion-button 
+            *ngIf="orcamento.status === 'aprovado'" 
+            fill="clear" 
+            size="small" 
+            color="success"
+            (click)="vincularPedido(orcamento)">
+            <ion-icon name="cart" slot="start"></ion-icon>
+            Pedido
+          </ion-button>
+
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            color="danger"
+            (click)="excluirOrcamento(orcamento, $event)">
+            <ion-icon name="trash" slot="start"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <!-- Modal de Detalhes -->
+  <ion-modal [isOpen]="modalDetalhesAberto" (didDismiss)="fecharModalDetalhes()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Detalhes do Orçamento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalDetalhes()">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="orcamentoSelecionado">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Orçamento #{{ orcamentoSelecionado.numero_orcamento }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <h3>Cliente</h3>
+            <p><strong>Nome:</strong> {{ orcamentoSelecionado.cliente_nome }}</p>
+            <p><strong>Email:</strong> {{ orcamentoSelecionado.email || 'Não informado' }}</p>
+            <p><strong>Telefone:</strong> {{ orcamentoSelecionado.telefone || 'Não informado' }}</p>
+
+            <h3>Datas</h3>
+            <p><strong>Orçamento:</strong> {{ orcamentoSelecionado.data_orcamento | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Validade:</strong> {{ orcamentoSelecionado.data_validade | date:'dd/MM/yyyy' }}</p>
+
+            <h3>Itens</h3>
+            <div *ngFor="let item of orcamentoSelecionado.itens" class="item-detalhe">
+              <p><strong>{{ item.produto_nome }}</strong></p>
+              <p>Quantidade: {{ item.quantidade }} {{ item.unidade }}</p>
+              <p>Valor Unit.: R$ {{ item.preco_unitario | number:'1.2-2' }}</p>
+              <p>Subtotal: R$ {{ item.subtotal | number:'1.2-2' }}</p>
+            </div>
+
+            <h3>Valores</h3>
+            <p><strong>Subtotal:</strong> R$ {{ orcamentoSelecionado.subtotal | number:'1.2-2' }}</p>
+            <p><strong>Desconto:</strong> R$ {{ orcamentoSelecionado.desconto | number:'1.2-2' }}</p>
+            <p class="total"><strong>Total:</strong> R$ {{ orcamentoSelecionado.total | number:'1.2-2' }}</p>
+
+            <div *ngIf="orcamentoSelecionado.observacoes">
+              <h3>Observações</h3>
+              <p>{{ orcamentoSelecionado.observacoes }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal de Atualização de Status -->
+  <ion-modal [isOpen]="modalStatusAberto" (didDismiss)="fecharModalStatus()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Atualizar Status</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalStatus()">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="orcamentoSelecionado">
+        <ion-card>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Novo Status</ion-label>
+              <ion-select [(ngModel)]="novoStatus" placeholder="Selecione o status">
+                <ion-select-option value="pendente">Pendente</ion-select-option>
+                <ion-select-option value="aprovado">Aprovado</ion-select-option>
+                <ion-select-option value="vendido">Vendido</ion-select-option>
+                <ion-select-option value="rejeitado">Rejeitado</ion-select-option>
+                <ion-select-option value="expirado">Expirado</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Observação (Opcional)</ion-label>
+              <ion-textarea
+                [(ngModel)]="observacaoStatus"
+                rows="3"
+                placeholder="Digite uma observação sobre a mudança de status...">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-button 
+              expand="block" 
+              (click)="atualizarStatus()"
+              [disabled]="!novoStatus">
+              Salvar
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>
+

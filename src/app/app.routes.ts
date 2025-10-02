@@ -42,4 +42,42 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'solicitar-orcamento',
+    loadComponent: () => import('./solicitar-orcamento/solicitar-orcamento.page').then( m => m.SolicitarOrcamentoPage)
+  },
+  {
+    path: 'gestao-leads',
+    loadComponent: () => import('./admin/gestao-leads/gestao-leads.page').then( m => m.GestaoLeadsPage)
+  },
+
+  {
+    path: 'gestao-orcamentos',
+    loadComponent: () => import('./admin/gestao-orcamentos/gestao-orcamentos.page').then( m => m.GestaoOrcamentosPage)
+  },
+  {
+    path: 'painel-orcamento',
+    loadComponent: () => import('./painel-orcamento/painel-orcamento.page').then( m => m.PainelOrcamentoPage)
+  },
+  {
+    path: 'admin/gestao-clientes',
+    loadComponent: () => import('./admin/gestao-clientes/gestao-clientes.page').then( m => m.GestaoClientesPage)
+  },
+  {
+    path: 'admin/gestao-pedidos',
+    loadComponent: () => import('./admin/gestao-pedidos/gestao-pedidos.page').then( m => m.GestaoPedidosPage)
+  },
+  {
+    path: 'admin/financeiro',
+    loadComponent: () => import('./admin/financeiro/financeiro.page').then( m => m.FinanceiroPage)
+  },
+  {
+    path: 'admin/agenda',
+    loadComponent: () => import('./admin/agenda/agenda.page').then( m => m.AgendaPage)
+  },
+  {
+    path: 'admin/relatorios',
+    loadComponent: () => import('./admin/relatorios/relatorios.page').then( m => m.RelatoriosPage)
+  },
+
 ];

@@ -119,6 +119,58 @@ class OrcamentoController {
         return str_pad($numero, 6, '0', STR_PAD_LEFT);
     }
 
+    public function getAll() {
+        try {
+            $query = "SELECT o.*, c.nome as cliente_nome, c.email, c.telefone
+                     FROM " . $this->table_orcamento . " o
+                     JOIN " . $this->table_cliente . " c ON o.cliente_id = c.id
+                     ORDER BY o.created_at DESC";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $orcamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'success' => true,
+                'data' => $orcamentos,
+                'message' => 'Orçamentos carregados com sucesso'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Erro ao carregar orçamentos: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function getByStatus($status) {
+        try {
+            $query = "SELECT o.*, c.nome as cliente_nome, c.email, c.telefone
+                     FROM " . $this->table_orcamento . " o
+                     JOIN " . $this->table_cliente . " c ON o.cliente_id = c.id
+                     WHERE o.status = :status
+                     ORDER BY o.created_at DESC";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':status', $status);
+            $stmt->execute();
+            $orcamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'success' => true,
+                'data' => $orcamentos,
+                'message' => 'Orçamentos carregados com sucesso'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => [],
+                'message' => 'Erro ao carregar orçamentos: ' . $e->getMessage()
+            ];
+        }
+    }
+
     public function getById($id) {
         try {
             $query = "SELECT o.*, c.nome as cliente_nome, c.email, c.telefone, c.endereco, c.cpf_cnpj
@@ -146,13 +198,156 @@ class OrcamentoController {
 
                 $orcamento['itens'] = $stmt_itens->fetchAll(PDO::FETCH_ASSOC);
 
-                return $orcamento;
+                return [
+                    'success' => true,
+                    'data' => $orcamento,
+                    'message' => 'Orçamento encontrado'
+                ];
             }
 
-            return null;
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Orçamento não encontrado'
+            ];
 
         } catch (Exception $e) {
-            return null;
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao buscar orçamento: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function updateStatus($id, $novoStatus, $observacao = '') {
+        try {
+            $this->conn->beginTransaction();
+
+            // Buscar status anterior
+            $query = "SELECT status FROM " . $this->table_orcamento . " WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $statusAnterior = $stmt->fetch(PDO::FETCH_ASSOC)['status'];
+
+            // Atualizar status do orçamento
+            $query = "UPDATE " . $this->table_orcamento . " SET status = :status WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':status', $novoStatus);
+            $stmt->execute();
+
+            // Registrar no histórico (se a tabela existir)
+            try {
+                $query = "INSERT INTO orcamento_historico 
+                         (orcamento_id, status_anterior, status_novo, observacao, usuario)
+                         VALUES (:orcamento_id, :status_anterior, :status_novo, :observacao, 'admin')";
+                
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':orcamento_id', $id);
+                $stmt->bindParam(':status_anterior', $statusAnterior);
+                $stmt->bindParam(':status_novo', $novoStatus);
+                $stmt->bindParam(':observacao', $observacao);
+                $stmt->execute();
+            } catch (Exception $e) {
+                // Ignorar se tabela não existir
+            }
+
+            // Se o status for 'vendido', atualizar data de venda
+            if ($novoStatus === 'vendido') {
+                $query = "UPDATE " . $this->table_orcamento . " 
+                         SET data_venda = CURDATE() 
+                         WHERE id = :id";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+
+            // Se o status for 'aprovado', atualizar data de aprovação
+            if ($novoStatus === 'aprovado') {
+                $query = "UPDATE " . $this->table_orcamento . " 
+                         SET data_aprovacao = CURDATE() 
+                         WHERE id = :id";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+
+            $this->conn->commit();
+
+            return [
+                'success' => true,
+                'data' => ['id' => $id, 'status' => $novoStatus],
+                'message' => 'Status atualizado com sucesso'
+            ];
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao atualizar status: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function vincularPedido($orcamentoId, $pedidoId) {
+        try {
+            $query = "UPDATE " . $this->table_orcamento . " 
+                     SET status = 'vendido', data_venda = CURDATE()
+                     WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $orcamentoId);
+            $stmt->execute();
+
+            return [
+                'success' => true,
+                'data' => ['orcamento_id' => $orcamentoId, 'pedido_id' => $pedidoId],
+                'message' => 'Orçamento vinculado ao pedido com sucesso'
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao vincular pedido: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function delete($id) {
+        try {
+            $this->conn->beginTransaction();
+
+            // Deletar itens do orçamento
+            $query = "DELETE FROM " . $this->table_itens . " WHERE orcamento_id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            // Deletar orçamento
+            $query = "DELETE FROM " . $this->table_orcamento . " WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $this->conn->commit();
+
+            return [
+                'success' => true,
+                'data' => ['id' => $id],
+                'message' => 'Orçamento excluído com sucesso'
+            ];
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao excluir orçamento: ' . $e->getMessage()
+            ];
         }
     }
 }

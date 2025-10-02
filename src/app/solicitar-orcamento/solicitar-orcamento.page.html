@@ -1,0 +1,140 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      <div class="header-logo">
+        <img src="assets/img/logo.jpeg" alt="N.D Connect" />
+        <span>Solicitar Orçamento</span>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+
+    <!-- Mensagem de Sucesso -->
+    <ion-card *ngIf="enviado" class="success-card">
+      <ion-card-content>
+        <div class="success-message">
+          <ion-icon name="checkmark-circle" color="success"></ion-icon>
+          <h2>Solicitação Enviada!</h2>
+          <p>Obrigado pelo contato. Nossa equipe entrará em contato em breve!</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Formulário de Solicitação -->
+    <ion-card *ngIf="!enviado">
+      <ion-card-header>
+        <ion-card-title>Solicite um Orçamento</ion-card-title>
+        <p class="subtitle">Preencha os dados abaixo e entraremos em contato</p>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form>
+          <ion-item>
+            <ion-label position="stacked">Nome Completo *</ion-label>
+            <ion-input
+              [(ngModel)]="solicitacao.nome"
+              name="nome"
+              type="text"
+              placeholder="Seu nome completo"
+              required>
+              <ion-icon name="person" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">E-mail</ion-label>
+            <ion-input
+              [(ngModel)]="solicitacao.email"
+              name="email"
+              type="email"
+              placeholder="seu@email.com">
+              <ion-icon name="mail" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Telefone/WhatsApp *</ion-label>
+            <ion-input
+              [(ngModel)]="solicitacao.telefone"
+              name="telefone"
+              type="tel"
+              placeholder="(00) 00000-0000"
+              (ionInput)="formatarTelefone($event)"
+              maxlength="15"
+              required>
+              <ion-icon name="call" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Empresa (Opcional)</ion-label>
+            <ion-input
+              [(ngModel)]="solicitacao.empresa"
+              name="empresa"
+              type="text"
+              placeholder="Nome da sua empresa">
+              <ion-icon name="business" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Mensagem *</ion-label>
+            <ion-textarea
+              [(ngModel)]="solicitacao.mensagem"
+              name="mensagem"
+              rows="5"
+              placeholder="Descreva o que você precisa: tipo de evento, data, equipamentos desejados, etc."
+              required>
+            </ion-textarea>
+          </ion-item>
+
+          <div class="form-actions">
+            <ion-button
+              expand="block"
+              (click)="enviarSolicitacao()"
+              [disabled]="enviando">
+              <ion-icon name="send" slot="start"></ion-icon>
+              {{ enviando ? 'Enviando...' : 'Enviar Solicitação' }}
+            </ion-button>
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="voltarHome()">
+              Voltar
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Informações de Contato -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Outras Formas de Contato</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="contact-info">
+          <div class="contact-item">
+            <ion-icon name="call" color="primary"></ion-icon>
+            <div>
+              <strong>Telefone/WhatsApp</strong>
+              <p>(00) 0000-0000</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <ion-icon name="mail" color="primary"></ion-icon>
+            <div>
+              <strong>E-mail</strong>
+              <p>contato@ndconnect.com</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>

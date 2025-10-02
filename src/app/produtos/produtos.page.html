@@ -52,6 +52,33 @@
                 <span class="unidade">{{ produto.unidade }}</span>
                 <span class="categoria">{{ produto.categoria_nome }}</span>
               </p>
+
+              <!-- BADGES DE ESTOQUE -->
+              <div class="estoque-info">
+                <ion-badge [color]="temEstoqueBaixo(produto.id) ? 'danger' : 'success'">
+                  <ion-icon name="cube"></ion-icon>
+                  Estoque: {{ getEstoqueProduto(produto.id).quantidade_disponivel }}
+                </ion-badge>
+                <ion-badge color="medium" *ngIf="getEstoqueProduto(produto.id).quantidade_reservada > 0">
+                  Reservado: {{ getEstoqueProduto(produto.id).quantidade_reservada }}
+                </ion-badge>
+                <ion-badge color="warning" *ngIf="temEstoqueBaixo(produto.id)">
+                  <ion-icon name="alert-circle"></ion-icon>
+                  Estoque Baixo!
+                </ion-badge>
+              </div>
+
+              <!-- BOTÕES DE ESTOQUE -->
+              <div class="acoes-estoque">
+                <ion-button fill="clear" size="small" (click)="abrirModalEstoque(produto); $event.stopPropagation()">
+                  <ion-icon name="cube" slot="start"></ion-icon>
+                  Ver Estoque
+                </ion-button>
+                <ion-button fill="clear" size="small" (click)="abrirModalMovimentacao(produto); $event.stopPropagation()">
+                  <ion-icon name="swap-horizontal" slot="start"></ion-icon>
+                  Movimentar
+                </ion-button>
+              </div>
             </ion-label>
             <ion-button slot="end" fill="clear" (click)="excluirProduto(produto.id, $event); $event.stopPropagation();">
               <ion-icon name="trash" color="danger"></ion-icon>
@@ -64,7 +91,8 @@
 
   <!-- Modal de Edição/Adição -->
   <ion-modal [isOpen]="modalAberto" (didDismiss)="fecharModal()">
-    <ion-header>
+    <ng-template>
+      <ion-header>
         <ion-toolbar>
           <ion-title>{{ produtoEditando.id ? 'Editar' : 'Adicionar' }} Produto</ion-title>
           <ion-buttons slot="end">
@@ -137,5 +165,114 @@
           </ion-button>
         </div>
       </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal de Estoque -->
+  <ion-modal [isOpen]="modalEstoqueAberto" (didDismiss)="fecharModalEstoque()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Estoque: {{ produtoSelecionadoEstoque?.nome }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalEstoque()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="produtoSelecionadoEstoque">
+        <ion-card>
+          <ion-card-content>
+            <div class="estoque-detalhes">
+              <div class="estoque-item">
+                <h3>Quantidade Disponível</h3>
+                <p class="quantidade-grande success">{{ produtoSelecionadoEstoque.estoque?.quantidade_disponivel || 0 }}</p>
+              </div>
+
+              <div class="estoque-item">
+                <h3>Quantidade Reservada</h3>
+                <p class="quantidade-grande warning">{{ produtoSelecionadoEstoque.estoque?.quantidade_reservada || 0 }}</p>
+              </div>
+
+              <div class="estoque-item">
+                <h3>Estoque Mínimo</h3>
+                <ion-item>
+                  <ion-input
+                    type="number"
+                    [(ngModel)]="produtoSelecionadoEstoque.estoque.quantidade_minima"
+                    placeholder="Definir mínimo">
+                  </ion-input>
+                  <ion-button slot="end" (click)="atualizarEstoqueMinimo()">
+                    <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                    Salvar
+                  </ion-button>
+                </ion-item>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal de Movimentação -->
+  <ion-modal [isOpen]="modalMovimentacaoAberto" (didDismiss)="fecharModalMovimentacao()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Movimentar Estoque</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalMovimentacao()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-card>
+          <ion-card-content>
+            <h3>{{ produtoSelecionadoEstoque?.nome }}</h3>
+            <p>Estoque atual: {{ getEstoqueProduto(produtoSelecionadoEstoque?.id).quantidade_disponivel }}</p>
+
+            <ion-item>
+              <ion-label position="stacked">Tipo de Movimentação</ion-label>
+              <ion-select [(ngModel)]="movimentacaoForm.tipo">
+                <ion-select-option value="entrada">Entrada</ion-select-option>
+                <ion-select-option value="saida">Saída</ion-select-option>
+                <ion-select-option value="ajuste">Ajuste</ion-select-option>
+                <ion-select-option value="devolucao">Devolução</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Quantidade</ion-label>
+              <ion-input
+                type="number"
+                [(ngModel)]="movimentacaoForm.quantidade"
+                min="0"
+                placeholder="0">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Observações</ion-label>
+              <ion-textarea
+                [(ngModel)]="movimentacaoForm.observacoes"
+                rows="3"
+                placeholder="Descreva a movimentação...">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-button expand="block" (click)="registrarMovimentacao()" class="btn-movimentar">
+              <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+              Registrar Movimentação
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
   </ion-modal>
 </ion-content>

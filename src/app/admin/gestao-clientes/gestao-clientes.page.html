@@ -1,0 +1,317 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestão de Clientes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalCadastro()">
+        <ion-icon name="add-circle"></ion-icon>
+        Novo Cliente
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="statusFiltro" (ionChange)="mudarFiltro($event)">
+      <ion-segment-button value="todos">
+        <ion-label>Todos ({{contadores.total}})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ativo">
+        <ion-label>Ativos ({{contadores.ativos}})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="inativo">
+        <ion-label>Inativos ({{contadores.inativos}})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="bloqueado">
+        <ion-label>Bloqueados ({{contadores.bloqueados}})</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <ion-searchbar
+      [(ngModel)]="termoPesquisa"
+      (ionInput)="pesquisar()"
+      placeholder="Buscar por nome, email, telefone, CPF/CNPJ...">
+    </ion-searchbar>
+
+    <div class="clientes-lista">
+      <ion-card *ngFor="let cliente of clientesFiltrados" (click)="verDetalhes(cliente)">
+        <ion-card-header>
+          <div class="card-header-content">
+            <div>
+              <ion-card-title>{{ cliente.nome }}</ion-card-title>
+              <p class="empresa" *ngIf="cliente.empresa">{{ cliente.empresa }}</p>
+            </div>
+            <ion-badge [color]="getStatusColor(cliente.status)">
+              {{ getStatusLabel(cliente.status) }}
+            </ion-badge>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="cliente-info">
+            <div class="info-item" *ngIf="cliente.cpf_cnpj">
+              <ion-icon name="document"></ion-icon>
+              <span>{{ cliente.cpf_cnpj }}</span>
+            </div>
+            <div class="info-item">
+              <ion-icon name="call"></ion-icon>
+              <span>{{ cliente.telefone }}</span>
+            </div>
+            <div class="info-item">
+              <ion-icon name="mail"></ion-icon>
+              <span>{{ cliente.email }}</span>
+            </div>
+            <div class="info-item" *ngIf="cliente.cidade">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ cliente.cidade }} - {{ cliente.estado }}</span>
+            </div>
+          </div>
+
+          <div class="acoes">
+            <ion-button fill="clear" size="small" (click)="ligarPara(cliente.telefone); $event.stopPropagation()">
+              <ion-icon name="call" slot="start"></ion-icon>
+              Ligar
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="enviarWhatsApp(cliente.telefone, cliente.nome); $event.stopPropagation()">
+              <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+              WhatsApp
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="abrirHistorico(cliente); $event.stopPropagation()">
+              <ion-icon name="stats-chart" slot="start"></ion-icon>
+              Histórico
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="abrirModalCadastro(cliente); $event.stopPropagation()">
+              <ion-icon name="create" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+            <ion-button fill="clear" size="small" color="danger" (click)="excluirCliente(cliente, $event)">
+              <ion-icon name="trash" slot="start"></ion-icon>
+              Excluir
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="no-results" *ngIf="clientesFiltrados.length === 0">
+        <ion-icon name="person"></ion-icon>
+        <p>Nenhum cliente encontrado</p>
+      </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <ion-modal [isOpen]="modalDetalhesAberto" (didDismiss)="fecharModalDetalhes()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Detalhes do Cliente</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalDetalhes()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding" *ngIf="clienteSelecionado">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ clienteSelecionado.nome }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item *ngIf="clienteSelecionado.empresa">
+                  <ion-label>Empresa:</ion-label>
+                  <ion-label slot="end">{{ clienteSelecionado.empresa }}</ion-label>
+                </ion-item>
+                <ion-item *ngIf="clienteSelecionado.cpf_cnpj">
+                  <ion-label>CPF/CNPJ:</ion-label>
+                  <ion-label slot="end">{{ clienteSelecionado.cpf_cnpj }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Email:</ion-label>
+                  <ion-label slot="end">{{ clienteSelecionado.email }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Telefone:</ion-label>
+                  <ion-label slot="end">{{ clienteSelecionado.telefone }}</ion-label>
+                </ion-item>
+                <ion-item *ngIf="clienteSelecionado.endereco">
+                  <ion-label>Endereço:</ion-label>
+                  <ion-label slot="end">{{ clienteSelecionado.endereco }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Tipo:</ion-label>
+                  <ion-label slot="end">{{ getTipoLabel(clienteSelecionado.tipo) }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Status:</ion-label>
+                  <ion-badge slot="end" [color]="getStatusColor(clienteSelecionado.status)">
+                    {{ getStatusLabel(clienteSelecionado.status) }}
+                  </ion-badge>
+                </ion-item>
+              </ion-list>
+
+              <h3 class="estatisticas-titulo">Estatísticas</h3>
+              <div class="estatisticas-grid" *ngIf="estatisticas">
+                <div class="stat-card">
+                  <p class="stat-valor">{{ estatisticas.total_orcamentos || 0 }}</p>
+                  <p class="stat-label">Orçamentos</p>
+                </div>
+                <div class="stat-card">
+                  <p class="stat-valor">{{ estatisticas.total_pedidos || 0 }}</p>
+                  <p class="stat-label">Pedidos</p>
+                </div>
+                <div class="stat-card">
+                  <p class="stat-valor">R$ {{ (estatisticas.total_gasto || 0).toFixed(2) }}</p>
+                  <p class="stat-label">Total Gasto</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Modal de Cadastro/Edição -->
+    <ion-modal [isOpen]="modalCadastroAberto" (didDismiss)="fecharModalCadastro()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>{{ clienteForm.id ? 'Editar Cliente' : 'Novo Cliente' }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalCadastro()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-content>
+              <ion-item>
+                <ion-label position="stacked">Nome *</ion-label>
+                <ion-input [(ngModel)]="clienteForm.nome" placeholder="Nome completo"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Empresa</ion-label>
+                <ion-input [(ngModel)]="clienteForm.empresa" placeholder="Nome da empresa"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Email *</ion-label>
+                <ion-input type="email" [(ngModel)]="clienteForm.email" placeholder="email@exemplo.com"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Telefone *</ion-label>
+                <ion-input type="tel" [(ngModel)]="clienteForm.telefone" placeholder="(00) 00000-0000"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">CPF/CNPJ</ion-label>
+                <ion-input [(ngModel)]="clienteForm.cpf_cnpj" placeholder="000.000.000-00"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Tipo</ion-label>
+                <ion-select [(ngModel)]="clienteForm.tipo">
+                  <ion-select-option value="pessoa_fisica">Pessoa Física</ion-select-option>
+                  <ion-select-option value="pessoa_juridica">Pessoa Jurídica</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Status</ion-label>
+                <ion-select [(ngModel)]="clienteForm.status">
+                  <ion-select-option value="ativo">Ativo</ion-select-option>
+                  <ion-select-option value="inativo">Inativo</ion-select-option>
+                  <ion-select-option value="bloqueado">Bloqueado</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Endereço</ion-label>
+                <ion-input [(ngModel)]="clienteForm.endereco" placeholder="Rua, número, bairro"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Cidade</ion-label>
+                <ion-input [(ngModel)]="clienteForm.cidade" placeholder="Cidade"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Estado</ion-label>
+                <ion-input [(ngModel)]="clienteForm.estado" placeholder="UF" maxlength="2"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Observações</ion-label>
+                <ion-textarea [(ngModel)]="clienteForm.observacoes" rows="3" placeholder="Observações adicionais"></ion-textarea>
+              </ion-item>
+
+              <ion-button expand="block" (click)="salvarCliente()" class="btn-salvar">
+                {{ clienteForm.id ? 'Atualizar Cliente' : 'Cadastrar Cliente' }}
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Modal de Histórico -->
+    <ion-modal [isOpen]="modalHistoricoAberto" (didDismiss)="fecharModalHistorico()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Histórico: {{ clienteSelecionado?.nome }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalHistorico()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+          <h3>Orçamentos ({{ historicoOrcamentos.length }})</h3>
+          <ion-card *ngFor="let orc of historicoOrcamentos">
+            <ion-card-content>
+              <p><strong>Número:</strong> {{ orc.numero_orcamento }}</p>
+              <p><strong>Data:</strong> {{ orc.data_orcamento | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Total:</strong> R$ {{ orc.total.toFixed(2) }}</p>
+              <ion-badge [color]="orc.status === 'aprovado' ? 'success' : 'warning'">
+                {{ orc.status }}
+              </ion-badge>
+            </ion-card-content>
+          </ion-card>
+
+          <h3 style="margin-top: 24px;">Pedidos ({{ historicoPedidos.length }})</h3>
+          <ion-card *ngFor="let ped of historicoPedidos">
+            <ion-card-content>
+              <p><strong>Número:</strong> {{ ped.numero_pedido }}</p>
+              <p><strong>Data:</strong> {{ ped.data_pedido | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Total:</strong> R$ {{ ped.total.toFixed(2) }}</p>
+              <ion-badge [color]="ped.status === 'entregue' ? 'success' : 'primary'">
+                {{ ped.status }}
+              </ion-badge>
+            </ion-card-content>
+          </ion-card>
+
+          <div class="no-results" *ngIf="historicoOrcamentos.length === 0 && historicoPedidos.length === 0">
+            <p>Nenhum histórico encontrado</p>
+          </div>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>
+</ion-content>
+

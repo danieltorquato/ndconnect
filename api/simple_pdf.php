@@ -15,12 +15,28 @@ function getLogoBase64() {
 function gerarPDFSimples($orcamento) {
     $logoBase64 = getLogoBase64();
 
+    // Verificar e definir valores padrão para evitar warnings
+    $numero_orcamento = isset($orcamento['numero_orcamento']) ? $orcamento['numero_orcamento'] : 'N/A';
+    $cliente_nome = isset($orcamento['cliente_nome']) ? $orcamento['cliente_nome'] : 'Cliente não informado';
+    $cliente_email = isset($orcamento['email']) ? $orcamento['email'] : '';
+    $cliente_telefone = isset($orcamento['telefone']) ? $orcamento['telefone'] : '';
+    $cliente_endereco = isset($orcamento['endereco']) ? $orcamento['endereco'] : '';
+    $cliente_cpf_cnpj = isset($orcamento['cpf_cnpj']) ? $orcamento['cpf_cnpj'] : '';
+    $data_orcamento = isset($orcamento['data_orcamento']) ? $orcamento['data_orcamento'] : date('Y-m-d');
+    $data_validade = isset($orcamento['data_validade']) ? $orcamento['data_validade'] : date('Y-m-d', strtotime('+10 days'));
+    $itens = isset($orcamento['itens']) && is_array($orcamento['itens']) ? $orcamento['itens'] : [];
+    $subtotal = isset($orcamento['subtotal']) ? $orcamento['subtotal'] : 0;
+    $desconto = isset($orcamento['desconto']) ? $orcamento['desconto'] : 0;
+    $total = isset($orcamento['total']) ? $orcamento['total'] : 0;
+    $observacoes = isset($orcamento['observacoes']) ? $orcamento['observacoes'] : '';
+    $id = isset($orcamento['id']) ? $orcamento['id'] : 0;
+
     $html = '
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="UTF-8">
-        <title>Orçamento - ' . $orcamento['numero_orcamento'] . '</title>
+        <title>Orçamento - ' . $numero_orcamento . '</title>
         <style>
             /* Reset e base */
             * {
@@ -49,38 +65,28 @@ function gerarPDFSimples($orcamento) {
 
             /* Header */
             .header {
-                background: linear-gradient(135deg, #0C2B59 0%, #1e3a8a 100%);
+                background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
                 color: white;
                 padding: 30px;
                 text-align: center;
                 position: relative;
             }
 
-            .header::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%);
-                opacity: 0.1;
-                z-index: 1;
-            }
-
-            .header-content {
-                position: relative;
-                z-index: 2;
-            }
-
             .logo {
-                font-size: 32px;
-                font-weight: 800;
-                margin-bottom: 10px;
+                max-width: 120px;
+                height: auto;
+                margin-bottom: 20px;
+                border-radius: 8px;
+            }
+
+            .company-name {
+                font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 8px;
                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             }
 
-            .company-subtitle {
+            .company-tagline {
                 font-size: 16px;
                 opacity: 0.9;
                 margin-bottom: 20px;
@@ -96,346 +102,386 @@ function gerarPDFSimples($orcamento) {
                 backdrop-filter: blur(10px);
             }
 
-            /* Dados do cliente */
+            /* Conteúdo principal */
+            .content {
+                padding: 40px;
+            }
+
+            /* Informações do cliente */
             .cliente-section {
-                padding: 30px;
-                background: white;
+                background: #f8f9fa;
+                padding: 25px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                border-left: 4px solid #3498db;
             }
 
             .section-title {
                 font-size: 20px;
-                font-weight: 700;
-                color: #0C2B59;
+                font-weight: 600;
+                color: #2c3e50;
                 margin-bottom: 20px;
-                padding-bottom: 10px;
-                border-bottom: 3px solid #E8622D;
-                position: relative;
+                display: flex;
+                align-items: center;
             }
 
-            .section-title::after {
-                content: "";
-                position: absolute;
-                bottom: -3px;
-                left: 0;
-                width: 50px;
-                height: 3px;
-                background: #F7A64C;
+            .section-title::before {
+                content: "👤";
+                margin-right: 10px;
+                font-size: 24px;
             }
 
             .cliente-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
+                gap: 15px;
             }
 
             .cliente-item {
                 display: flex;
                 flex-direction: column;
-                gap: 5px;
             }
 
             .cliente-label {
-                font-weight: 600;
-                color: #64748b;
-                font-size: 14px;
+                font-size: 12px;
+                color: #6c757d;
                 text-transform: uppercase;
+                font-weight: 600;
+                margin-bottom: 5px;
                 letter-spacing: 0.5px;
             }
 
             .cliente-value {
                 font-size: 16px;
-                color: #1e293b;
+                color: #2c3e50;
                 font-weight: 500;
             }
 
-            .data-info {
-                background: #f1f5f9;
-                padding: 20px;
-                border-radius: 8px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+            /* Datas */
+            .datas-section {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
                 margin-bottom: 30px;
             }
 
             .data-item {
                 text-align: center;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 12px;
+                border: 2px solid #e9ecef;
             }
 
             .data-label {
-                font-size: 12px;
-                color: #64748b;
+                font-size: 14px;
+                color: #6c757d;
                 font-weight: 600;
+                margin-bottom: 8px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                margin-bottom: 5px;
             }
 
             .data-value {
-                font-size: 16px;
-                color: #0C2B59;
+                font-size: 18px;
+                color: #2c3e50;
                 font-weight: 700;
             }
 
             /* Tabela de itens */
             .itens-section {
-                padding: 0 30px 30px;
+                margin-bottom: 30px;
             }
 
             .itens-table {
                 width: 100%;
                 border-collapse: collapse;
                 background: white;
-                border-radius: 8px;
+                border-radius: 12px;
                 overflow: hidden;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
 
             .itens-table th {
-                background: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%);
+                background: #2c3e50;
                 color: white;
-                padding: 16px 12px;
-                font-weight: 700;
+                padding: 15px 12px;
+                text-align: left;
+                font-weight: 600;
                 font-size: 14px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                text-align: left;
-            }
-
-            .itens-table th:first-child {
-                border-top-left-radius: 8px;
-            }
-
-            .itens-table th:last-child {
-                border-top-right-radius: 8px;
             }
 
             .itens-table td {
-                padding: 16px 12px;
-                border-bottom: 1px solid #e2e8f0;
+                padding: 15px 12px;
+                border-bottom: 1px solid #e9ecef;
                 font-size: 14px;
             }
 
-            .itens-table tr:last-child td {
-                border-bottom: none;
+            .itens-table tr:nth-child(even) {
+                background: #f8f9fa;
             }
 
-            .itens-table tr:nth-child(even) {
-                background: #f8fafc;
+            .itens-table tr:hover {
+                background: #e3f2fd;
             }
 
             .produto-nome {
                 font-weight: 600;
-                color: #0C2B59;
+                color: #2c3e50;
             }
 
-            .quantidade, .preco, .subtotal, .unidade {
+            .categoria {
+                font-size: 12px;
+                color: #6c757d;
+                background: #e9ecef;
+                padding: 2px 8px;
+                border-radius: 12px;
+                display: inline-block;
+            }
+
+            .quantidade {
                 text-align: center;
-                font-weight: 500;
+                font-weight: 600;
             }
 
-            .preco, .subtotal {
-                color: #059669;
+            .preco {
+                text-align: right;
                 font-weight: 600;
+                color: #27ae60;
+            }
+
+            .subtotal {
+                text-align: right;
+                font-weight: 700;
+                color: #2c3e50;
             }
 
             /* Totais */
             .totais-section {
-                padding: 0 30px 30px;
-            }
-
-            .totais {
-                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                background: #f8f9fa;
                 padding: 25px;
                 border-radius: 12px;
-                margin-top: 20px;
+                margin-bottom: 30px;
             }
 
-            .total-line {
+            .total-item {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 12px;
-                font-size: 16px;
+                padding: 10px 0;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .total-item:last-child {
+                border-bottom: none;
+                font-size: 18px;
+                font-weight: 700;
+                color: #2c3e50;
+                background: #e3f2fd;
+                padding: 15px;
+                margin: 10px -15px -15px -15px;
+                border-radius: 0 0 12px 12px;
             }
 
             .total-label {
-                font-weight: 600;
-                color: #64748b;
+                font-size: 16px;
+                color: #6c757d;
             }
 
             .total-value {
-                font-weight: 700;
-                color: #0C2B59;
-            }
-
-            .total-final {
-                border-top: 2px solid #E8622D;
-                padding-top: 15px;
-                margin-top: 15px;
-                font-size: 20px;
-                font-weight: 800;
-            }
-
-            .total-final .total-value {
-                color: #E8622D;
-                font-size: 24px;
+                font-size: 16px;
+                font-weight: 600;
+                color: #2c3e50;
             }
 
             /* Observações */
-            .observacoes {
-                padding: 0 30px 30px;
-            }
-
-            .observacoes-content {
-                background: #fef3c7;
+            .observacoes-section {
+                background: #fff3cd;
+                border: 1px solid #ffeaa7;
                 padding: 20px;
-                border-radius: 8px;
-                border-left: 4px solid #F7A64C;
+                border-radius: 12px;
+                margin-bottom: 30px;
             }
 
-            .observacoes-text {
-                color: #92400e;
-                font-style: italic;
-                line-height: 1.6;
-            }
-
-            /* Botões de compartilhamento */
-            .share-buttons {
-                background: #f8fafc;
-                padding: 30px;
-                text-align: center;
-                border-top: 1px solid #e2e8f0;
-            }
-
-            .share-title {
-                font-size: 18px;
-                font-weight: 700;
-                color: #0C2B59;
+            .observacoes-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #856404;
                 margin-bottom: 10px;
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                gap: 10px;
             }
 
-            .share-subtitle {
-                color: #64748b;
-                margin-bottom: 25px;
-                font-size: 14px;
+            .observacoes-title::before {
+                content: "📝";
+                margin-right: 8px;
             }
 
-            .button-group {
+            .observacoes-text {
+                color: #856404;
+                line-height: 1.6;
+            }
+
+            /* Botões de ação */
+            .action-buttons {
                 display: flex;
-                gap: 12px;
+                gap: 15px;
                 justify-content: center;
                 flex-wrap: wrap;
+                margin-bottom: 30px;
             }
 
-            .share-buttons button {
-                padding: 12px 20px;
+            .btn {
+                padding: 12px 24px;
                 border: none;
                 border-radius: 8px;
+                font-size: 14px;
                 font-weight: 600;
                 cursor: pointer;
-                font-size: 14px;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
                 transition: all 0.3s ease;
                 min-width: 140px;
-                display: flex;
-                align-items: center;
                 justify-content: center;
-                gap: 8px;
             }
 
             .btn-whatsapp {
-                background: #25D366;
+                background: #25d366;
                 color: white;
             }
 
             .btn-whatsapp:hover {
-                background: #1ea952;
+                background: #128c7e;
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
             }
 
-            .btn-download {
-                background: #0C2B59;
+            .btn-email {
+                background: #3498db;
                 color: white;
             }
 
-            .btn-download:hover {
-                background: #1e3a8a;
+            .btn-email:hover {
+                background: #2980b9;
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(12, 43, 89, 0.3);
-            }
-
-            .btn-share {
-                background: #E8622D;
-                color: white;
-            }
-
-            .btn-share:hover {
-                background: #d5511a;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(232, 98, 45, 0.3);
+                box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
             }
 
             .btn-print {
-                background: #64748b;
+                background: #95a5a6;
                 color: white;
             }
 
             .btn-print:hover {
-                background: #475569;
+                background: #7f8c8d;
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+                box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+            }
+
+            .btn-download {
+                background: #e74c3c;
+                color: white;
+            }
+
+            .btn-download:hover {
+                background: #c0392b;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
             }
 
             /* Footer */
             .footer {
-                background: #0C2B59;
+                background: #2c3e50;
                 color: white;
-                padding: 25px 30px;
+                padding: 30px;
                 text-align: center;
             }
 
-            .footer-company {
-                font-size: 18px;
+            .footer-title {
+                font-size: 20px;
                 font-weight: 700;
-                margin-bottom: 8px;
+                margin-bottom: 15px;
             }
 
-            .footer-description {
-                font-size: 14px;
-                opacity: 0.9;
-                margin-bottom: 8px;
+            .footer-info {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 20px;
             }
 
-            .footer-contact {
+            .footer-item {
+                text-align: center;
+            }
+
+            .footer-label {
                 font-size: 12px;
                 opacity: 0.8;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .footer-value {
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            .footer-note {
+                font-size: 14px;
+                opacity: 0.9;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
             }
 
             /* Responsividade */
             @media (max-width: 768px) {
+                body {
+                    padding: 10px;
+                }
+
+                .content {
+                    padding: 20px;
+                }
+
+                .header {
+                    padding: 20px;
+                }
+
+                .company-name {
+                    font-size: 24px;
+                }
+
                 .cliente-grid {
                     grid-template-columns: 1fr;
                 }
 
-                .data-info {
-                    flex-direction: column;
-                    gap: 15px;
+                .datas-section {
+                    grid-template-columns: 1fr;
                 }
 
-                .button-group {
+                .action-buttons {
                     flex-direction: column;
                     align-items: center;
                 }
 
-                .share-buttons button {
+                .btn {
                     width: 100%;
                     max-width: 300px;
+                }
+
+                .itens-table {
+                    font-size: 12px;
+                }
+
+                .itens-table th,
+                .itens-table td {
+                    padding: 10px 8px;
                 }
             }
 
@@ -451,252 +497,240 @@ function gerarPDFSimples($orcamento) {
                     border-radius: 0;
                 }
 
-                .share-buttons {
+                .action-buttons {
                     display: none;
+                }
+
+                .header {
+                    background: #2c3e50 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+
+                .footer {
+                    background: #2c3e50 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
                 }
             }
         </style>
     </head>
     <body>
         <div class="container">
+            <!-- Header -->
             <div class="header">
-                <div class="header-content">';
-
-    if ($logoBase64) {
-        $html .= '<img src="' . $logoBase64 . '" alt="N.D CONNECT" style="width: 200px; height: 80px; margin-bottom: 15px;">';
-    } else {
-        $html .= '<div class="logo">N.D CONNECT</div>';
-    }
-
-    $html .= '
-                    <div class="company-subtitle">EQUIPAMENTOS PARA EVENTOS</div>
-                    <div class="orcamento-number">ORÇAMENTO Nº ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT) . '</div>
-                </div>
+                ' . ($logoBase64 ? '<img src="' . $logoBase64 . '" alt="N.D Connect Logo" class="logo">' : '') . '
+                <div class="company-name">N.D CONNECT</div>
+                <div class="company-tagline">Equipamentos para Eventos</div>
+                <div class="orcamento-number">ORÇAMENTO Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '</div>
             </div>
 
-            <div class="cliente-section">
-                <div class="section-title">DADOS DO CLIENTE</div>
-                <div class="cliente-grid">
-                    <div class="cliente-item">
-                        <div class="cliente-label">Nome</div>
-                        <div class="cliente-value">' . htmlspecialchars($orcamento['cliente_nome']) . '</div>
-                    </div>';
-
-    if (!empty($orcamento['email'])) {
-        $html .= '
-                    <div class="cliente-item">
-                        <div class="cliente-label">E-mail</div>
-                        <div class="cliente-value">' . htmlspecialchars($orcamento['email']) . '</div>
-                    </div>';
-    }
-
-    if (!empty($orcamento['telefone'])) {
-        $html .= '
-                    <div class="cliente-item">
-                        <div class="cliente-label">Telefone</div>
-                        <div class="cliente-value">' . htmlspecialchars($orcamento['telefone']) . '</div>
-                    </div>';
-    }
-
-    if (!empty($orcamento['endereco'])) {
-        $html .= '
-                    <div class="cliente-item">
-                        <div class="cliente-label">Endereço</div>
-                        <div class="cliente-value">' . htmlspecialchars($orcamento['endereco']) . '</div>
-                    </div>';
-    }
-
-    if (!empty($orcamento['cpf_cnpj'])) {
-        $html .= '
-                    <div class="cliente-item">
-                        <div class="cliente-label">CPF/CNPJ</div>
-                        <div class="cliente-value">' . htmlspecialchars($orcamento['cpf_cnpj']) . '</div>
-                    </div>';
-    }
-
-    $html .= '
-                </div>
-            </div>
-
-            <div class="data-info">
-                <div class="data-item">
-                    <div class="data-label">Data do Orçamento</div>
-                    <div class="data-value">' . date('d/m/Y', strtotime($orcamento['data_orcamento'])) . '</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Válido até</div>
-                    <div class="data-value">' . date('d/m/Y', strtotime($orcamento['data_validade'])) . '</div>
-                </div>
-            </div>
-
-            <div class="itens-section">
-                <div class="section-title">ITENS DO ORÇAMENTO</div>
-        <table class="itens-table">
-            <thead>
-                <tr>
-                    <th style="width: 50%;">PRODUTO</th>
-                    <th style="width: 10%;">QTD</th>
-                    <th style="width: 15%;">PREÇO UNIT.</th>
-                    <th style="width: 15%;">SUBTOTAL</th>
-                    <th style="width: 10%;">UNID.</th>
-                </tr>
-            </thead>
-            <tbody>';
-
-    foreach ($orcamento['itens'] as $item) {
-        $html .= '
-                <tr>
-                    <td class="produto-nome">' . htmlspecialchars($item['produto_nome']) . '</td>
-                    <td>' . $item['quantidade'] . '</td>
-                    <td>R$ ' . number_format($item['preco_unitario'], 2, ',', '.') . '</td>
-                    <td>R$ ' . number_format($item['subtotal'], 2, ',', '.') . '</td>
-                    <td>' . htmlspecialchars($item['unidade']) . '</td>
-                </tr>';
-    }
-
-    $html .= '
-            </tbody>
-        </table>
-
-            <div class="totais-section">
-                <div class="totais">
-                    <div class="total-line">
-                        <span class="total-label">SUBTOTAL</span>
-                        <span class="total-value">R$ ' . number_format($orcamento['subtotal'], 2, ',', '.') . '</span>
-                    </div>';
-
-    if ($orcamento['desconto'] > 0) {
-        $html .= '
-                    <div class="total-line">
-                        <span class="total-label">DESCONTO</span>
-                        <span class="total-value">- R$ ' . number_format($orcamento['desconto'], 2, ',', '.') . '</span>
-                    </div>';
-    }
-
-    $html .= '
-                    <div class="total-line total-final">
-                        <span class="total-label">TOTAL</span>
-                        <span class="total-value">R$ ' . number_format($orcamento['total'], 2, ',', '.') . '</span>
+            <!-- Conteúdo principal -->
+            <div class="content">
+                <!-- Informações do cliente -->
+                <div class="cliente-section">
+                    <div class="section-title">Dados do Cliente</div>
+                    <div class="cliente-grid">
+                        <div class="cliente-item">
+                            <div class="cliente-label">Nome</div>
+                            <div class="cliente-value">' . htmlspecialchars($cliente_nome) . '</div>
+                        </div>
+                        ' . (!empty($cliente_email) ? '
+                        <div class="cliente-item">
+                            <div class="cliente-label">E-mail</div>
+                            <div class="cliente-value">' . htmlspecialchars($cliente_email) . '</div>
+                        </div>
+                        ' : '') . '
+                        ' . (!empty($cliente_telefone) ? '
+                        <div class="cliente-item">
+                            <div class="cliente-label">Telefone</div>
+                            <div class="cliente-value">' . htmlspecialchars($cliente_telefone) . '</div>
+                        </div>
+                        ' : '') . '
+                        ' . (!empty($cliente_endereco) ? '
+                        <div class="cliente-item">
+                            <div class="cliente-label">Endereço</div>
+                            <div class="cliente-value">' . htmlspecialchars($cliente_endereco) . '</div>
+                        </div>
+                        ' : '') . '
+                        ' . (!empty($cliente_cpf_cnpj) ? '
+                        <div class="cliente-item">
+                            <div class="cliente-label">CPF/CNPJ</div>
+                            <div class="cliente-value">' . htmlspecialchars($cliente_cpf_cnpj) . '</div>
+                        </div>
+                        ' : '') . '
                     </div>
                 </div>
-            </div>';
 
-    if (!empty($orcamento['observacoes'])) {
-        $html .= '
-            <div class="observacoes">
-                <div class="section-title">OBSERVAÇÕES</div>
-                <div class="observacoes-content">
-                    <div class="observacoes-text">' . nl2br(htmlspecialchars($orcamento['observacoes'])) . '</div>
+                <!-- Datas -->
+                <div class="datas-section">
+                    <div class="data-item">
+                        <div class="data-label">Data do Orçamento</div>
+                        <div class="data-value">' . date('d/m/Y', strtotime($data_orcamento)) . '</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">Válido até</div>
+                        <div class="data-value">' . date('d/m/Y', strtotime($data_validade)) . '</div>
+                    </div>
                 </div>
-            </div>';
+
+                <!-- Itens do orçamento -->
+                <div class="itens-section">
+                    <div class="section-title">Itens do Orçamento</div>
+                    <table class="itens-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Quantidade</th>
+                                <th>Preço Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ';
+
+    foreach ($itens as $item) {
+        $produto_nome = isset($item['produto_nome']) ? $item['produto_nome'] : 'Produto não informado';
+        $categoria_nome = isset($item['categoria_nome']) ? $item['categoria_nome'] : '';
+        $quantidade = isset($item['quantidade']) ? $item['quantidade'] : 0;
+        $preco_unitario = isset($item['preco_unitario']) ? $item['preco_unitario'] : 0;
+        $subtotal_item = isset($item['subtotal']) ? $item['subtotal'] : 0;
+        $unidade = isset($item['unidade']) ? $item['unidade'] : 'un';
+
+        $html .= '
+                            <tr>
+                                <td>
+                                    <div class="produto-nome">' . htmlspecialchars($produto_nome) . '</div>
+                                    ' . (!empty($categoria_nome) ? '<div class="categoria">' . htmlspecialchars($categoria_nome) . '</div>' : '') . '
+                                </td>
+                                <td class="quantidade">' . $quantidade . ' ' . htmlspecialchars($unidade) . '</td>
+                                <td class="preco">R$ ' . number_format($preco_unitario, 2, ',', '.') . '</td>
+                                <td class="subtotal">R$ ' . number_format($subtotal_item, 2, ',', '.') . '</td>
+                            </tr>';
     }
 
     $html .= '
-        <div class="share-buttons">
-            <h3>📤 Compartilhar Orçamento</h3>
-            <p>Clique em WhatsApp para enviar direto para o cliente ou E-mail para enviar por e-mail</p>
-            <div class="button-group">
-                <button onclick="shareWhatsApp()" class="btn-whatsapp">📱 WhatsApp (Envio Direto)</button>
-                <button onclick="shareEmail()" class="btn-share">📧 E-mail (Envio Direto)</button>
-                <button onclick="downloadPDF()" class="btn-download">📄 Download PDF</button>
-                <button onclick="printPDF()" class="btn-print">🖨️ Imprimir</button>
-            </div>
-        </div>
+                        </tbody>
+                    </table>
+                </div>
 
-        <div class="footer">
-            <div><strong>N.D CONNECT - EQUIPAMENTOS PARA EVENTOS</strong></div>
-            <div>Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED</div>
-            <div>Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br</div>
+                <!-- Totais -->
+                <div class="totais-section">
+                    <div class="total-item">
+                        <span class="total-label">Subtotal</span>
+                        <span class="total-value">R$ ' . number_format($subtotal, 2, ',', '.') . '</span>
+                    </div>
+                    ' . ($desconto > 0 ? '
+                    <div class="total-item">
+                        <span class="total-label">Desconto</span>
+                        <span class="total-value">- R$ ' . number_format($desconto, 2, ',', '.') . '</span>
+                    </div>
+                    ' : '') . '
+                    <div class="total-item">
+                        <span class="total-label">Total</span>
+                        <span class="total-value">R$ ' . number_format($total, 2, ',', '.') . '</span>
+                    </div>
+                </div>
+
+                ' . (!empty($observacoes) ? '
+                <!-- Observações -->
+                <div class="observacoes-section">
+                    <div class="observacoes-title">Observações</div>
+                    <div class="observacoes-text">' . nl2br(htmlspecialchars($observacoes)) . '</div>
+                </div>
+                ' : '') . '
+
+                <!-- Botões de ação -->
+                <div class="action-buttons">
+                    <button class="btn btn-whatsapp" onclick="shareWhatsApp()">
+                        📱 WhatsApp
+                    </button>
+                    <button class="btn btn-email" onclick="shareEmail()">
+                        📧 E-mail
+                    </button>
+                    <button class="btn btn-print" onclick="printPDF()">
+                        🖨️ Imprimir
+                    </button>
+                    <button class="btn btn-download" onclick="downloadPDF()">
+                        💾 Baixar PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-title">N.D CONNECT</div>
+                <div class="footer-info">
+                    <div class="footer-item">
+                        <div class="footer-label">Telefone</div>
+                        <div class="footer-value">(11) 99999-9999</div>
+                    </div>
+                    <div class="footer-item">
+                        <div class="footer-label">E-mail</div>
+                        <div class="footer-value">contato@ndconnect.com.br</div>
+                    </div>
+                    <div class="footer-item">
+                        <div class="footer-label">Site</div>
+                        <div class="footer-value">www.ndconnect.com.br</div>
+                    </div>
+                </div>
+                <div class="footer-note">
+                    Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED<br>
+                    Sua parceira em eventos inesquecíveis
+                </div>
+            </div>
         </div>
 
         <script>
-        async function shareWhatsApp() {
+        function shareWhatsApp() {
             try {
-                // Gerar PDF e obter URL
-                const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $orcamento['id'] . '";
+                const orcamentoUrl = window.location.href;
+                const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $id . '";
 
-                // Criar mensagem formatada
-                const message = "🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*\\n\\nOlá ' . htmlspecialchars($orcamento['cliente_nome']) . '! 👋\\n\\nSegue o orçamento solicitado:\\n\\n📋 *Orçamento Nº ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT) . '*\\n💰 *Valor Total: R$ ' . number_format($orcamento['total'], 2, ',', '.') . '*\\n📅 *Válido até: ' . date('d/m/Y', strtotime($orcamento['data_validade'])) . '*\\n\\n📄 *Baixar PDF:* " + pdfUrl + "\\n\\n✨ *Agradecemos pela preferência!*\\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*";
+                const message = "🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*\\n\\nOlá ' . htmlspecialchars($cliente_nome) . '! 👋\\n\\nSegue o orçamento solicitado:\\n\\n📋 *Orçamento Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '*\\n💰 *Valor Total: R$ ' . number_format($total, 2, ',', '.') . '*\\n📅 *Válido até: ' . date('d/m/Y', strtotime($data_validade)) . '*\\n\\n📄 *Baixar PDF:* " + pdfUrl + "\\n\\n✨ *Agradecemos pela preferência!*\\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*";
 
-                // Verificar se tem telefone para envio direto
-                const telefone = "' . addslashes(htmlspecialchars($orcamento['cliente_telefone'] ?? '')) . '";
+                const telefone = "' . addslashes(htmlspecialchars($cliente_telefone)) . '";
                 let whatsappUrl;
 
-                if (telefone && telefone.trim() != "") {
-                    const numero = telefone.replace(/[^0-9]/g, "");
-                    if (numero.length === 10 || numero.length === 11) {
-                        const numeroWhatsApp = "+55" + numero;
-                        whatsappUrl = "https://wa.me/" + numeroWhatsApp + "?text=" + encodeURIComponent(message);
-                        console.log("Enviando para:", telefone, "->", numeroWhatsApp);
-                    } else {
-                        // Telefone inválido, usar fallback
-                        whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
-                        console.log("Telefone inválido, usando fallback");
-                    }
+                if (telefone) {
+                    // Limpar e formatar telefone
+                    const telefoneLimpo = telefone.replace(/[^0-9]/g, "");
+                    const telefoneFormatado = telefoneLimpo.startsWith("55") ? telefoneLimpo : "55" + telefoneLimpo;
+                    whatsappUrl = "https://wa.me/" + telefoneFormatado + "?text=" + encodeURIComponent(message);
                 } else {
-                    // Sem telefone, usar fallback
                     whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
-                    console.log("Sem telefone, usando fallback");
                 }
 
-                // Tentar usar Web Share API com arquivo se disponível
-                if (navigator.share && navigator.canShare) {
-                    try {
-                        // Tentar buscar o arquivo PDF
-                        const response = await fetch(pdfUrl);
-                        const blob = await response.blob();
-                        const file = new File([blob], "orcamento_' . strtolower(explode(' ', $orcamento['cliente_nome'])[0]) . '_' . $orcamento['id'] . '.pdf", { type: "application/pdf" });
-
-                        // Verificar se pode compartilhar arquivo
-                        if (navigator.canShare({ files: [file] })) {
-                            await navigator.share({
-                                title: "Orçamento N.D Connect",
-                                text: message,
-                                files: [file]
-                            });
-                            return;
-                        }
-                    } catch (e) {
-                        console.log("Não foi possível compartilhar arquivo, usando WhatsApp:", e);
-                    }
-                }
-
-                // Abrir WhatsApp com número específico ou fallback
                 window.open(whatsappUrl, "_blank");
 
             } catch (error) {
-                console.error("Erro ao compartilhar:", error);
-                alert("Erro ao compartilhar orçamento. Tente novamente.");
+                console.error("Erro ao compartilhar no WhatsApp:", error);
+                alert("Erro ao abrir WhatsApp. Tente novamente.");
             }
         }
 
         function downloadPDF() {
-            window.open("pdf_real.php?id=' . $orcamento['id'] . '", "_blank");
+            try {
+                window.open("pdf_real.php?id=' . $id . '", "_blank");
+            } catch (error) {
+                console.error("Erro ao baixar PDF:", error);
+                alert("Erro ao baixar PDF. Tente novamente.");
+            }
         }
 
         async function shareEmail() {
             try {
-                const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $orcamento['id'] . '";
                 const orcamentoUrl = window.location.href;
+                const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $id . '";
 
-                // Verificar se tem e-mail para envio direto
-                const email = "' . htmlspecialchars($orcamento['cliente_email'] ?? '') . '";
+                const email = "' . htmlspecialchars($cliente_email) . '";
                 let emailUrl;
 
-                if (email && email.trim() !== "") {
-                    // Validar e-mail
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (emailRegex.test(email)) {
-                        const assunto = "Orçamento N.D Connect - Nº ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT) . '";
-                        const corpo = "Olá ' . htmlspecialchars($orcamento['cliente_nome']) . '! 👋\n\nEsperamos que esteja bem! Segue em anexo o orçamento solicitado para seu evento.\n\n📋 *DETALHES DO ORÇAMENTO*\n• Número: ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT) . '\n• Valor Total: R$ ' . number_format($orcamento['total'], 2, ',', '.') . '\n• Válido até: ' . date('d/m/Y', strtotime($orcamento['data_validade'])) . '\n\n📄 *ARQUIVOS ANEXOS*\n• PDF para impressão: " + pdfUrl + "\n• Visualização online: " + orcamentoUrl + "\n\n✨ *Agradecemos pela preferência!*\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*\n\n---\nN.D CONNECT - EQUIPAMENTOS PARA EVENTOS\nEspecializada em palcos, geradores, efeitos, stands, som, luz e painéis LED\nContato: (11) 99999-9999 | Email: contato@ndconnect.com.br";
+                if (email) {
+                    const assunto = "Orçamento N.D Connect - Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '";
+                    const corpo = "Olá ' . htmlspecialchars($cliente_nome) . '! 👋\n\nEsperamos que esteja bem! Segue em anexo o orçamento solicitado para seu evento.\n\n📋 *DETALHES DO ORÇAMENTO*\n• Número: ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '\n• Valor Total: R$ ' . number_format($total, 2, ',', '.') . '\n• Válido até: ' . date('d/m/Y', strtotime($data_validade)) . '\n\n📄 *ARQUIVOS ANEXOS*\n• PDF para impressão: " + pdfUrl + "\n• Visualização online: " + orcamentoUrl + "\n\n✨ *Agradecemos pela preferência!*\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*\n\n---\nN.D CONNECT - EQUIPAMENTOS PARA EVENTOS\nEspecializada em palcos, geradores, efeitos, stands, som, luz e painéis LED\nContato: (11) 99999-9999 | Email: contato@ndconnect.com.br";
 
-                        emailUrl = "mailto:" + email + "?subject=" + encodeURIComponent(assunto) + "&body=" + encodeURIComponent(corpo);
-                        console.log("Enviando e-mail para:", email);
-                    } else {
-                        // E-mail inválido, usar fallback
-                        emailUrl = "mailto:?subject=" + encodeURIComponent("Orçamento N.D Connect") + "&body=" + encodeURIComponent("Segue o orçamento: " + pdfUrl);
-                        console.log("E-mail inválido, usando fallback");
-                    }
+                    emailUrl = "mailto:" + email + "?subject=" + encodeURIComponent(assunto) + "&body=" + encodeURIComponent(corpo);
                 } else {
                     // Sem e-mail, usar fallback
                     emailUrl = "mailto:?subject=" + encodeURIComponent("Orçamento N.D Connect") + "&body=" + encodeURIComponent("Segue o orçamento: " + pdfUrl);
@@ -708,11 +742,11 @@ function gerarPDFSimples($orcamento) {
                     try {
                         const response = await fetch(pdfUrl);
                         const blob = await response.blob();
-                        const file = new File([blob], "orcamento_' . strtolower(explode(' ', $orcamento['cliente_nome'])[0]) . '_' . $orcamento['id'] . '.pdf", { type: "application/pdf" });
+                        const file = new File([blob], "orcamento_' . strtolower(explode(' ', $cliente_nome)[0]) . '_' . $id . '.pdf", { type: "application/pdf" });
 
                         if (navigator.canShare({ files: [file] })) {
                             await navigator.share({
-                                title: "Orçamento N.D Connect - ' . $orcamento['numero_orcamento'] . '",
+                                title: "Orçamento N.D Connect - ' . $numero_orcamento . '",
                                 text: "Orçamento de equipamentos para eventos",
                                 files: [file]
                             });
@@ -745,9 +779,10 @@ function gerarPDFSimples($orcamento) {
 // Endpoint para gerar PDF
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $orcamentoController = new OrcamentoController();
-    $orcamento = $orcamentoController->getById($_GET['id']);
+    $response = $orcamentoController->getById($_GET['id']);
 
-    if ($orcamento) {
+    if ($response['success'] && $response['data']) {
+        $orcamento = $response['data'];
         $html = gerarPDFSimples($orcamento);
 
         // Configurar headers para impressão/PDF
@@ -755,7 +790,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
         echo $html;
     } else {
         http_response_code(404);
-        echo 'Orçamento não encontrado';
+        echo 'Orçamento não encontrado: ' . $response['message'];
     }
 } else {
     http_response_code(400);

@@ -163,13 +163,13 @@ class ProdutoController {
     public function create($data) {
         try {
             $query = "INSERT INTO " . $this->table_name . "
-                      (nome, descricao, preco_unitario, unidade, categoria_id, popularidade)
-                      VALUES (:nome, :descricao, :preco_unitario, :unidade, :categoria_id, :popularidade)";
+                      (nome, descricao, preco, unidade, categoria_id, popularidade)
+                      VALUES (:nome, :descricao, :preco, :unidade, :categoria_id, :popularidade)";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nome', $data['nome']);
             $stmt->bindParam(':descricao', $data['descricao']);
-            $stmt->bindParam(':preco_unitario', $data['preco_unitario']);
+            $stmt->bindParam(':preco', $data['preco_unitario']);
             $stmt->bindParam(':unidade', $data['unidade']);
             $stmt->bindParam(':categoria_id', $data['categoria_id']);
             $stmt->bindParam(':popularidade', $data['popularidade']);
@@ -192,7 +192,7 @@ class ProdutoController {
     public function update($id, $data) {
         try {
             $query = "UPDATE " . $this->table_name . "
-                      SET nome = :nome, descricao = :descricao, preco_unitario = :preco_unitario,
+                      SET nome = :nome, descricao = :descricao, preco = :preco,
                           unidade = :unidade, categoria_id = :categoria_id, popularidade = :popularidade
                       WHERE id = :id";
 
@@ -200,7 +200,7 @@ class ProdutoController {
             $stmt->bindParam(':id', $id);
             $stmt->bindParam(':nome', $data['nome']);
             $stmt->bindParam(':descricao', $data['descricao']);
-            $stmt->bindParam(':preco_unitario', $data['preco_unitario']);
+            $stmt->bindParam(':preco', $data['preco_unitario']);
             $stmt->bindParam(':unidade', $data['unidade']);
             $stmt->bindParam(':categoria_id', $data['categoria_id']);
             $stmt->bindParam(':popularidade', $data['popularidade']);

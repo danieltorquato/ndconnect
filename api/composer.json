@@ -1,6 +1,13 @@
 {
+    "name": "ndconnect/orcamento",
+    "description": "Sistema de Orçamentos N.D Connect",
+    "type": "project",
     "require": {
-        "mpdf/mpdf": "^6.1",
-        "tecnickcom/tcpdf": "^6.10"
+        "tecnickcom/tcpdf": "^6.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
     }
 }

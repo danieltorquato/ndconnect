@@ -53,3 +53,77 @@ ion-modal {
   --width: 90%;
   --max-width: 500px;
 }
+
+// ESTOQUE
+.estoque-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+
+  ion-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+.acoes-estoque {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+
+  ion-button {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    font-size: 12px;
+  }
+}
+
+.estoque-detalhes {
+  display: grid;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.estoque-item {
+  h3 {
+    font-size: 16px;
+    color: var(--ion-color-medium);
+    margin: 0 0 12px 0;
+  }
+
+  .quantidade-grande {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 16px 0;
+    text-align: center;
+
+    &.success {
+      color: var(--ion-color-success);
+    }
+
+    &.warning {
+      color: var(--ion-color-warning);
+    }
+
+    &.danger {
+      color: var(--ion-color-danger);
+    }
+  }
+
+  ion-item {
+    --background: var(--ion-color-light);
+    border-radius: 8px;
+  }
+}
+
+.btn-movimentar {
+  margin-top: 24px;
+}

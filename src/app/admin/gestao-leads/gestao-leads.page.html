@@ -1,0 +1,218 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestão de Leads</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="statusFiltro" (ionChange)="mudarFiltro($event)" scrollable>
+      <ion-segment-button value="todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="novo">
+        <ion-label>Novos</ion-label>
+        <ion-badge *ngIf="contadores.novos > 0" color="danger">{{ contadores.novos }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="contatado">
+        <ion-label>Contatados</ion-label>
+        <ion-badge *ngIf="contadores.contatados > 0">{{ contadores.contatados }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="qualificado">
+        <ion-label>Qualificados</ion-label>
+        <ion-badge *ngIf="contadores.qualificados > 0">{{ contadores.qualificados }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="convertido">
+        <ion-label>Convertidos</ion-label>
+        <ion-badge *ngIf="contadores.convertidos > 0" color="success">{{ contadores.convertidos }}</ion-badge>
+      </ion-segment-button>
+      <ion-segment-button value="perdido">
+        <ion-label>Perdidos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+
+    <ion-searchbar
+      [(ngModel)]="termoPesquisa"
+      (ionInput)="pesquisar()"
+      placeholder="Pesquisar por nome, email, telefone ou empresa..."
+      debounce="300">
+    </ion-searchbar>
+
+    <ion-card *ngIf="leadsFiltrados.length === 0" class="empty-state">
+      <ion-card-content>
+        <ion-icon name="person-add" color="medium"></ion-icon>
+        <p>Nenhum lead encontrado</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngFor="let lead of leadsFiltrados" class="lead-card">
+      <ion-card-header>
+        <div class="card-header-content">
+          <div>
+            <ion-card-title>{{ lead.nome }}</ion-card-title>
+            <p class="empresa" *ngIf="lead.empresa">{{ lead.empresa }}</p>
+          </div>
+          <ion-badge [color]="getStatusColor(lead.status)">
+            {{ getStatusLabel(lead.status) }}
+          </ion-badge>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="lead-info">
+          <div class="info-row" *ngIf="lead.telefone">
+            <ion-icon name="call"></ion-icon>
+            <span>{{ lead.telefone }}</span>
+          </div>
+          <div class="info-row" *ngIf="lead.email">
+            <ion-icon name="mail"></ion-icon>
+            <span>{{ lead.email }}</span>
+          </div>
+          <div class="info-row">
+            <ion-icon name="time"></ion-icon>
+            <span>{{ lead.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-row">
+            <ion-icon name="chatbubbles"></ion-icon>
+            <span class="origem-badge">{{ getOrigemLabel(lead.origem) }}</span>
+          </div>
+        </div>
+
+        <div class="mensagem-preview">
+          <p>{{ lead.mensagem.substring(0, 100) }}{{ lead.mensagem.length > 100 ? '...' : '' }}</p>
+        </div>
+
+        <div class="card-actions">
+          <ion-button fill="clear" size="small" (click)="verDetalhes(lead)">
+            <ion-icon name="chatbubbles" slot="start"></ion-icon>
+            Detalhes
+          </ion-button>
+
+          <ion-button fill="clear" size="small" color="success" (click)="ligarPara(lead.telefone)">
+            <ion-icon name="call" slot="start"></ion-icon>
+            Ligar
+          </ion-button>
+
+          <ion-button fill="clear" size="small" (click)="enviarWhatsApp(lead.telefone, lead.nome)">
+            <ion-icon name="chatbubbles" slot="start"></ion-icon>
+            WhatsApp
+          </ion-button>
+
+          <ion-button fill="clear" size="small" (click)="abrirModalAtualizar(lead)">
+            <ion-icon name="create" slot="start"></ion-icon>
+            Atualizar
+          </ion-button>
+
+          <ion-button
+            *ngIf="lead.status === 'qualificado'"
+            fill="clear"
+            size="small"
+            color="primary"
+            (click)="converterEmCliente(lead)">
+            <ion-icon name="swap-horizontal" slot="start"></ion-icon>
+            Converter
+          </ion-button>
+
+          <ion-button fill="clear" size="small" color="danger" (click)="excluirLead(lead, $event)">
+            <ion-icon name="trash" slot="start"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <!-- Modal de Detalhes -->
+  <ion-modal [isOpen]="modalDetalhesAberto" (didDismiss)="fecharModalDetalhes()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Detalhes do Lead</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalDetalhes()">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="leadSelecionado">
+        <ion-card>
+          <ion-card-content>
+            <h3>Informações do Lead</h3>
+            <p><strong>Nome:</strong> {{ leadSelecionado.nome }}</p>
+            <p *ngIf="leadSelecionado.empresa"><strong>Empresa:</strong> {{ leadSelecionado.empresa }}</p>
+            <p><strong>Telefone:</strong> {{ leadSelecionado.telefone }}</p>
+            <p *ngIf="leadSelecionado.email"><strong>E-mail:</strong> {{ leadSelecionado.email }}</p>
+            <p><strong>Origem:</strong> {{ getOrigemLabel(leadSelecionado.origem) }}</p>
+            <p><strong>Status:</strong> <ion-badge [color]="getStatusColor(leadSelecionado.status)">{{ getStatusLabel(leadSelecionado.status) }}</ion-badge></p>
+            <p><strong>Data:</strong> {{ leadSelecionado.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+
+            <h3>Mensagem</h3>
+            <p class="mensagem-completa">{{ leadSelecionado.mensagem }}</p>
+
+            <div *ngIf="leadSelecionado.observacoes">
+              <h3>Observações</h3>
+              <p>{{ leadSelecionado.observacoes }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal de Atualização -->
+  <ion-modal [isOpen]="modalAtualizarAberto" (didDismiss)="fecharModalAtualizar()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Atualizar Lead</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalAtualizar()">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="leadSelecionado">
+        <ion-card>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Status</ion-label>
+              <ion-select [(ngModel)]="novoStatus" placeholder="Selecione o status">
+                <ion-select-option value="novo">Novo</ion-select-option>
+                <ion-select-option value="contatado">Contatado</ion-select-option>
+                <ion-select-option value="qualificado">Qualificado</ion-select-option>
+                <ion-select-option value="convertido">Convertido</ion-select-option>
+                <ion-select-option value="perdido">Perdido</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Observações</ion-label>
+              <ion-textarea
+                [(ngModel)]="observacoes"
+                rows="5"
+                placeholder="Adicione observações sobre o contato com este lead...">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-button expand="block" (click)="atualizarLead()" [disabled]="!novoStatus">
+              Salvar
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

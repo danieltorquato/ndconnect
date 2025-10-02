@@ -1,0 +1,388 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Relatórios e Análises</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="abaAtiva" (ionChange)="mudarAba($event)">
+      <ion-segment-button value="dashboard">
+        <ion-label>Dashboard</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="vendas">
+        <ion-label>Vendas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="produtos">
+        <ion-label>Produtos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="clientes">
+        <ion-label>Clientes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="funil">
+        <ion-label>Funil</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="metas">
+        <ion-label>Metas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+
+    <!-- ABA DASHBOARD EXECUTIVO -->
+    <div *ngIf="abaAtiva === 'dashboard'" class="dashboard-executivo">
+      <h2>Dashboard Executivo</h2>
+
+      <div class="cards-resumo">
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <div class="card-icon">
+              <ion-icon name="cart"></ion-icon>
+            </div>
+            <div class="card-info">
+              <p class="card-label">Pedidos do Mês</p>
+              <h3 class="card-valor">{{ dashboardExecutivo.vendas_mes?.total_pedidos || 0 }}</h3>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <div class="card-icon success">
+              <ion-icon name="cash"></ion-icon>
+            </div>
+            <div class="card-info">
+              <p class="card-label">Faturamento</p>
+              <h3 class="card-valor">R$ {{ dashboardExecutivo.vendas_mes?.total_vendas || 0 | number:'1.2-2' }}</h3>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <div class="card-icon warning">
+              <ion-icon name="trending"></ion-icon>
+            </div>
+            <div class="card-info">
+              <p class="card-label">Ticket Médio</p>
+              <h3 class="card-valor">R$ {{ dashboardExecutivo.vendas_mes?.ticket_medio || 0 | number:'1.2-2' }}</h3>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <div class="card-icon" [ngClass]="getVariacaoColor(dashboardExecutivo.variacao_mes_anterior)">
+              <ion-icon [name]="getVariacaoIcon(dashboardExecutivo.variacao_mes_anterior)"></ion-icon>
+            </div>
+            <div class="card-info">
+              <p class="card-label">Variação Mensal</p>
+              <h3 class="card-valor">{{ dashboardExecutivo.variacao_mes_anterior || 0 | number:'1.1-1' }}%</h3>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <div class="dashboard-grid">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Top 5 Produtos</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let produto of dashboardExecutivo.top_produtos; let i = index">
+                <ion-badge slot="start" color="primary">{{ i + 1 }}º</ion-badge>
+                <ion-label>
+                  <h4>{{ produto.nome }}</h4>
+                  <p>{{ produto.total_vendido }} vendidos - R$ {{ produto.receita_total | number:'1.2-2' }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Top 5 Clientes</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let cliente of dashboardExecutivo.top_clientes; let i = index">
+                <ion-badge slot="start" color="success">{{ i + 1 }}º</ion-badge>
+                <ion-label>
+                  <h4>{{ cliente.nome }}</h4>
+                  <p>{{ cliente.total_pedidos }} pedidos - R$ {{ cliente.total_gasto | number:'1.2-2' }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- ABA VENDAS -->
+    <div *ngIf="abaAtiva === 'vendas'" class="vendas-relatorio">
+      <h2>Relatório de Vendas</h2>
+
+      <div class="filtros-periodo">
+        <ion-item>
+          <ion-label position="stacked">Data Início</ion-label>
+          <ion-input type="date" [(ngModel)]="periodoInicio"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Data Fim</ion-label>
+          <ion-input type="date" [(ngModel)]="periodoFim"></ion-input>
+        </ion-item>
+        <ion-button (click)="atualizarPeriodo()">Atualizar</ion-button>
+      </div>
+
+      <div class="cards-resumo">
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <p class="card-label">Total de Pedidos</p>
+            <h3 class="card-valor">{{ vendasPeriodo.resumo?.total_pedidos || 0 }}</h3>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <p class="card-label">Total de Vendas</p>
+            <h3 class="card-valor">R$ {{ vendasPeriodo.resumo?.total_vendas || 0 | number:'1.2-2' }}</h3>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="card-resumo">
+          <ion-card-content>
+            <p class="card-label">Ticket Médio</p>
+            <h3 class="card-valor">R$ {{ vendasPeriodo.resumo?.ticket_medio || 0 | number:'1.2-2' }}</h3>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <ion-card *ngIf="vendasPeriodo.vendas_por_dia?.length > 0">
+        <ion-card-header>
+          <ion-card-title>Vendas Diárias</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let venda of vendasPeriodo.vendas_por_dia">
+              <ion-label>
+                <h4>{{ venda.data | date:'dd/MM/yyyy' }}</h4>
+                <p>{{ venda.total_pedidos }} pedidos - Ticket: R$ {{ venda.ticket_medio | number:'1.2-2' }}</p>
+              </ion-label>
+              <ion-badge slot="end" color="success">R$ {{ venda.total_vendas | number:'1.2-2' }}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- ABA PRODUTOS -->
+    <div *ngIf="abaAtiva === 'produtos'" class="produtos-relatorio">
+      <h2>Análise de Produtos</h2>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Top 10 Produtos Mais Vendidos</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let produto of topProdutos; let i = index">
+              <ion-badge slot="start" color="primary">{{ i + 1 }}º</ion-badge>
+              <ion-label>
+                <h4>{{ produto.nome }}</h4>
+                <p>{{ produto.categoria_nome }} | {{ produto.total_pedidos }} pedidos</p>
+              </ion-label>
+              <div slot="end" class="produto-stats">
+                <p><strong>{{ produto.total_vendido }}</strong> vendidos</p>
+                <p class="receita">R$ {{ produto.receita_total | number:'1.2-2' }}</p>
+              </div>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Vendas por Categoria</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let categoria of produtosPorCategoria">
+              <ion-label>
+                <h4>{{ categoria.categoria }}</h4>
+                <p>{{ categoria.total_produtos }} produtos | {{ categoria.total_vendido || 0 }} vendidos</p>
+              </ion-label>
+              <ion-badge slot="end" color="success">R$ {{ categoria.receita_total || 0 | number:'1.2-2' }}</ion-badge>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- ABA CLIENTES -->
+    <div *ngIf="abaAtiva === 'clientes'" class="clientes-relatorio">
+      <h2>Top Clientes</h2>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>10 Melhores Clientes</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let cliente of topClientes; let i = index">
+              <ion-badge slot="start" [color]="i < 3 ? 'warning' : 'medium'">{{ i + 1 }}º</ion-badge>
+              <ion-label>
+                <h4>{{ cliente.nome }}</h4>
+                <p>{{ cliente.empresa || 'Pessoa Física' }} | {{ cliente.telefone }}</p>
+                <p class="info-extra">{{ cliente.total_pedidos }} pedidos | Ticket: R$ {{ cliente.ticket_medio | number:'1.2-2' }}</p>
+              </ion-label>
+              <div slot="end" class="cliente-valor">
+                <p class="total-gasto">R$ {{ cliente.total_gasto | number:'1.2-2' }}</p>
+              </div>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- ABA FUNIL -->
+    <div *ngIf="abaAtiva === 'funil'" class="funil-relatorio">
+      <h2>Funil de Vendas</h2>
+
+      <ion-card class="funil-card">
+        <ion-card-content>
+          <div class="funil-etapa">
+            <div class="etapa-header">
+              <ion-icon name="person"></ion-icon>
+              <h3>Leads</h3>
+            </div>
+            <div class="etapa-valor">{{ funilVendas.leads || 0 }}</div>
+          </div>
+
+          <div class="funil-seta">
+            <ion-icon name="trending"></ion-icon>
+            <span>{{ funilVendas.taxa_lead_orcamento || 0 }}%</span>
+          </div>
+
+          <div class="funil-etapa">
+            <div class="etapa-header">
+              <ion-icon name="stats-chart"></ion-icon>
+              <h3>Orçamentos</h3>
+            </div>
+            <div class="etapa-valor">{{ funilVendas.orcamentos || 0 }}</div>
+          </div>
+
+          <div class="funil-seta">
+            <ion-icon name="trending"></ion-icon>
+            <span>{{ funilVendas.taxa_orcamento_aprovacao || 0 }}%</span>
+          </div>
+
+          <div class="funil-etapa">
+            <div class="etapa-header">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <h3>Aprovados</h3>
+            </div>
+            <div class="etapa-valor">{{ funilVendas.orcamentos_aprovados || 0 }}</div>
+          </div>
+
+          <div class="funil-seta">
+            <ion-icon name="trending"></ion-icon>
+            <span>{{ funilVendas.taxa_aprovacao_pedido || 0 }}%</span>
+          </div>
+
+          <div class="funil-etapa">
+            <div class="etapa-header">
+              <ion-icon name="cart"></ion-icon>
+              <h3>Pedidos</h3>
+            </div>
+            <div class="etapa-valor">{{ funilVendas.pedidos || 0 }}</div>
+          </div>
+
+          <div class="funil-seta">
+            <ion-icon name="trending"></ion-icon>
+            <span>{{ funilVendas.taxa_pedido_entrega || 0 }}%</span>
+          </div>
+
+          <div class="funil-etapa success">
+            <div class="etapa-header">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <h3>Entregues</h3>
+            </div>
+            <div class="etapa-valor">{{ funilVendas.pedidos_entregues || 0 }}</div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- ABA METAS -->
+    <div *ngIf="abaAtiva === 'metas'" class="metas-relatorio">
+      <h2>Metas vs Realizado</h2>
+
+      <div class="filtros-metas">
+        <ion-item>
+          <ion-label position="stacked">Mês</ion-label>
+          <ion-select [(ngModel)]="mesRelatorio">
+            <ion-select-option [value]="1">Janeiro</ion-select-option>
+            <ion-select-option [value]="2">Fevereiro</ion-select-option>
+            <ion-select-option [value]="3">Março</ion-select-option>
+            <ion-select-option [value]="4">Abril</ion-select-option>
+            <ion-select-option [value]="5">Maio</ion-select-option>
+            <ion-select-option [value]="6">Junho</ion-select-option>
+            <ion-select-option [value]="7">Julho</ion-select-option>
+            <ion-select-option [value]="8">Agosto</ion-select-option>
+            <ion-select-option [value]="9">Setembro</ion-select-option>
+            <ion-select-option [value]="10">Outubro</ion-select-option>
+            <ion-select-option [value]="11">Novembro</ion-select-option>
+            <ion-select-option [value]="12">Dezembro</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Ano</ion-label>
+          <ion-input type="number" [(ngModel)]="anoRelatorio"></ion-input>
+        </ion-item>
+        <ion-button (click)="atualizarMetas()">Atualizar</ion-button>
+      </div>
+
+      <ion-card *ngFor="let meta of metasVsRealizado">
+        <ion-card-content>
+          <div class="meta-header">
+            <h3>{{ meta.usuario }}</h3>
+            <ion-badge [color]="meta.percentual >= 100 ? 'success' : meta.percentual >= 70 ? 'warning' : 'danger'">
+              {{ meta.percentual }}%
+            </ion-badge>
+          </div>
+
+          <div class="meta-valores">
+            <div class="meta-item">
+              <p>Meta</p>
+              <h4>R$ {{ meta.meta | number:'1.2-2' }}</h4>
+            </div>
+            <div class="meta-item">
+              <p>Realizado</p>
+              <h4>R$ {{ meta.realizado | number:'1.2-2' }}</h4>
+            </div>
+            <div class="meta-item">
+              <p>Pedidos</p>
+              <h4>{{ meta.total_pedidos }}</h4>
+            </div>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="meta.percentual > 100 ? 100 : meta.percentual"
+                 [ngClass]="meta.percentual >= 100 ? 'success' : meta.percentual >= 70 ? 'warning' : 'danger'">
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+  </div>
+</ion-content>
+

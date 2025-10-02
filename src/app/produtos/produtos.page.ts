@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { home, add, trash, close, save } from 'ionicons/icons';
+import { home, add, trash, close, save, cube, swapHorizontal, alertCircle, checkmarkCircle } from 'ionicons/icons';
 import {
   IonHeader,
   IonToolbar,
@@ -22,7 +22,9 @@ import {
   IonList,
   IonModal,
   IonButtons,
-  IonTextarea
+  IonTextarea,
+  IonBadge,
+  AlertController
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -68,6 +70,7 @@ interface Categoria {
     IonModal,
     IonButtons,
     IonTextarea,
+    IonBadge,
     CommonModule,
     FormsModule
   ]
@@ -90,23 +93,48 @@ export class ProdutosPage implements OnInit {
     popularidade: 0
   };
 
+  // ESTOQUE
+  estoqueAtual: Map<number, any> = new Map();
+  alertasEstoque: any[] = [];
+  modalEstoqueAberto: boolean = false;
+  modalMovimentacaoAberto: boolean = false;
+  produtoSelecionadoEstoque: any = null;
+
+  movimentacaoForm = {
+    tipo: 'entrada',
+    quantidade: 0,
+    observacoes: ''
+  };
+
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private alertController: AlertController
   ) {
-    addIcons({ home, add, trash, close, save });
+    addIcons({ home, add, trash, close, save, cube, swapHorizontal, alertCircle, checkmarkCircle });
   }
 
   ngOnInit() {
     this.carregarProdutos();
     this.carregarCategorias();
+    this.carregarEstoqueAtual();
+    this.carregarAlertasEstoque();
   }
 
   carregarProdutos() {
-    this.http.get<any[]>('http://localhost:8000/api/produtos').subscribe(
-      (data) => {
-        this.produtos = data;
-        this.produtosFiltrados = data;
+    this.http.get<any>('http://localhost:8000/produtos').subscribe(
+      (response) => {
+        if (response.success) {
+          // Mapear preco para preco_unitario para compatibilidade com a interface
+          this.produtos = response.data.map((produto: any) => ({
+            ...produto,
+            preco_unitario: produto.preco
+          }));
+          this.produtosFiltrados = this.produtos;
+        } else {
+          console.error('Erro na resposta da API:', response.message);
+          this.mostrarNotificacao('Erro ao carregar produtos: ' + response.message, 'danger');
+        }
       },
       (error) => {
         console.error('Erro ao carregar produtos:', error);
@@ -116,9 +144,13 @@ export class ProdutosPage implements OnInit {
   }
 
   carregarCategorias() {
-    this.http.get<any[]>('http://localhost:8000/api/categorias').subscribe(
-      (data) => {
-        this.categorias = data;
+    this.http.get<any>('http://localhost:8000/categorias').subscribe(
+      (response) => {
+        if (response.success) {
+          this.categorias = response.data;
+        } else {
+          console.error('Erro na resposta da API:', response.message);
+        }
       },
       (error) => {
         console.error('Erro ao carregar categorias:', error);
@@ -188,8 +220,8 @@ export class ProdutosPage implements OnInit {
     }
 
     const url = this.produtoEditando.id
-      ? `http://localhost:8000/api/produtos/${this.produtoEditando.id}`
-      : 'http://localhost:8000/api/produtos';
+      ? `http://localhost:8000/produtos/${this.produtoEditando.id}`
+      : 'http://localhost:8000/produtos';
 
     const method = this.produtoEditando.id ? 'PUT' : 'POST';
 
@@ -217,7 +249,7 @@ export class ProdutosPage implements OnInit {
     if (!produtoId) return;
 
     if (confirm('Tem certeza que deseja excluir este produto?')) {
-      this.http.delete(`http://localhost:8000/api/produtos/${produtoId}`).subscribe(
+      this.http.delete(`http://localhost:8000/produtos/${produtoId}`).subscribe(
         (response) => {
           this.mostrarNotificacao('Produto excluído!', 'success');
           this.carregarProdutos();
@@ -236,6 +268,167 @@ export class ProdutosPage implements OnInit {
   }
 
   voltarHome() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/painel']);
+  }
+
+  // ============================================
+  // MÉTODOS DE ESTOQUE
+  // ============================================
+
+  carregarEstoqueAtual() {
+    this.http.get<any>('http://localhost:8000/estoque').subscribe({
+      next: (response) => {
+        if (response.success) {
+          response.data.forEach((item: any) => {
+            this.estoqueAtual.set(item.produto_id, item);
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar estoque:', error);
+      }
+    });
+  }
+
+  carregarAlertasEstoque() {
+    this.http.get<any>('http://localhost:8000/estoque/alertas').subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.alertasEstoque = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar alertas:', error);
+      }
+    });
+  }
+
+  getEstoqueProduto(produtoId: number | undefined): any {
+    if (!produtoId) {
+      return {
+        quantidade_disponivel: 0,
+        quantidade_reservada: 0,
+        quantidade_minima: 0
+      };
+    }
+
+    return this.estoqueAtual.get(produtoId) || {
+      quantidade_disponivel: 0,
+      quantidade_reservada: 0,
+      quantidade_minima: 0
+    };
+  }
+
+  temEstoqueBaixo(produtoId: number | undefined): boolean {
+    if (!produtoId) return false;
+
+    const estoque = this.getEstoqueProduto(produtoId);
+    return estoque.quantidade_minima > 0 &&
+           estoque.quantidade_disponivel <= estoque.quantidade_minima;
+  }
+
+  abrirModalEstoque(produto: Produto) {
+    if (!produto.id) return;
+
+    this.produtoSelecionadoEstoque = { ...produto };
+
+    this.http.get<any>(`http://localhost:8000/estoque/produto/${produto.id}`).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.produtoSelecionadoEstoque.estoque = response.data;
+          this.modalEstoqueAberto = true;
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar estoque do produto:', error);
+        this.mostrarNotificacao('Erro ao carregar estoque', 'danger');
+      }
+    });
+  }
+
+  fecharModalEstoque() {
+    this.modalEstoqueAberto = false;
+    this.produtoSelecionadoEstoque = null;
+  }
+
+  async atualizarEstoqueMinimo() {
+    if (!this.produtoSelecionadoEstoque?.id) return;
+
+    const quantidade_minima = this.produtoSelecionadoEstoque.estoque?.quantidade_minima || 0;
+
+    this.http.put<any>(
+      `http://localhost:8000/estoque/produto/${this.produtoSelecionadoEstoque.id}/estoque-minimo`,
+      { quantidade_minima }
+    ).subscribe({
+      next: async (response) => {
+        if (response.success) {
+          this.mostrarNotificacao('Estoque mínimo atualizado!', 'success');
+          this.carregarEstoqueAtual();
+          this.carregarAlertasEstoque();
+        } else {
+          this.mostrarNotificacao('Erro ao atualizar', 'danger');
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar estoque mínimo:', error);
+        this.mostrarNotificacao('Erro ao atualizar', 'danger');
+      }
+    });
+  }
+
+  abrirModalMovimentacao(produto: Produto) {
+    this.produtoSelecionadoEstoque = { ...produto };
+    this.movimentacaoForm = {
+      tipo: 'entrada',
+      quantidade: 0,
+      observacoes: ''
+    };
+    this.modalMovimentacaoAberto = true;
+  }
+
+  fecharModalMovimentacao() {
+    this.modalMovimentacaoAberto = false;
+    this.produtoSelecionadoEstoque = null;
+    this.movimentacaoForm = {
+      tipo: 'entrada',
+      quantidade: 0,
+      observacoes: ''
+    };
+  }
+
+  async registrarMovimentacao() {
+    if (!this.produtoSelecionadoEstoque?.id) return;
+
+    if (this.movimentacaoForm.quantidade <= 0) {
+      this.mostrarNotificacao('Quantidade deve ser maior que zero', 'warning');
+      return;
+    }
+
+    const dados = {
+      produto_id: this.produtoSelecionadoEstoque.id,
+      tipo: this.movimentacaoForm.tipo,
+      quantidade: this.movimentacaoForm.quantidade,
+      observacoes: this.movimentacaoForm.observacoes,
+      pedido_id: null,
+      usuario: 'admin'
+    };
+
+    this.http.post<any>('http://localhost:8000/estoque/movimentacoes', dados).subscribe({
+      next: async (response) => {
+        if (response.success) {
+          this.mostrarNotificacao('Movimentação registrada!', 'success');
+          this.fecharModalMovimentacao();
+          this.carregarProdutos();
+          this.carregarEstoqueAtual();
+          this.carregarAlertasEstoque();
+        } else {
+          this.mostrarNotificacao('Erro: ' + response.message, 'danger');
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao registrar movimentação:', error);
+        this.mostrarNotificacao('Erro ao registrar movimentação', 'danger');
+      }
+    });
   }
 }

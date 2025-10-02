@@ -1,0 +1,403 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Módulo Financeiro</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="abaAtiva" (ionChange)="mudarAba($event)">
+      <ion-segment-button value="dashboard">
+        <ion-label>Dashboard</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="receber">
+        <ion-label>A Receber</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="pagar">
+        <ion-label>A Pagar</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="fluxo">
+        <ion-label>Fluxo de Caixa</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+
+    <!-- ABA DASHBOARD -->
+    <div *ngIf="abaAtiva === 'dashboard'" class="dashboard">
+      <h2>Dashboard Financeiro</h2>
+
+      <div class="metricas-grid">
+        <ion-card class="metrica-card success">
+          <ion-card-content>
+            <ion-icon name="trending-up"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.receber_pendente.toFixed(2) }}</h3>
+            <p>A Receber (Pendente)</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="metrica-card danger">
+          <ion-card-content>
+            <ion-icon name="close-circle"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.receber_vencido.toFixed(2) }}</h3>
+            <p>A Receber (Vencido)</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="metrica-card warning">
+          <ion-card-content>
+            <ion-icon name="trending-down"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.pagar_pendente.toFixed(2) }}</h3>
+            <p>A Pagar (Pendente)</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="metrica-card danger">
+          <ion-card-content>
+            <ion-icon name="close-circle"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.pagar_vencido.toFixed(2) }}</h3>
+            <p>A Pagar (Vencido)</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <h3 class="section-title">Resumo do Mês</h3>
+      <div class="metricas-grid">
+        <ion-card class="metrica-card success">
+          <ion-card-content>
+            <ion-icon name="cash"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.entradas_mes.toFixed(2) }}</h3>
+            <p>Entradas do Mês</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="metrica-card danger">
+          <ion-card-content>
+            <ion-icon name="card"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.saidas_mes.toFixed(2) }}</h3>
+            <p>Saídas do Mês</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="metrica-card" [ngClass]="dashboardFinanceiro.saldo_mes >= 0 ? 'success' : 'danger'">
+          <ion-card-content>
+            <ion-icon name="wallet"></ion-icon>
+            <h3>R$ {{ dashboardFinanceiro.saldo_mes.toFixed(2) }}</h3>
+            <p>Saldo do Mês</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- ABA CONTAS A RECEBER -->
+    <div *ngIf="abaAtiva === 'receber'">
+      <div class="section-header">
+        <h2>Contas a Receber</h2>
+      </div>
+
+      <ion-segment [(ngModel)]="statusReceberFiltro" (ionChange)="filtrarContasReceber($event)">
+        <ion-segment-button value="todos">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pendente">
+          <ion-label>Pendentes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pago">
+          <ion-label>Pagos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="atrasado">
+          <ion-label>Atrasados</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <div class="contas-lista">
+        <ion-card *ngFor="let conta of contasReceberFiltradas">
+          <ion-card-header>
+            <div class="card-header-content">
+              <div>
+                <ion-card-title>{{ conta.descricao }}</ion-card-title>
+                <p class="cliente">{{ conta.cliente_nome }}</p>
+              </div>
+              <ion-badge [color]="getStatusColor(conta.status)">
+                {{ getStatusLabel(conta.status) }}
+              </ion-badge>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="conta-info">
+              <div class="info-item">
+                <ion-icon name="cash"></ion-icon>
+                <span>R$ {{ conta.valor.toFixed(2) }}</span>
+              </div>
+              <div class="info-item">
+                <ion-icon name="calendar"></ion-icon>
+                <span>Vencimento: {{ conta.data_vencimento | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="info-item" *ngIf="conta.forma_pagamento">
+                <ion-icon name="card"></ion-icon>
+                <span>{{ conta.forma_pagamento }}</span>
+              </div>
+            </div>
+
+            <div class="acoes" *ngIf="conta.status !== 'pago'">
+              <ion-button fill="clear" size="small" color="success" (click)="abrirModalPagamentoReceber(conta)">
+                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                Registrar Pagamento
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="no-results" *ngIf="contasReceberFiltradas.length === 0">
+          <ion-icon name="document-text"></ion-icon>
+          <p>Nenhuma conta encontrada</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA CONTAS A PAGAR -->
+    <div *ngIf="abaAtiva === 'pagar'">
+      <div class="section-header">
+        <h2>Contas a Pagar</h2>
+      </div>
+
+      <ion-segment [(ngModel)]="statusPagarFiltro" (ionChange)="mudarFiltroPagar($event)">
+        <ion-segment-button value="todos">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pendente">
+          <ion-label>Pendentes</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="pago">
+          <ion-label>Pagos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="atrasado">
+          <ion-label>Atrasados</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <div class="contas-lista">
+        <ion-card *ngFor="let conta of contasPagarFiltradas">
+          <ion-card-header>
+            <div class="card-header-content">
+              <div>
+                <ion-card-title>{{ conta.descricao }}</ion-card-title>
+                <p class="cliente">{{ conta.fornecedor }}</p>
+              </div>
+              <ion-badge [color]="getStatusColor(conta.status)">
+                {{ getStatusLabel(conta.status) }}
+              </ion-badge>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="conta-info">
+              <div class="info-item">
+                <ion-icon name="cash"></ion-icon>
+                <span>R$ {{ conta.valor.toFixed(2) }}</span>
+              </div>
+              <div class="info-item">
+                <ion-icon name="calendar"></ion-icon>
+                <span>Vencimento: {{ conta.data_vencimento | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="info-item">
+                <ion-badge color="medium">{{ conta.categoria }}</ion-badge>
+              </div>
+            </div>
+
+            <div class="acoes" *ngIf="conta.status !== 'pago'">
+              <ion-button fill="clear" size="small" color="success" (click)="abrirModalPagamentoPagar(conta)">
+                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                Registrar Pagamento
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="no-results" *ngIf="contasPagarFiltradas.length === 0">
+          <ion-icon name="document-text"></ion-icon>
+          <p>Nenhuma conta encontrada</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA FLUXO DE CAIXA -->
+    <div *ngIf="abaAtiva === 'fluxo'">
+      <div class="section-header">
+        <h2>Fluxo de Caixa</h2>
+      </div>
+
+      <ion-card>
+        <ion-card-content>
+          <div class="periodo-selector">
+            <ion-item>
+              <ion-label>Período Início:</ion-label>
+              <ion-input type="date" [(ngModel)]="periodoInicio" (ionChange)="atualizarPeriodo()"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label>Período Fim:</ion-label>
+              <ion-input type="date" [(ngModel)]="periodoFim" (ionChange)="atualizarPeriodo()"></ion-input>
+            </ion-item>
+          </div>
+
+          <div class="resumo-fluxo">
+            <div class="resumo-item success">
+              <ion-icon name="trending-up"></ion-icon>
+              <div>
+                <p>Total Entradas</p>
+                <h3>R$ {{ fluxoCaixa.total_entradas.toFixed(2) }}</h3>
+              </div>
+            </div>
+            <div class="resumo-item danger">
+              <ion-icon name="trending-down"></ion-icon>
+              <div>
+                <p>Total Saídas</p>
+                <h3>R$ {{ fluxoCaixa.total_saidas.toFixed(2) }}</h3>
+              </div>
+            </div>
+            <div class="resumo-item" [ngClass]="fluxoCaixa.saldo >= 0 ? 'success' : 'danger'">
+              <ion-icon name="wallet"></ion-icon>
+              <div>
+                <p>Saldo</p>
+                <h3>R$ {{ fluxoCaixa.saldo.toFixed(2) }}</h3>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <h3 class="section-title">Movimentações</h3>
+      <div class="movimentacoes-lista">
+        <ion-card *ngFor="let mov of fluxoCaixa.movimentacoes">
+          <ion-card-content>
+            <div class="movimentacao-item">
+              <ion-icon [name]="getTipoIcon(mov.tipo)" [color]="getTipoColor(mov.tipo)"></ion-icon>
+              <div class="mov-info">
+                <h4>{{ mov.descricao }}</h4>
+                <p>{{ mov.categoria }} - {{ mov.data_movimento | date:'dd/MM/yyyy' }}</p>
+              </div>
+              <div class="mov-valor" [ngClass]="mov.tipo">
+                <strong>{{ mov.tipo === 'entrada' ? '+' : '-' }} R$ {{ mov.valor.toFixed(2) }}</strong>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="no-results" *ngIf="fluxoCaixa.movimentacoes.length === 0">
+          <ion-icon name="stats-chart"></ion-icon>
+          <p>Nenhuma movimentação no período</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL PAGAMENTO RECEBER -->
+    <ion-modal [isOpen]="modalPagamentoReceberAberto" (didDismiss)="fecharModalPagamentoReceber()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Registrar Recebimento</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalPagamentoReceber()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding" *ngIf="contaSelecionada">
+          <ion-card>
+            <ion-card-content>
+              <h3>{{ contaSelecionada.descricao }}</h3>
+              <p>Cliente: {{ contaSelecionada.cliente_nome }}</p>
+              <p>Valor: R$ {{ contaSelecionada.valor.toFixed(2) }}</p>
+
+              <ion-item>
+                <ion-label position="stacked">Data do Pagamento</ion-label>
+                <ion-input type="date" [(ngModel)]="pagamentoForm.data_pagamento"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Valor Pago</ion-label>
+                <ion-input type="number" [(ngModel)]="pagamentoForm.valor_pago"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Forma de Pagamento</ion-label>
+                <ion-select [(ngModel)]="pagamentoForm.forma_pagamento">
+                  <ion-select-option value="Dinheiro">Dinheiro</ion-select-option>
+                  <ion-select-option value="PIX">PIX</ion-select-option>
+                  <ion-select-option value="Cartão">Cartão</ion-select-option>
+                  <ion-select-option value="Transferência">Transferência</ion-select-option>
+                  <ion-select-option value="Boleto">Boleto</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-button expand="block" (click)="registrarPagamentoReceber()" color="success">
+                Confirmar Recebimento
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- MODAL PAGAMENTO PAGAR -->
+    <ion-modal [isOpen]="modalPagamentoPagarAberto" (didDismiss)="fecharModalPagamentoPagar()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Registrar Pagamento</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalPagamentoPagar()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding" *ngIf="contaSelecionada">
+          <ion-card>
+            <ion-card-content>
+              <h3>{{ contaSelecionada.descricao }}</h3>
+              <p>Fornecedor: {{ contaSelecionada.fornecedor }}</p>
+              <p>Valor: R$ {{ contaSelecionada.valor.toFixed(2) }}</p>
+
+              <ion-item>
+                <ion-label position="stacked">Data do Pagamento</ion-label>
+                <ion-input type="date" [(ngModel)]="pagamentoForm.data_pagamento"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Valor Pago</ion-label>
+                <ion-input type="number" [(ngModel)]="pagamentoForm.valor_pago"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Forma de Pagamento</ion-label>
+                <ion-select [(ngModel)]="pagamentoForm.forma_pagamento">
+                  <ion-select-option value="Dinheiro">Dinheiro</ion-select-option>
+                  <ion-select-option value="PIX">PIX</ion-select-option>
+                  <ion-select-option value="Cartão">Cartão</ion-select-option>
+                  <ion-select-option value="Transferência">Transferência</ion-select-option>
+                  <ion-select-option value="Boleto">Boleto</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-button expand="block" (click)="registrarPagamentoPagar()" color="danger">
+                Confirmar Pagamento
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>
+</ion-content>
+

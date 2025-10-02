@@ -1,0 +1,318 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Agenda de Eventos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalCadastro()">
+        <ion-icon name="add"></ion-icon>
+        Novo Evento
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="statusFiltro" (ionChange)="mudarFiltro($event)">
+      <ion-segment-button value="todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="agendado">
+        <ion-label>Agendados ({{contadores.agendados}})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="confirmado">
+        <ion-label>Confirmados ({{contadores.confirmados}})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="em_andamento">
+        <ion-label>Em Andamento ({{contadores.em_andamento}})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="concluido">
+        <ion-label>Concluídos ({{contadores.concluidos}})</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <ion-searchbar [(ngModel)]="termoPesquisa" (ionInput)="pesquisar()" placeholder="Buscar por nome, cliente ou local..."></ion-searchbar>
+
+    <div class="eventos-lista">
+      <ion-card *ngFor="let evento of eventosFiltrados" (click)="verDetalhes(evento)">
+        <ion-card-header>
+          <div class="card-header-content">
+            <div>
+              <ion-card-title>{{ evento.nome_evento }}</ion-card-title>
+              <p class="cliente">{{ evento.cliente_nome }}</p>
+            </div>
+            <ion-badge [color]="getStatusColor(evento.status)">
+              {{ getStatusLabel(evento.status) }}
+            </ion-badge>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="evento-info">
+            <div class="info-item">
+              <ion-icon name="calendar"></ion-icon>
+              <span>{{ evento.data_evento | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="info-item">
+              <ion-icon name="time"></ion-icon>
+              <span>{{ evento.hora_inicio }} - {{ evento.hora_fim }}</span>
+            </div>
+            <div class="info-item">
+              <ion-icon name="location"></ion-icon>
+              <span>{{ evento.local_evento }}</span>
+            </div>
+            <div class="info-item" *ngIf="evento.tipo_evento">
+              <ion-badge color="medium">{{ evento.tipo_evento }}</ion-badge>
+            </div>
+            <div class="info-item" *ngIf="evento.numero_participantes">
+              <ion-icon name="person"></ion-icon>
+              <span>{{ evento.numero_participantes }} pessoas</span>
+            </div>
+            <div class="info-item" *ngIf="evento.total_equipamentos">
+              <ion-icon name="cube"></ion-icon>
+              <span>{{ evento.total_equipamentos }} equipamentos</span>
+            </div>
+          </div>
+
+          <div class="acoes">
+            <ion-button fill="clear" size="small" (click)="abrirModalStatus(evento); $event.stopPropagation()">
+              <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+              Atualizar Status
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="abrirModalCadastro(evento); $event.stopPropagation()">
+              <ion-icon name="create" slot="start"></ion-icon>
+              Editar
+            </ion-button>
+            <ion-button fill="clear" size="small" color="danger" (click)="excluirEvento(evento, $event)">
+              <ion-icon name="trash" slot="start"></ion-icon>
+              Excluir
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="no-results" *ngIf="eventosFiltrados.length === 0">
+        <ion-icon name="calendar"></ion-icon>
+        <p>Nenhum evento encontrado</p>
+      </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <ion-modal [isOpen]="modalDetalhesAberto" (didDismiss)="fecharModalDetalhes()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Detalhes do Evento</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalDetalhes()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding" *ngIf="eventoSelecionado">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ eventoSelecionado.nome_evento }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                <ion-item>
+                  <ion-label>Cliente:</ion-label>
+                  <ion-label slot="end">{{ eventoSelecionado.cliente_nome }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Data:</ion-label>
+                  <ion-label slot="end">{{ eventoSelecionado.data_evento | date:'dd/MM/yyyy' }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Horário:</ion-label>
+                  <ion-label slot="end">{{ eventoSelecionado.hora_inicio }} - {{ eventoSelecionado.hora_fim }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Local:</ion-label>
+                  <ion-label slot="end">{{ eventoSelecionado.local_evento }}</ion-label>
+                </ion-item>
+                <ion-item *ngIf="eventoSelecionado.endereco">
+                  <ion-label>Endereço:</ion-label>
+                  <ion-label slot="end">{{ eventoSelecionado.endereco }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Tipo:</ion-label>
+                  <ion-badge slot="end" color="medium">{{ eventoSelecionado.tipo_evento }}</ion-badge>
+                </ion-item>
+                <ion-item *ngIf="eventoSelecionado.numero_participantes">
+                  <ion-label>Participantes:</ion-label>
+                  <ion-label slot="end">{{ eventoSelecionado.numero_participantes }}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-label>Status:</ion-label>
+                  <ion-badge slot="end" [color]="getStatusColor(eventoSelecionado.status)">
+                    {{ getStatusLabel(eventoSelecionado.status) }}
+                  </ion-badge>
+                </ion-item>
+              </ion-list>
+
+              <h3 class="section-title" *ngIf="eventoSelecionado.equipamentos?.length > 0">Equipamentos</h3>
+              <ion-list *ngIf="eventoSelecionado.equipamentos?.length > 0">
+                <ion-item *ngFor="let equip of eventoSelecionado.equipamentos">
+                  <ion-label>
+                    <h4>{{ equip.produto_nome }}</h4>
+                    <p>Quantidade: {{ equip.quantidade }} {{ equip.unidade }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Modal de Cadastro/Edição -->
+    <ion-modal [isOpen]="modalCadastroAberto" (didDismiss)="fecharModalCadastro()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>{{ eventoForm.id ? 'Editar Evento' : 'Novo Evento' }}</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalCadastro()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-content>
+              <ion-item>
+                <ion-label position="stacked">Nome do Evento *</ion-label>
+                <ion-input [(ngModel)]="eventoForm.nome_evento" placeholder="Ex: Show Banda X"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Data do Evento *</ion-label>
+                <ion-input type="date" [(ngModel)]="eventoForm.data_evento"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Hora Início</ion-label>
+                <ion-input type="time" [(ngModel)]="eventoForm.hora_inicio"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Hora Fim</ion-label>
+                <ion-input type="time" [(ngModel)]="eventoForm.hora_fim"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Local do Evento</ion-label>
+                <ion-input [(ngModel)]="eventoForm.local_evento" placeholder="Ex: Arena Central"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Endereço</ion-label>
+                <ion-input [(ngModel)]="eventoForm.endereco" placeholder="Rua, número"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Cidade</ion-label>
+                <ion-input [(ngModel)]="eventoForm.cidade"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Estado</ion-label>
+                <ion-input [(ngModel)]="eventoForm.estado" maxlength="2"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Tipo de Evento</ion-label>
+                <ion-select [(ngModel)]="eventoForm.tipo_evento">
+                  <ion-select-option value="Show">Show</ion-select-option>
+                  <ion-select-option value="Casamento">Casamento</ion-select-option>
+                  <ion-select-option value="Corporativo">Corporativo</ion-select-option>
+                  <ion-select-option value="Festa">Festa</ion-select-option>
+                  <ion-select-option value="Festival">Festival</ion-select-option>
+                  <ion-select-option value="Outros">Outros</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Número de Participantes</ion-label>
+                <ion-input type="number" [(ngModel)]="eventoForm.numero_participantes"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Responsável no Local</ion-label>
+                <ion-input [(ngModel)]="eventoForm.responsavel_local"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Telefone do Local</ion-label>
+                <ion-input type="tel" [(ngModel)]="eventoForm.telefone_local"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Observações</ion-label>
+                <ion-textarea [(ngModel)]="eventoForm.observacoes" rows="3"></ion-textarea>
+              </ion-item>
+
+              <ion-button expand="block" (click)="salvarEvento()" class="btn-salvar">
+                {{ eventoForm.id ? 'Atualizar Evento' : 'Criar Evento' }}
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Modal de Atualizar Status -->
+    <ion-modal [isOpen]="modalStatusAberto" (didDismiss)="fecharModalStatus()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Atualizar Status</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="fecharModalStatus()">
+                <ion-icon name="close-circle"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+          <ion-card>
+            <ion-card-content>
+              <h3>Evento: {{ eventoSelecionado?.nome_evento }}</h3>
+              <p>Status atual: <strong>{{ getStatusLabel(eventoSelecionado?.status) }}</strong></p>
+
+              <ion-item>
+                <ion-label position="stacked">Novo Status</ion-label>
+                <ion-select [(ngModel)]="novoStatus">
+                  <ion-select-option value="agendado">Agendado</ion-select-option>
+                  <ion-select-option value="confirmado">Confirmado</ion-select-option>
+                  <ion-select-option value="em_preparacao">Em Preparação</ion-select-option>
+                  <ion-select-option value="em_andamento">Em Andamento</ion-select-option>
+                  <ion-select-option value="concluido">Concluído</ion-select-option>
+                  <ion-select-option value="cancelado">Cancelado</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-button expand="block" (click)="atualizarStatus()" class="btn-atualizar">
+                Atualizar Status
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>
+</ion-content>
+

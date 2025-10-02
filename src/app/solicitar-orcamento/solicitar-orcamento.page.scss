@@ -1,0 +1,172 @@
+:host {
+  --nd-primary: #FF6B00;
+  --nd-secondary: #1a1a1a;
+  --nd-accent: #00A8E8;
+  --nd-success: #28a745;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  img {
+    height: 35px;
+    object-fit: contain;
+  }
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+
+  ion-card-title {
+    color: var(--nd-primary);
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+}
+
+ion-item {
+  --padding-start: 0;
+  margin-bottom: 16px;
+
+  ion-label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--nd-secondary);
+  }
+
+  ion-input, ion-textarea {
+    --padding-start: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+
+  ion-icon[slot="start"] {
+    margin-right: 8px;
+    color: var(--nd-primary);
+  }
+}
+
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  ion-button {
+    --border-radius: 8px;
+    font-weight: 600;
+    text-transform: none;
+    height: 48px;
+
+    &:not([fill="outline"]) {
+      --background: var(--nd-primary);
+    }
+
+    &[fill="outline"] {
+      --border-color: var(--nd-primary);
+      --color: var(--nd-primary);
+    }
+  }
+}
+
+.success-card {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+
+  .success-message {
+    text-align: center;
+    padding: 32px 16px;
+
+    ion-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 16px 0 8px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+  }
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+
+    ion-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    div {
+      flex: 1;
+
+      strong {
+        display: block;
+        color: var(--nd-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+      }
+
+      p {
+        margin: 0;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .header-logo {
+    img {
+      height: 28px;
+    }
+
+    span {
+      font-size: 0.95rem;
+    }
+  }
+
+  .container {
+    padding: 8px;
+  }
+}
+

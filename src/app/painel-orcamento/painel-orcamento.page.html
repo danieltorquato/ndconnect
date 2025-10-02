@@ -1,0 +1,101 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      <ion-icon name="calculator" slot="start"></ion-icon>
+      Painel de Orçamentos
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Painel de Orçamentos</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Seção Principal - Sistema de Orçamentos -->
+  <div class="main-section">
+    <ion-card class="feature-card primary-card" (click)="irParaOrcamentos()">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="calculator"></ion-icon>
+          Sistema de Orçamentos
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Crie e gerencie orçamentos de forma rápida e eficiente</p>
+        <ion-badge color="success">Principal</ion-badge>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Grid de Funcionalidades -->
+  <ion-grid>
+    <ion-row>
+      <!-- Produtos -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="feature-card" (click)="irParaProdutos()">
+          <ion-card-content>
+            <div class="card-content">
+              <ion-icon name="cube" class="card-icon"></ion-icon>
+              <div class="card-text">
+                <h3>Gestão de Produtos</h3>
+                <p>Cadastre e gerencie produtos e estoque</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Histórico de Orçamentos -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="feature-card" (click)="irParaHistoricoOrcamentos()">
+          <ion-card-content>
+            <div class="card-content">
+              <ion-icon name="time" class="card-icon"></ion-icon>
+              <div class="card-text">
+                <h3>Histórico de Orçamentos</h3>
+                <p>Visualize todos os orçamentos criados</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Gestão de Orçamentos -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="feature-card" (click)="irParaGestaoOrcamentos()">
+          <ion-card-content>
+            <div class="card-content">
+              <ion-icon name="settings" class="card-icon"></ion-icon>
+              <div class="card-text">
+                <h3>Gestão de Orçamentos</h3>
+                <p>Gerencie status e aprovações</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Relatórios -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="feature-card" (click)="irParaRelatorios()">
+          <ion-card-content>
+            <div class="card-content">
+              <ion-icon name="analytics" class="card-icon"></ion-icon>
+              <div class="card-text">
+                <h3>Relatórios e Análises</h3>
+                <p>Dashboards e relatórios detalhados</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  
+
+
+</ion-content>
