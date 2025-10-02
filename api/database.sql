@@ -19,6 +19,7 @@ CREATE TABLE produtos (
     preco DECIMAL(10,2) NOT NULL,
     unidade VARCHAR(50) DEFAULT 'unidade',
     ativo BOOLEAN DEFAULT TRUE,
+    popularidade INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
@@ -73,45 +74,45 @@ INSERT INTO categorias (nome, descricao) VALUES
 ('Painel LED', 'Telas e painéis de LED');
 
 -- Inserir produtos de exemplo
-INSERT INTO produtos (categoria_id, nome, descricao, preco, unidade) VALUES
+INSERT INTO produtos (categoria_id, nome, descricao, preco, unidade, popularidade) VALUES
 -- Palco
-(1, 'Palco 3x3m', 'Palco modular 3x3 metros com altura de 1m', 800.00, 'unidade'),
-(1, 'Palco 4x4m', 'Palco modular 4x4 metros com altura de 1m', 1200.00, 'unidade'),
-(1, 'Palco 6x4m', 'Palco modular 6x4 metros com altura de 1m', 1800.00, 'unidade'),
-(1, 'Rampa de acesso', 'Rampa de acesso para palco', 200.00, 'unidade'),
+(1, 'Palco 3x3m', 'Palco modular 3x3 metros com altura de 1m', 800.00, 'unidade', 95),
+(1, 'Palco 4x4m', 'Palco modular 4x4 metros com altura de 1m', 1200.00, 'unidade', 85),
+(1, 'Palco 6x4m', 'Palco modular 6x4 metros com altura de 1m', 1800.00, 'unidade', 70),
+(1, 'Rampa de acesso', 'Rampa de acesso para palco', 200.00, 'unidade', 30),
 
 -- Gerador
-(2, 'Gerador 5KVA', 'Gerador diesel 5KVA portátil', 300.00, 'dia'),
-(2, 'Gerador 10KVA', 'Gerador diesel 10KVA portátil', 500.00, 'dia'),
-(2, 'Gerador 20KVA', 'Gerador diesel 20KVA portátil', 800.00, 'dia'),
-(2, 'Gerador 30KVA', 'Gerador diesel 30KVA portátil', 1200.00, 'dia'),
+(2, 'Gerador 5KVA', 'Gerador diesel 5KVA portátil', 300.00, 'dia', 90),
+(2, 'Gerador 10KVA', 'Gerador diesel 10KVA portátil', 500.00, 'dia', 80),
+(2, 'Gerador 20KVA', 'Gerador diesel 20KVA portátil', 800.00, 'dia', 60),
+(2, 'Gerador 30KVA', 'Gerador diesel 30KVA portátil', 1200.00, 'dia', 40),
 
 -- Efeitos
-(3, 'Máquina de fumaça', 'Máquina de fumaça profissional', 150.00, 'dia'),
-(3, 'Máquina de neblina', 'Máquina de neblina profissional', 120.00, 'dia'),
-(3, 'Canhão de luz', 'Canhão de luz móvel', 200.00, 'dia'),
-(3, 'Efeitos pirotécnicos', 'Pacote de efeitos pirotécnicos', 500.00, 'evento'),
+(3, 'Máquina de fumaça', 'Máquina de fumaça profissional', 150.00, 'dia', 75),
+(3, 'Máquina de neblina', 'Máquina de neblina profissional', 120.00, 'dia', 65),
+(3, 'Canhão de luz', 'Canhão de luz móvel', 200.00, 'dia', 55),
+(3, 'Efeitos pirotécnicos', 'Pacote de efeitos pirotécnicos', 500.00, 'evento', 35),
 
 -- Stand Octanorme
-(4, 'Stand 3x3m', 'Stand modular 3x3 metros', 600.00, 'unidade'),
-(4, 'Stand 6x3m', 'Stand modular 6x3 metros', 1000.00, 'unidade'),
-(4, 'Stand 9x3m', 'Stand modular 9x3 metros', 1400.00, 'unidade'),
-(4, 'Parede divisória', 'Parede divisória modular', 100.00, 'metro'),
+(4, 'Stand 3x3m', 'Stand modular 3x3 metros', 600.00, 'unidade', 70),
+(4, 'Stand 6x3m', 'Stand modular 6x3 metros', 1000.00, 'unidade', 60),
+(4, 'Stand 9x3m', 'Stand modular 9x3 metros', 1400.00, 'unidade', 45),
+(4, 'Parede divisória', 'Parede divisória modular', 100.00, 'metro', 25),
 
 -- Som
-(5, 'Sistema de som 2.1', 'Sistema de som 2.1 com 2 caixas e subwoofer', 300.00, 'dia'),
-(5, 'Sistema de som 4.1', 'Sistema de som 4.1 com 4 caixas e subwoofer', 500.00, 'dia'),
-(5, 'Microfone sem fio', 'Microfone sem fio profissional', 80.00, 'dia'),
-(5, 'Mixer de áudio', 'Mixer de áudio 12 canais', 200.00, 'dia'),
+(5, 'Sistema de som 2.1', 'Sistema de som 2.1 com 2 caixas e subwoofer', 300.00, 'dia', 88),
+(5, 'Sistema de som 4.1', 'Sistema de som 4.1 com 4 caixas e subwoofer', 500.00, 'dia', 78),
+(5, 'Microfone sem fio', 'Microfone sem fio profissional', 80.00, 'dia', 82),
+(5, 'Mixer de áudio', 'Mixer de áudio 12 canais', 200.00, 'dia', 68),
 
 -- Luz
-(6, 'Kit de iluminação básico', 'Kit com 4 refletores e tripés', 200.00, 'dia'),
-(6, 'Kit de iluminação profissional', 'Kit com 8 refletores, tripés e controlador', 400.00, 'dia'),
-(6, 'Laser show', 'Sistema de laser show profissional', 600.00, 'dia'),
-(6, 'Stroboscópio', 'Stroboscópio profissional', 100.00, 'dia'),
+(6, 'Kit de iluminação básico', 'Kit com 4 refletores e tripés', 200.00, 'dia', 72),
+(6, 'Kit de iluminação profissional', 'Kit com 8 refletores, tripés e controlador', 400.00, 'dia', 62),
+(6, 'Laser show', 'Sistema de laser show profissional', 600.00, 'dia', 52),
+(6, 'Stroboscópio', 'Stroboscópio profissional', 100.00, 'dia', 42),
 
 -- Painel LED
-(7, 'Painel LED 2x1m', 'Painel LED 2x1 metros P2.5', 800.00, 'dia'),
-(7, 'Painel LED 3x2m', 'Painel LED 3x2 metros P2.5', 1200.00, 'dia'),
-(7, 'Painel LED 4x3m', 'Painel LED 4x3 metros P2.5', 1800.00, 'dia'),
-(7, 'Painel LED 6x4m', 'Painel LED 6x4 metros P2.5', 2500.00, 'dia');
+(7, 'Painel LED 2x1m', 'Painel LED 2x1 metros P2.5', 800.00, 'dia', 65),
+(7, 'Painel LED 3x2m', 'Painel LED 3x2 metros P2.5', 1200.00, 'dia', 55),
+(7, 'Painel LED 4x3m', 'Painel LED 4x3 metros P2.5', 1800.00, 'dia', 45),
+(7, 'Painel LED 6x4m', 'Painel LED 6x4 metros P2.5', 2500.00, 'dia', 35);

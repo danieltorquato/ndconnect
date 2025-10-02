@@ -1,2 +1,98 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+
+// Cores oficiais da N.D Connect
+:root {
+  // Azul Marinho Escuro - Fundo principal
+  --nd-primary: #0C2B59;
+  --nd-primary-rgb: 12, 43, 89;
+
+  // Laranja/Vermelho Pôr do Sol - Cor de destaque
+  --nd-secondary: #E8622D;
+  --nd-secondary-rgb: 232, 98, 45;
+
+  // Amarelo/Ouro - Tom mais claro do pôr do sol
+  --nd-accent: #F7A64C;
+  --nd-accent-rgb: 247, 166, 76;
+
+  // Branco - Texto e elementos claros
+  --nd-light: #FFFFFF;
+  --nd-light-rgb: 255, 255, 255;
+
+  // Cores de apoio
+  --nd-dark: #0C2B59;
+  --nd-medium: #64748b;
+  --nd-success: #10b981;
+  --nd-warning: #F7A64C;
+  --nd-danger: #ef4444;
+
+  // Gradientes
+  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
+  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%);
+}
+
+// Ionic Color Variables
+:root {
+  --ion-color-primary: var(--nd-primary);
+  --ion-color-primary-rgb: var(--nd-primary-rgb);
+  --ion-color-primary-contrast: var(--nd-light);
+  --ion-color-primary-contrast-rgb: var(--nd-light-rgb);
+  --ion-color-primary-shade: #0a2440;
+  --ion-color-primary-tint: #24416a;
+
+  --ion-color-secondary: var(--nd-secondary);
+  --ion-color-secondary-rgb: var(--nd-secondary-rgb);
+  --ion-color-secondary-contrast: var(--nd-light);
+  --ion-color-secondary-contrast-rgb: var(--nd-light-rgb);
+  --ion-color-secondary-shade: #cc5627;
+  --ion-color-secondary-tint: #eb7241;
+
+  --ion-color-tertiary: var(--nd-accent);
+  --ion-color-tertiary-rgb: var(--nd-accent-rgb);
+  --ion-color-tertiary-contrast: var(--nd-primary);
+  --ion-color-tertiary-contrast-rgb: var(--nd-primary-rgb);
+  --ion-color-tertiary-shade: #d99343;
+  --ion-color-tertiary-tint: #f8af5e;
+
+  --ion-color-success: var(--nd-success);
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: var(--nd-light);
+  --ion-color-success-contrast-rgb: var(--nd-light-rgb);
+  --ion-color-success-shade: #0ea472;
+  --ion-color-success-tint: #28c299;
+
+  --ion-color-warning: var(--nd-warning);
+  --ion-color-warning-rgb: var(--nd-accent-rgb);
+  --ion-color-warning-contrast: var(--nd-primary);
+  --ion-color-warning-contrast-rgb: var(--nd-primary-rgb);
+  --ion-color-warning-shade: #d99343;
+  --ion-color-warning-tint: #f8af5e;
+
+  --ion-color-danger: var(--nd-danger);
+  --ion-color-danger-rgb: 239, 68, 68;
+  --ion-color-danger-contrast: var(--nd-light);
+  --ion-color-danger-contrast-rgb: var(--nd-light-rgb);
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+
+  --ion-color-light: var(--nd-light);
+  --ion-color-light-rgb: var(--nd-light-rgb);
+  --ion-color-light-contrast: var(--nd-primary);
+  --ion-color-light-contrast-rgb: var(--nd-primary-rgb);
+  --ion-color-light-shade: #e2e2e2;
+  --ion-color-light-tint: #ffffff;
+
+  --ion-color-medium: var(--nd-medium);
+  --ion-color-medium-rgb: 100, 116, 139;
+  --ion-color-medium-contrast: var(--nd-light);
+  --ion-color-medium-contrast-rgb: var(--nd-light-rgb);
+  --ion-color-medium-shade: #586574;
+  --ion-color-medium-tint: #7a8a9c;
+
+  --ion-color-dark: var(--nd-dark);
+  --ion-color-dark-rgb: var(--nd-primary-rgb);
+  --ion-color-dark-contrast: var(--nd-light);
+  --ion-color-dark-contrast-rgb: var(--nd-light-rgb);
+  --ion-color-dark-shade: #0a2440;
+  --ion-color-dark-tint: #24416a;
+}

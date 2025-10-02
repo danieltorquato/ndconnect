@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonAlert, IonNote } from '@ionic/angular/standalone';
+import { Component, OnInit, Inject } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp } from 'ionicons/icons';
+import { add, remove, calculator, document as documentIcon, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DOCUMENT } from '@angular/common';
 
 interface Produto {
   id: number;
@@ -43,14 +44,16 @@ interface Cliente {
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonAlert, IonNote, CommonModule, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, CommonModule, FormsModule],
 })
 export class HomePage implements OnInit {
   categorias: Categoria[] = [];
   produtos: Produto[] = [];
   produtosFiltrados: Produto[] = [];
+  produtosIniciais: Produto[] = [];
   categoriaSelecionada: number = 0;
   termoPesquisa: string = '';
+  mostrarTodosProdutos: boolean = false;
 
   itensOrcamento: ItemOrcamento[] = [];
   cliente: Cliente = {
@@ -71,13 +74,16 @@ export class HomePage implements OnInit {
 
   private apiUrl = 'http://localhost:8000';
 
-  constructor(private http: HttpClient) {
-    addIcons({ add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp });
+  constructor(
+    private http: HttpClient,
+    @Inject(DOCUMENT) private document: Document
+  ) {
+    addIcons({ add, remove, calculator, document: documentIcon, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star });
   }
 
   ngOnInit() {
     this.carregarCategorias();
-    this.carregarProdutos();
+    this.carregarProdutosIniciais();
     this.definirDataValidadePadrao();
     this.definirDataMinima();
   }
@@ -138,21 +144,49 @@ export class HomePage implements OnInit {
     });
   }
 
-  carregarProdutos() {
+  carregarProdutosIniciais() {
+    this.http.get<any>(`${this.apiUrl}/produtos/populares?limit=5`).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.produtosIniciais = response.data;
+          this.produtosFiltrados = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar produtos iniciais:', error);
+      }
+    });
+  }
+
+  carregarTodosProdutos() {
     this.http.get<any>(`${this.apiUrl}/produtos`).subscribe({
       next: (response) => {
         if (response.success) {
           this.produtos = response.data;
-          this.filtrarProdutos();
+          this.mostrarTodosProdutos = true;
+          // Mostrar todos os produtos sem aplicar filtros
+          this.produtosFiltrados = this.produtos;
         }
       },
       error: (error) => {
-        console.error('Erro ao carregar produtos:', error);
+        console.error('Erro ao carregar todos os produtos:', error);
       }
     });
   }
 
   filtrarProdutos() {
+    // Se não há pesquisa ou filtro E não está mostrando todos os produtos, mostrar apenas os produtos iniciais
+    if (!this.termoPesquisa.trim() && this.categoriaSelecionada === 0 && !this.mostrarTodosProdutos) {
+      this.produtosFiltrados = this.produtosIniciais;
+      return;
+    }
+
+    // Se há pesquisa ou filtro, carregar todos os produtos se ainda não foram carregados
+    if (!this.mostrarTodosProdutos) {
+      this.carregarTodosProdutos();
+      return;
+    }
+
     let produtosFiltrados = this.produtos;
 
     // Filtrar por categoria
@@ -181,6 +215,31 @@ export class HomePage implements OnInit {
 
   pesquisarProdutos() {
     this.filtrarProdutos();
+  }
+
+  limparFiltros() {
+    this.termoPesquisa = '';
+    this.categoriaSelecionada = 0;
+    this.mostrarTodosProdutos = false;
+    this.produtosFiltrados = this.produtosIniciais;
+  }
+
+  alternarVisualizacao() {
+    if (this.mostrarTodosProdutos) {
+      // Atualmente mostrando todos, voltar para populares
+      this.mostrarTodosProdutos = false;
+      this.produtosFiltrados = this.produtosIniciais;
+    } else {
+      // Atualmente mostrando populares, mostrar todos
+      if (this.produtos.length === 0) {
+        // Se ainda não carregou todos os produtos, carregar agora
+        this.carregarTodosProdutos();
+      } else {
+        // Se já carregou, apenas alternar a visualização
+        this.mostrarTodosProdutos = true;
+        this.produtosFiltrados = this.produtos;
+      }
+    }
   }
 
   adicionarItem(produto: Produto) {
@@ -293,53 +352,226 @@ export class HomePage implements OnInit {
   }
 
   compartilharWhatsApp() {
-    if (!this.ultimoOrcamentoId) {
-      window.alert('Gere um orçamento primeiro');
+    if (this.itensOrcamento.length === 0) {
+      this.mostrarNotificacao('Adicione itens ao orçamento primeiro', 'error');
       return;
     }
 
-    const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
-    const mensagem = `Olá ${this.cliente.nome}!
+    // Se não tem orçamento gerado, gerar um primeiro
+    if (!this.ultimoOrcamentoId) {
+      this.gerarOrcamento();
+      return;
+    }
 
-Segue o orçamento solicitado da N.D Connect:
+    try {
+      const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
+      const mensagem = `🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*
+
+Olá ${this.cliente.nome}! 👋
+
+Segue o orçamento solicitado:
 
 📋 *Orçamento Nº ${this.ultimoOrcamentoId}*
-💰 *Total: R$ ${this.total.toFixed(2).replace('.', ',')}*
+💰 *Valor Total: R$ ${this.total.toFixed(2).replace('.', ',')}*
 📅 *Válido até: ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}*
 
-Acesse o PDF completo: ${pdfUrl}
+📄 *Visualizar PDF:* ${pdfUrl}
 
-Agradecemos pela preferência!
-N.D Connect - Equipamentos para Eventos`;
+${this.itensOrcamento.length > 0 ? `\n📦 *Itens incluídos:*\n${this.itensOrcamento.map(item => `• ${item.produto_nome} (${item.quantidade}x)`).join('\n')}` : ''}
 
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-    window.open(whatsappUrl, '_blank');
+${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
+
+✨ *Agradecemos pela preferência!*
+🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*`;
+
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+      window.open(whatsappUrl, '_blank');
+
+      this.mostrarNotificacao('Abrindo WhatsApp...', 'info');
+    } catch (error) {
+      this.mostrarNotificacao('Erro ao abrir WhatsApp', 'error');
+    }
   }
 
   salvarPDF() {
-    if (!this.ultimoOrcamentoId) {
-      window.alert('Gere um orçamento primeiro');
+    if (this.itensOrcamento.length === 0) {
+      this.mostrarNotificacao('Adicione itens ao orçamento primeiro', 'error');
       return;
     }
 
-    // Abrir PDF em nova aba para download
-    const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
-    window.open(pdfUrl, '_blank');
+    // Se não tem orçamento gerado, gerar um primeiro
+    if (!this.ultimoOrcamentoId) {
+      this.gerarOrcamento();
+      return;
+    }
+
+    try {
+      this.mostrarNotificacao('Iniciando download do PDF...', 'info');
+
+      // Usar pdf_real.php para download real do PDF
+      const pdfUrl = `${this.apiUrl}/pdf_real.php?id=${this.ultimoOrcamentoId}`;
+
+      // Criar link temporário para download
+      const link = this.document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `orcamento_${this.ultimoOrcamentoId}.pdf`;
+      link.target = '_blank';
+      this.document.body.appendChild(link);
+      link.click();
+      this.document.body.removeChild(link);
+
+      // Feedback de sucesso após um pequeno delay
+      setTimeout(() => {
+        this.mostrarNotificacao('Download iniciado com sucesso!', 'success');
+      }, 1000);
+    } catch (error) {
+      this.mostrarNotificacao('Erro ao baixar PDF', 'error');
+    }
   }
 
   compartilhar() {
-    if (!this.ultimoOrcamentoId) {
-      window.alert('Gere um orçamento primeiro');
+    if (this.itensOrcamento.length === 0) {
+      this.mostrarNotificacao('Adicione itens ao orçamento primeiro', 'error');
       return;
     }
 
-    const opcao = window.prompt('Escolha uma opção:\n1 - WhatsApp\n2 - Salvar PDF\n\nDigite o número da opção:');
+    // Se não tem orçamento gerado, gerar um primeiro
+    if (!this.ultimoOrcamentoId) {
+      this.gerarOrcamento();
+      return;
+    }
+
+    // Verificar se o navegador suporta Web Share API
+    if (navigator && 'share' in navigator) {
+      this.compartilharNativo();
+    } else {
+      // Fallback para navegadores que não suportam Web Share API
+      this.compartilharFallback();
+    }
+  }
+
+  async compartilharNativo() {
+    try {
+      const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
+      const titulo = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}`;
+      const texto = `Orçamento de R$ ${this.total.toFixed(2).replace('.', ',')} - Válido até ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}`;
+
+      await navigator.share({
+        title: titulo,
+        text: texto,
+        url: pdfUrl
+      });
+    } catch (error) {
+      console.log('Compartilhamento cancelado ou erro:', error);
+      // Se o usuário cancelar, não fazer nada
+    }
+  }
+
+  compartilharFallback() {
+    const opcao = window.prompt('Escolha uma opção:\n1 - WhatsApp\n2 - Salvar PDF\n3 - Copiar Link\n\nDigite o número da opção:');
 
     if (opcao === '1') {
       this.compartilharWhatsApp();
     } else if (opcao === '2') {
       this.salvarPDF();
+    } else if (opcao === '3') {
+      this.copiarLink();
     }
+  }
+
+  copiarLink() {
+    if (this.itensOrcamento.length === 0) {
+      this.mostrarNotificacao('Adicione itens ao orçamento primeiro', 'error');
+      return;
+    }
+
+    // Se não tem orçamento gerado, gerar um primeiro
+    if (!this.ultimoOrcamentoId) {
+      this.gerarOrcamento();
+      return;
+    }
+
+    try {
+      const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
+      const textoCompleto = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}\nValor: R$ ${this.total.toFixed(2).replace('.', ',')}\nVálido até: ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}\n\nVisualizar: ${pdfUrl}`;
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textoCompleto).then(() => {
+          this.mostrarNotificacao('Link copiado para a área de transferência!', 'success');
+        }).catch(() => {
+          this.copiarLinkFallback(textoCompleto);
+        });
+      } else {
+        this.copiarLinkFallback(textoCompleto);
+      }
+    } catch (error) {
+      this.mostrarNotificacao('Erro ao copiar link', 'error');
+    }
+  }
+
+  copiarLinkFallback(textoCompleto: string) {
+    // Fallback para navegadores mais antigos
+    const textArea = this.document.createElement('textarea');
+    textArea.value = textoCompleto;
+    this.document.body.appendChild(textArea);
+    textArea.select();
+    this.document.execCommand('copy');
+    this.document.body.removeChild(textArea);
+    this.mostrarNotificacao('Link copiado para a área de transferência!', 'success');
+  }
+
+  mostrarAlerta(mensagem: string) {
+    // Criar notificação customizada
+    this.mostrarNotificacao(mensagem, 'success');
+  }
+
+  mostrarNotificacao(mensagem: string, tipo: 'success' | 'error' | 'info' = 'info') {
+    // Criar elemento de notificação
+    const notificacao = this.document.createElement('div');
+    notificacao.className = `notificacao notificacao-${tipo}`;
+    notificacao.innerHTML = `
+      <div class="notificacao-content">
+        <ion-icon name="${tipo === 'success' ? 'checkmark-circle' : tipo === 'error' ? 'warning' : 'information-circle'}" class="notificacao-icon"></ion-icon>
+        <span class="notificacao-texto">${mensagem}</span>
+      </div>
+    `;
+
+    // Adicionar estilos inline
+    notificacao.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
+      color: white;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+      max-width: 300px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    `;
+
+    // Adicionar ao DOM
+    this.document.body.appendChild(notificacao);
+
+    // Animar entrada
+    setTimeout(() => {
+      notificacao.style.transform = 'translateX(0)';
+    }, 100);
+
+    // Remover após 3 segundos
+    setTimeout(() => {
+      notificacao.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        if (this.document.body.contains(notificacao)) {
+          this.document.body.removeChild(notificacao);
+        }
+      }, 300);
+    }, 3000);
   }
 
   limparOrcamento() {
@@ -365,5 +597,10 @@ N.D Connect - Equipamentos para Eventos`;
 
   trackByItemId(index: number, item: ItemOrcamento): number {
     return item.produto_id;
+  }
+
+  abrirHistorico() {
+    const url = `${this.apiUrl}/historico_orcamentos.php`;
+    window.open(url, '_blank');
   }
 }

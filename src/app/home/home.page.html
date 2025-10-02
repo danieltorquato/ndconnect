@@ -5,6 +5,14 @@
         <img src="assets/img/logo.jpeg" alt="N.D Connect" class="header-logo">
         <span>Orçamentos</span>
         <ion-badge color="secondary" *ngIf="itensOrcamento.length > 0">{{itensOrcamento.length}} itens</ion-badge>
+        <ion-button
+          fill="clear"
+          color="light"
+          size="small"
+          (click)="abrirHistorico()"
+          class="historico-btn">
+          <ion-icon name="list" slot="icon-only"></ion-icon>
+        </ion-button>
       </div>
     </ion-title>
   </ion-toolbar>
@@ -42,6 +50,16 @@
           </ion-select-option>
         </ion-select>
       </ion-item>
+      <ion-item *ngIf="termoPesquisa.trim() || categoriaSelecionada !== 0">
+        <ion-button
+          fill="outline"
+          color="medium"
+          (click)="limparFiltros()"
+          expand="block">
+          <ion-icon name="close" slot="start"></ion-icon>
+          Limpar Filtros
+        </ion-button>
+      </ion-item>
     </ion-card-content>
   </ion-card>
 
@@ -49,7 +67,12 @@
   <ion-card>
     <ion-card-header>
       <ion-card-title>
-        Produtos Disponíveis
+        <span *ngIf="!mostrarTodosProdutos && !termoPesquisa.trim() && categoriaSelecionada === 0">
+          Produtos Mais Populares
+        </span>
+        <span *ngIf="mostrarTodosProdutos || termoPesquisa.trim() || categoriaSelecionada !== 0">
+          Produtos Disponíveis
+        </span>
         <ion-badge color="primary">{{produtosFiltrados.length}} produtos</ion-badge>
       </ion-card-title>
     </ion-card-header>
@@ -59,6 +82,19 @@
         <h3>Nenhum produto encontrado</h3>
         <p>Tente ajustar os filtros ou termo de pesquisa</p>
       </div>
+
+      <!-- Botão para alternar entre produtos populares e todos os produtos -->
+      <div *ngIf="!termoPesquisa.trim() && categoriaSelecionada === 0 && produtosFiltrados.length > 0" class="ver-todos-container">
+        <ion-button
+          fill="outline"
+          color="secondary"
+          (click)="alternarVisualizacao()"
+          expand="block">
+          <ion-icon [name]="mostrarTodosProdutos ? 'list' : 'star'" slot="start"></ion-icon>
+          {{ mostrarTodosProdutos ? 'Mostrar Somente Populares' : 'Ver Todos os Produtos' }}
+        </ion-button>
+      </div>
+
       <ion-grid *ngIf="produtosFiltrados.length > 0">
         <ion-row>
           <ion-col size="12" size-md="6" size-lg="4" *ngFor="let produto of produtosFiltrados; trackBy: trackByProdutoId">
@@ -239,39 +275,6 @@
         <ion-icon name="calculator" slot="start"></ion-icon>
         Gerar Orçamento
       </ion-button>
-
-      <!-- Botões de Compartilhamento (aparecem após gerar orçamento) -->
-      <div *ngIf="ultimoOrcamentoId" class="share-buttons">
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="success"
-          (click)="compartilharWhatsApp()"
-          class="action-button">
-          <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
-          Compartilhar no WhatsApp
-        </ion-button>
-
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="secondary"
-          (click)="salvarPDF()"
-          class="action-button">
-          <ion-icon name="download" slot="start"></ion-icon>
-          Salvar PDF
-        </ion-button>
-
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="tertiary"
-          (click)="compartilhar()"
-          class="action-button">
-          <ion-icon name="share" slot="start"></ion-icon>
-          Mais Opções
-        </ion-button>
-      </div>
 
       <ion-button
         expand="block"

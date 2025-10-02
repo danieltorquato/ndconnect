@@ -35,3 +35,72 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Cores oficiais da N.D Connect - Aplicação global */
+:root {
+  // Cores principais
+  --nd-primary: #0C2B59;
+  --nd-secondary: #E8622D;
+  --nd-accent: #F7A64C;
+  --nd-light: #FFFFFF;
+  --nd-dark: #0C2B59;
+  --nd-medium: #64748b;
+
+  // Gradientes
+  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
+  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%);
+}
+
+/* Aplicação global das cores nos componentes Ionic */
+ion-toolbar {
+  --background: var(--nd-primary);
+  --color: var(--nd-light);
+}
+
+ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+
+  &[color="primary"] {
+    --background: var(--nd-gradient);
+    --color: var(--nd-light);
+    --border-color: transparent;
+  }
+
+  &[color="secondary"] {
+    --background: var(--nd-secondary);
+    --color: var(--nd-light);
+  }
+
+  &[color="tertiary"] {
+    --background: var(--nd-accent);
+    --color: var(--nd-primary);
+  }
+}
+
+ion-badge {
+  font-weight: 600;
+
+  &[color="primary"] {
+    --background: var(--nd-gradient);
+    --color: var(--nd-light);
+  }
+
+  &[color="secondary"] {
+    --background: var(--nd-secondary);
+    --color: var(--nd-light);
+  }
+}
+
+/* Melhorias de acessibilidade e contraste */
+:root {
+  // Garantir contraste adequado
+  --ion-color-primary-contrast: var(--nd-light);
+  --ion-color-secondary-contrast: var(--nd-light);
+  --ion-color-tertiary-contrast: var(--nd-primary);
+
+  // Cores de foco para acessibilidade
+  --ion-color-primary-shade: #0a2440;
+  --ion-color-secondary-shade: #cc5627;
+  --ion-color-tertiary-shade: #d99343;
+}

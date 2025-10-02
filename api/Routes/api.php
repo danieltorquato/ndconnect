@@ -32,6 +32,14 @@ try {
             }
             break;
 
+        case 'produtos/populares':
+            $controller = new ProdutoController();
+            if ($request_method == 'GET') {
+                $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5;
+                $response = $controller->getMaisPopulares($limit);
+            }
+            break;
+
         case 'categorias':
             $controller = new CategoriaController();
             if ($request_method == 'GET') {
