@@ -1,0 +1,136 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      <div class="header-content">
+        <img src="assets/img/logo.jpeg" alt="N.D Connect" class="header-logo">
+        <span>Painel de Controle</span>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Painel de Controle</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="container">
+    <!-- Menu Principal -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="grid" slot="start"></ion-icon>
+          Menu Principal
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="menu-grid">
+          <ion-button expand="block" size="large" (click)="irParaOrcamento()" class="menu-button primary">
+            <ion-icon name="calculator" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Novo Orçamento</span>
+              <span class="button-subtitle">Criar orçamento para cliente</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" size="large" (click)="irParaProdutos()" class="menu-button secondary">
+            <ion-icon name="cube" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Gerenciar Produtos</span>
+              <span class="button-subtitle">Adicionar, editar e excluir produtos</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" size="large" (click)="abrirHistorico()" class="menu-button tertiary">
+            <ion-icon name="time" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Histórico de Orçamentos</span>
+              <span class="button-subtitle">Visualizar orçamentos anteriores</span>
+            </div>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Links Úteis -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="link" slot="start"></ion-icon>
+          Links Úteis
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="links-grid">
+          <ion-button expand="block" fill="outline" (click)="abrirLink('email')" class="link-button">
+            <ion-icon name="mail" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Email Marketing</span>
+              <span class="button-subtitle">Campanhas e newsletters</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('instagram')" class="link-button">
+            <ion-icon name="logo-instagram" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Instagram</span>
+              <span class="button-subtitle">@ndconnect_oficial</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('site')" class="link-button">
+            <ion-icon name="globe" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Site Oficial</span>
+              <span class="button-subtitle">www.ndconnect.com.br</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('whatsapp')" class="link-button">
+            <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">WhatsApp Business</span>
+              <span class="button-subtitle">Atendimento ao cliente</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('facebook')" class="link-button">
+            <ion-icon name="logo-facebook" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Facebook</span>
+              <span class="button-subtitle">Página oficial</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('youtube')" class="link-button">
+            <ion-icon name="logo-youtube" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">YouTube</span>
+              <span class="button-subtitle">Canal de vídeos</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('linkedin')" class="link-button">
+            <ion-icon name="logo-linkedin" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">LinkedIn</span>
+              <span class="button-subtitle">Rede profissional</span>
+            </div>
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="abrirLink('google')" class="link-button">
+            <ion-icon name="logo-google" slot="start"></ion-icon>
+            <div class="button-content">
+              <span class="button-title">Google My Business</span>
+              <span class="button-subtitle">Perfil empresarial</span>
+            </div>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+
+  </div>
+</ion-content>

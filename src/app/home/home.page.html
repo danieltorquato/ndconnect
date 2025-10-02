@@ -1,290 +1,402 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>
-      <div class="header-content">
-        <img src="assets/img/logo.jpeg" alt="N.D Connect" class="header-logo">
-        <span>Orçamentos</span>
-        <ion-badge color="secondary" *ngIf="itensOrcamento.length > 0">{{itensOrcamento.length}} itens</ion-badge>
-        <ion-button
-          fill="clear"
-          color="light"
-          size="small"
-          (click)="abrirHistorico()"
-          class="historico-btn">
-          <ion-icon name="list" slot="icon-only"></ion-icon>
-        </ion-button>
+<app-navbar></app-navbar>
+
+<ion-content [fullscreen]="true" class="premium-content">
+
+  <!-- Hero Section Premium -->
+  <section class="hero-premium">
+    <div class="hero-background">
+      <div class="gradient-overlay"></div>
+      <div class="animated-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
       </div>
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Orçamentos</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <!-- Seção de Filtros e Pesquisa -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtrar e Pesquisar Produtos</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Pesquisar produtos</ion-label>
-        <ion-input
-          [(ngModel)]="termoPesquisa"
-          (ionInput)="pesquisarProdutos()"
-          placeholder="Digite o nome, descrição ou categoria do produto..."
-          clearInput="true">
-          <ion-icon name="search" slot="start"></ion-icon>
-        </ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>Categoria</ion-label>
-        <ion-select [(ngModel)]="categoriaSelecionada" (ionChange)="filtrarPorCategoria()" placeholder="Todas as categorias">
-          <ion-select-option [value]="0">Todas as categorias</ion-select-option>
-          <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
-            {{categoria.nome}}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-item *ngIf="termoPesquisa.trim() || categoriaSelecionada !== 0">
-        <ion-button
-          fill="outline"
-          color="medium"
-          (click)="limparFiltros()"
-          expand="block">
-          <ion-icon name="close" slot="start"></ion-icon>
-          Limpar Filtros
-        </ion-button>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Seção de Produtos -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <span *ngIf="!mostrarTodosProdutos && !termoPesquisa.trim() && categoriaSelecionada === 0">
-          Produtos Mais Populares
-        </span>
-        <span *ngIf="mostrarTodosProdutos || termoPesquisa.trim() || categoriaSelecionada !== 0">
-          Produtos Disponíveis
-        </span>
-        <ion-badge color="primary">{{produtosFiltrados.length}} produtos</ion-badge>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <div *ngIf="produtosFiltrados.length === 0" class="no-results">
-        <ion-icon name="search" size="large" color="medium"></ion-icon>
-        <h3>Nenhum produto encontrado</h3>
-        <p>Tente ajustar os filtros ou termo de pesquisa</p>
-      </div>
-
-      <!-- Botão para alternar entre produtos populares e todos os produtos -->
-      <div *ngIf="!termoPesquisa.trim() && categoriaSelecionada === 0 && produtosFiltrados.length > 0" class="ver-todos-container">
-        <ion-button
-          fill="outline"
-          color="secondary"
-          (click)="alternarVisualizacao()"
-          expand="block">
-          <ion-icon [name]="mostrarTodosProdutos ? 'list' : 'star'" slot="start"></ion-icon>
-          {{ mostrarTodosProdutos ? 'Mostrar Somente Populares' : 'Ver Todos os Produtos' }}
-        </ion-button>
-      </div>
-
-      <ion-grid *ngIf="produtosFiltrados.length > 0">
-        <ion-row>
-          <ion-col size="12" size-md="6" size-lg="4" *ngFor="let produto of produtosFiltrados; trackBy: trackByProdutoId">
-            <ion-card class="produto-card">
-              <ion-card-content>
-                <div class="produto-header">
-                  <h3>{{produto.nome}}</h3>
-                  <ion-badge color="secondary" class="categoria-badge">{{produto.categoria_nome}}</ion-badge>
                 </div>
-                <p class="descricao">{{produto.descricao}}</p>
-                <div class="preco-container">
-                  <span class="preco">R$ {{produto.preco | number:'1.2-2'}}</span>
-                  <span class="unidade">/ {{produto.unidade}}</span>
+
+    <div class="hero-container">
+      <div class="hero-content-premium">
+        <div class="hero-badge">
+          <ion-icon name="star"></ion-icon>
+          <span>Líder em Equipamentos para Eventos</span>
                 </div>
-                <ion-button
-                  expand="block"
-                  fill="outline"
-                  color="primary"
-                  (click)="adicionarItem(produto)"
-                  class="add-button">
-                  <ion-icon name="add" slot="start"></ion-icon>
-                  Adicionar
+
+        <h1 class="hero-title-premium" data-aos="fade-up">
+          Transforme Cada Evento em uma
+          <span class="gradient-text">Experiência Extraordinária</span>
+        </h1>
+
+        <p class="hero-description" data-aos="fade-up" data-aos-delay="100">
+          Soluções completas em equipamentos profissionais. Som, luz, palcos, geradores e tecnologia de ponta para eventos que impressionam e ficam na memória.
+        </p>
+
+        <div class="hero-actions" data-aos="fade-up" data-aos-delay="200">
+          <ion-button size="large" class="btn-premium primary" (click)="irPara('/produtos-catalogo')">
+            <ion-icon name="cube-outline" slot="start"></ion-icon>
+            Explorar Produtos
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+
+          <ion-button size="large" class="btn-premium secondary" (click)="abrirWhatsApp()">
+            <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+            Falar com Especialista
                 </ion-button>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
+        </div>
 
-  <!-- Seção do Orçamento -->
-  <ion-card *ngIf="itensOrcamento.length > 0">
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="document"></ion-icon>
-        Orçamento Atual
-        <ion-badge color="primary">{{itensOrcamento.length}} itens</ion-badge>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let item of itensOrcamento; trackBy: trackByItemId" class="item-orcamento">
-          <div class="item-content">
-            <div class="item-info">
-              <h4>{{item.produto_nome}}</h4>
-              <p class="categoria">{{item.categoria_nome}}</p>
-              <p class="preco-unitario">R$ {{item.preco_unitario | number:'1.2-2'}} / {{item.unidade}}</p>
+        <div class="hero-stats" data-aos="fade-up" data-aos-delay="300">
+          <div class="stat">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Eventos Realizados</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Satisfação</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Suporte</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <ion-icon name="chevron-down"></ion-icon>
             </div>
-            <div class="item-controls">
-              <ion-button
-                fill="outline"
-                size="small"
-                (click)="atualizarQuantidade(item.produto_id, item.quantidade - 1)">
-                <ion-icon name="remove"></ion-icon>
-              </ion-button>
-              <span class="quantidade">{{item.quantidade}}</span>
-              <ion-button
-                fill="outline"
-                size="small"
-                (click)="atualizarQuantidade(item.produto_id, item.quantidade + 1)">
-                <ion-icon name="add"></ion-icon>
-              </ion-button>
-              <span class="subtotal">R$ {{item.subtotal | number:'1.2-2'}}</span>
+  </section>
+
+  <!-- Brands/Trust Section -->
+  <section class="trust-section">
+    <div class="container-premium">
+      <p class="trust-title">Confiança de centenas de empresas e produtoras</p>
+      <div class="trust-badges">
+        <div class="trust-badge">✓ Equipamentos Certificados</div>
+        <div class="trust-badge">✓ Manutenção Preventiva</div>
+        <div class="trust-badge">✓ Suporte 24/7</div>
+        <div class="trust-badge">✓ Garantia Total</div>
             </div>
           </div>
-        </ion-item>
-      </ion-list>
+  </section>
 
-      <div class="totais">
-        <ion-item>
-          <ion-label>Subtotal:</ion-label>
-          <ion-label slot="end">R$ {{subtotal | number:'1.2-2'}}</ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>Desconto:</ion-label>
-          <ion-input
-            type="number"
-            [(ngModel)]="desconto"
-            (ionInput)="calcularTotal()"
-            placeholder="0.00"
-            slot="end">
-          </ion-input>
-        </ion-item>
-        <ion-item class="total-item">
-          <ion-label><strong>TOTAL:</strong></ion-label>
-          <ion-label slot="end"><strong>R$ {{total | number:'1.2-2'}}</strong></ion-label>
-        </ion-item>
+  <!-- Services Section -->
+  <section class="services-premium">
+    <div class="container-premium">
+      <div class="section-header-premium" data-aos="fade-up">
+        <span class="section-label">Nossas Soluções</span>
+        <h2 class="section-title-premium">
+          Equipamentos de <span class="gradient-text">Alta Performance</span>
+        </h2>
+        <p class="section-description">
+          Oferecemos tudo que você precisa para criar eventos memoráveis, com tecnologia de ponta e suporte especializado
+        </p>
       </div>
-    </ion-card-content>
-  </ion-card>
 
-  <!-- Seção de Dados do Cliente -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="person"></ion-icon>
-        Dados do Cliente
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Nome *</ion-label>
-        <ion-input [(ngModel)]="cliente.nome" placeholder="Nome completo do cliente"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Email</ion-label>
-        <ion-input type="email" [(ngModel)]="cliente.email" placeholder="email@exemplo.com"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Telefone</ion-label>
-        <ion-input type="tel" [(ngModel)]="cliente.telefone" placeholder="(11) 99999-9999"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Endereço</ion-label>
-        <ion-input [(ngModel)]="cliente.endereco" placeholder="Endereço completo"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">CPF/CNPJ</ion-label>
-        <ion-input [(ngModel)]="cliente.cpf_cnpj" placeholder="000.000.000-00 ou 00.000.000/0000-00"></ion-input>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
+      <div class="services-grid">
+        <div class="service-card-premium" data-aos="fade-up" data-aos-delay="0">
+          <div class="service-icon">
+            <ion-icon name="musical-notes"></ion-icon>
+          </div>
+          <h3>Som Profissional</h3>
+          <p>Sistemas de áudio de última geração com potência e qualidade cristalina para qualquer porte de evento.</p>
+          <div class="service-features">
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Line Arrays Premium</span>
+            </div>
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Mesas Digitais</span>
+            </div>
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Microfones Profissionais</span>
+            </div>
+          </div>
+          <ion-button class="service-btn" fill="clear" (click)="irPara('/produtos-catalogo')">
+            Ver Detalhes
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
 
-  <!-- Seção de Validade do Orçamento -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="calendar"></ion-icon>
-        Validade do Orçamento
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Data de Validade *</ion-label>
-        <ion-datetime
-          [(ngModel)]="dataValidade"
-          presentation="date"
-          [min]="dataMinima"
-          (ionChange)="onDataValidadeChange()"
-          placeholder="Selecione a data de validade">
-        </ion-datetime>
-      </ion-item>
-      <ion-note color="medium">
-        <p><ion-icon name="warning" color="warning"></ion-icon> <strong>Validade mínima:</strong> 10 dias conforme legislação brasileira</p>
-        <p>Você pode alterar a data conforme necessário</p>
-      </ion-note>
-    </ion-card-content>
-  </ion-card>
+        <div class="service-card-premium featured" data-aos="fade-up" data-aos-delay="100">
+          <div class="featured-badge">Mais Popular</div>
+          <div class="service-icon">
+            <ion-icon name="bulb"></ion-icon>
+          </div>
+          <h3>Iluminação Cênica</h3>
+          <p>Transforme ambientes com iluminação profissional, efeitos especiais e controle total de atmosfera.</p>
+          <div class="service-features">
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Moving Heads LED</span>
+            </div>
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Lasers e Strobes</span>
+            </div>
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Controle DMX</span>
+            </div>
+          </div>
+          <ion-button class="service-btn" fill="clear" (click)="irPara('/produtos-catalogo')">
+            Ver Detalhes
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
 
-  <!-- Seção de Observações -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="document-text"></ion-icon>
-        Observações
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-textarea
-          [(ngModel)]="observacoes"
-          placeholder="Observações adicionais para o orçamento..."
-          rows="3">
-        </ion-textarea>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
+        <div class="service-card-premium" data-aos="fade-up" data-aos-delay="200">
+          <div class="service-icon">
+            <ion-icon name="flash"></ion-icon>
+          </div>
+          <h3>Geradores de Energia</h3>
+          <p>Energia confiável e silenciosa para garantir que seu evento nunca pare, independente das condições.</p>
+          <div class="service-features">
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Alta Potência</span>
+            </div>
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Baixo Ruído</span>
+            </div>
+            <div class="feature-item">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              <span>Automático</span>
+            </div>
+          </div>
+          <ion-button class="service-btn" fill="clear" (click)="irPara('/produtos-catalogo')">
+            Ver Detalhes
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
 
-  <!-- Botões de Ação -->
-  <ion-card *ngIf="itensOrcamento.length > 0">
-    <ion-card-content>
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="gerarOrcamento()"
-        class="action-button">
-        <ion-icon name="calculator" slot="start"></ion-icon>
-        Gerar Orçamento
+        <div class="service-card-premium" data-aos="fade-up" data-aos-delay="0">
+          <div class="service-icon">
+            <ion-icon name="construct"></ion-icon>
+          </div>
+          <h3>Palcos & Estruturas</h3>
+          <p>Estruturas modulares seguras e profissionais, desde pequenos eventos até grandes produções.</p>
+          <ion-button class="service-btn" fill="clear" (click)="irPara('/produtos-catalogo')">
+            Ver Detalhes
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
       </ion-button>
+        </div>
 
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="medium"
-        (click)="limparOrcamento()"
-        class="action-button">
-        <ion-icon name="trash" slot="start"></ion-icon>
-        Limpar Orçamento
+        <div class="service-card-premium" data-aos="fade-up" data-aos-delay="100">
+          <div class="service-icon">
+            <ion-icon name="desktop"></ion-icon>
+          </div>
+          <h3>Painéis de LED</h3>
+          <p>Telões de alta definição para máximo impacto visual em apresentações e transmissões.</p>
+          <ion-button class="service-btn" fill="clear" (click)="irPara('/produtos-catalogo')">
+            Ver Detalhes
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+        </ion-button>
+        </div>
+
+        <div class="service-card-premium" data-aos="fade-up" data-aos-delay="200">
+          <div class="service-icon">
+            <ion-icon name="sparkles"></ion-icon>
+          </div>
+          <h3>Efeitos Especiais</h3>
+          <p>Fumaça, bolhas, confetes, lasers e muito mais para momentos inesquecíveis.</p>
+          <ion-button class="service-btn" fill="clear" (click)="irPara('/produtos-catalogo')">
+            Ver Detalhes
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+        </ion-button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section class="why-choose-premium">
+    <div class="container-premium">
+      <div class="why-choose-grid">
+        <div class="why-choose-content" data-aos="fade-right">
+          <span class="section-label">Por Que a N.D Connect?</span>
+          <h2 class="section-title-premium">
+            Excelência em Cada <span class="gradient-text">Detalhe</span>
+          </h2>
+          <p class="section-description">
+            Mais do que equipamentos, oferecemos tranquilidade e garantia de sucesso para seu evento
+          </p>
+
+          <div class="benefits-grid">
+            <div class="benefit-card">
+              <div class="benefit-icon">
+                <ion-icon name="shield-checkmark"></ion-icon>
+              </div>
+              <div class="benefit-content">
+                <h4>Qualidade Garantida</h4>
+                <p>Equipamentos de marcas renomadas, constantemente atualizados e mantidos</p>
+              </div>
+            </div>
+
+            <div class="benefit-card">
+              <div class="benefit-icon">
+                <ion-icon name="people"></ion-icon>
+              </div>
+              <div class="benefit-content">
+                <h4>Equipe Especializada</h4>
+                <p>Profissionais experientes para suporte técnico em todas as etapas</p>
+              </div>
+            </div>
+
+            <div class="benefit-card">
+              <div class="benefit-icon">
+                <ion-icon name="time"></ion-icon>
+              </div>
+              <div class="benefit-content">
+                <h4>Entrega Pontual</h4>
+                <p>Compromisso com prazos e logística eficiente para sua tranquilidade</p>
+              </div>
+            </div>
+
+            <div class="benefit-card">
+              <div class="benefit-icon">
+                <ion-icon name="cash"></ion-icon>
+              </div>
+              <div class="benefit-content">
+                <h4>Preço Justo</h4>
+                <p>Melhor custo-benefício do mercado sem comprometer a qualidade</p>
+              </div>
+            </div>
+          </div>
+
+          <ion-button class="btn-premium primary" size="large" (click)="irPara('/sobre')">
+            Conheça Nossa História
+            <ion-icon name="arrow-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="why-choose-visual" data-aos="fade-left">
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <ion-icon name="trophy"></ion-icon>
+              </div>
+              <div class="stat-number">500+</div>
+              <div class="stat-label">Eventos de Sucesso</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">
+                <ion-icon name="star"></ion-icon>
+              </div>
+              <div class="stat-number">98%</div>
+              <div class="stat-label">Clientes Satisfeitos</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">
+                <ion-icon name="time"></ion-icon>
+              </div>
+              <div class="stat-number">24/7</div>
+              <div class="stat-label">Suporte Disponível</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-premium">
+    <div class="container-premium">
+      <div class="cta-content" data-aos="zoom-in">
+        <h2>Pronto Para Criar um Evento Memorável?</h2>
+        <p>Fale com nossos especialistas e receba um orçamento personalizado em minutos</p>
+        <div class="cta-actions">
+          <ion-button size="large" class="btn-premium primary" (click)="abrirWhatsApp()">
+            <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+            WhatsApp: (11) 95389-8557
+          </ion-button>
+          <ion-button size="large" class="btn-premium secondary" (click)="irPara('/orcamento-cliente')">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            Solicitar Orçamento
       </ion-button>
-    </ion-card-content>
-  </ion-card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Premium -->
+  <footer class="footer-premium">
+    <div class="container-premium">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="assets/img/logo.jpeg" alt="N.D Connect">
+            <h3>N.D CONNECT</h3>
+            <p>Equipamentos profissionais para eventos extraordinários</p>
+          </div>
+          <div class="social-links">
+            <a (click)="abrirLink('instagram')" class="social-btn">
+              <ion-icon name="logo-instagram"></ion-icon>
+            </a>
+            <a (click)="abrirLink('facebook')" class="social-btn">
+              <ion-icon name="logo-facebook"></ion-icon>
+            </a>
+            <a (click)="abrirLink('youtube')" class="social-btn">
+              <ion-icon name="logo-youtube"></ion-icon>
+            </a>
+            <a (click)="abrirLink('linkedin')" class="social-btn">
+              <ion-icon name="logo-linkedin"></ion-icon>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Menu</h4>
+          <ul>
+            <li><a (click)="irPara('/home')">Início</a></li>
+            <li><a (click)="irPara('/sobre')">Sobre Nós</a></li>
+            <li><a (click)="irPara('/produtos-catalogo')">Produtos</a></li>
+            <li><a (click)="irPara('/portfolio')">Portfólio</a></li>
+            <li><a (click)="irPara('/contato')">Contato</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Produtos</h4>
+          <ul>
+            <li><a (click)="irPara('/produtos-catalogo')">Som Profissional</a></li>
+            <li><a (click)="irPara('/produtos-catalogo')">Iluminação</a></li>
+            <li><a (click)="irPara('/produtos-catalogo')">Geradores</a></li>
+            <li><a (click)="irPara('/produtos-catalogo')">Palcos</a></li>
+            <li><a (click)="irPara('/produtos-catalogo')">Painéis LED</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <ul class="contact-info">
+            <li>
+              <ion-icon name="logo-whatsapp"></ion-icon>
+              <a (click)="abrirWhatsApp()">(11) 95389-8557</a>
+            </li>
+            <li>
+              <ion-icon name="mail"></ion-icon>
+              <a href="mailto:danieltorquato2009@gmail.com">danieltorquato2009@gmail.com</a>
+            </li>
+            <li>
+              <ion-icon name="time"></ion-icon>
+              <span>Atendimento 24/7</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 N.D Connect. Todos os direitos reservados.</p>
+        <div class="footer-links">
+          <a>Termos de Uso</a>
+          <a>Política de Privacidade</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </ion-content>

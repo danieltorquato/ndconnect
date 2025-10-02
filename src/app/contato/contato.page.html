@@ -1,0 +1,181 @@
+<app-navbar></app-navbar>
+
+<ion-content [fullscreen]="true">
+  <section class="hero-contato">
+    <div class="hero-content">
+      <h1>Entre em Contato</h1>
+      <p>Estamos prontos para atender você e fazer seu evento acontecer</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="contato-grid">
+      <!-- Informações de Contato -->
+      <div class="info-section">
+        <ion-card class="contact-card">
+          <ion-card-header>
+            <ion-card-title>Fale Conosco</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="contact-item">
+              <div class="contact-icon whatsapp">
+                <ion-icon name="logo-whatsapp"></ion-icon>
+              </div>
+              <div class="contact-info">
+                <h4>WhatsApp</h4>
+                <p>(11) 95389-8557</p>
+                <ion-button fill="clear" (click)="abrirWhatsApp()">
+                  Iniciar Conversa
+                  <ion-icon name="arrow-forward" slot="end"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon email">
+                <ion-icon name="mail"></ion-icon>
+              </div>
+              <div class="contact-info">
+                <h4>E-mail</h4>
+                <p>danieltorquato2009@gmail.com</p>
+                <ion-button fill="clear" (click)="abrirEmail()">
+                  Enviar E-mail
+                  <ion-icon name="arrow-forward" slot="end"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <ion-icon name="time"></ion-icon>
+              </div>
+              <div class="contact-info">
+                <h4>Horário de Atendimento</h4>
+                <p>24 horas por dia, 7 dias por semana</p>
+                <small>Suporte disponível para emergências</small>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card class="social-card">
+          <ion-card-header>
+            <ion-card-title>Redes Sociais</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="social-links">
+              <a class="social-link instagram">
+                <ion-icon name="logo-instagram"></ion-icon>
+                <span>@ndconnect_oficial</span>
+              </a>
+              <a class="social-link facebook">
+                <ion-icon name="logo-facebook"></ion-icon>
+                <span>/ndconnect</span>
+              </a>
+              <a class="social-link youtube">
+                <ion-icon name="logo-youtube"></ion-icon>
+                <span>N.D Connect</span>
+              </a>
+              <a class="social-link linkedin">
+                <ion-icon name="logo-linkedin"></ion-icon>
+                <span>/company/ndconnect</span>
+              </a>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Formulário Rápido -->
+      <div class="form-section">
+        <ion-card class="form-card">
+          <ion-card-header>
+            <ion-card-title>Envie uma Mensagem</ion-card-title>
+            <p>Preencha o formulário abaixo e entraremos em contato</p>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="form-group">
+              <label>Categoria</label>
+              <ion-select placeholder="Selecione uma categoria" class="custom-select" [(ngModel)]="categoriaContato">
+                <ion-select-option value="orcamento">Solicitar Orçamento</ion-select-option>
+                <ion-select-option value="sugestao">Sugestão</ion-select-option>
+                <ion-select-option value="elogio">Elogio</ion-select-option>
+                <ion-select-option value="duvida">Dúvida</ion-select-option>
+                <ion-select-option value="reclamacao">Reclamação</ion-select-option>
+                <ion-select-option value="parceria">Parceria</ion-select-option>
+                <ion-select-option value="outros">Outros</ion-select-option>
+              </ion-select>
+            </div>
+
+            <div class="form-group">
+              <label>Nome</label>
+              <ion-input placeholder="Seu nome" class="custom-input" [(ngModel)]="nomeContato"></ion-input>
+            </div>
+
+            <div class="form-group">
+              <label>WhatsApp</label>
+              <ion-input placeholder="(11) 99999-9999" class="custom-input" [(ngModel)]="whatsappContato"></ion-input>
+            </div>
+
+            <div class="form-group">
+              <label>E-mail</label>
+              <ion-input type="email" placeholder="seu@email.com" class="custom-input" [(ngModel)]="emailContato"></ion-input>
+            </div>
+
+            <div class="form-group">
+              <label>Mensagem</label>
+              <ion-textarea rows="5" placeholder="Como podemos ajudar?" class="custom-textarea" [(ngModel)]="mensagemContato"></ion-textarea>
+            </div>
+
+            <ion-button expand="block" size="large" class="submit-button" (click)="enviarMensagem()">
+              <ion-icon name="mail" slot="start"></ion-icon>
+              Enviar por E-mail
+            </ion-button>
+
+            <div class="form-note">
+              <ion-icon name="lock-closed"></ion-icon>
+              <span>Suas informações estão seguras conosco</span>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Perguntas Frequentes -->
+    <section class="faq-section">
+      <h2>Perguntas Frequentes</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>
+            <ion-icon name="help-circle"></ion-icon>
+            Qual o prazo para receber o orçamento?
+          </h3>
+          <p>Enviamos orçamentos em até 24 horas após o recebimento da solicitação. Em casos urgentes, entre em contato via WhatsApp para agilizar.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>
+            <ion-icon name="help-circle"></ion-icon>
+            Vocês fazem eventos fora de São Paulo?
+          </h3>
+          <p>Sim! Atendemos todo o Brasil. Entre em contato para verificar disponibilidade e condições especiais para sua região.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>
+            <ion-icon name="help-circle"></ion-icon>
+            Posso agendar uma visita técnica?
+          </h3>
+          <p>Claro! Oferecemos visitas técnicas gratuitas para eventos de médio e grande porte. Agende pelo WhatsApp.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>
+            <ion-icon name="help-circle"></ion-icon>
+            Quais as formas de pagamento?
+          </h3>
+          <p>Aceitamos PIX, transferência bancária, cartão de crédito e boleto. Condições especiais para pagamento antecipado.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</ion-content>

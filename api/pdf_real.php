@@ -65,10 +65,14 @@ $pdf->SetTitle('Orçamento N.D Connect - ' . $orcamentoId);
 $pdf->SetSubject('Orçamento de Equipamentos para Eventos');
 $pdf->SetKeywords('orçamento, eventos, equipamentos, N.D Connect');
 
+// Desabilitar cabeçalho e rodapé
+$pdf->setPrintHeader(false);
+$pdf->setPrintFooter(false);
+
 // Configurar margens
-$pdf->SetMargins(15, 20, 15);
-$pdf->SetHeaderMargin(5);
-$pdf->SetFooterMargin(10);
+$pdf->SetMargins(15, 0, 15);
+$pdf->SetHeaderMargin(0);
+$pdf->SetFooterMargin(0);
 
 // Configurar quebras de página automáticas
 $pdf->SetAutoPageBreak(TRUE, 25);
@@ -76,152 +80,268 @@ $pdf->SetAutoPageBreak(TRUE, 25);
 // Adicionar uma página
 $pdf->AddPage();
 
-// Definir fonte
-$pdf->SetFont('helvetica', '', 10);
+// Cores personalizadas N.D Connect
+$azulMarinho = array(12, 43, 89);    // #0C2B59
+$laranja = array(232, 98, 45);       // #E8622D
+$amarelo = array(247, 166, 76);      // #F7A64C
+$cinzaClaro = array(248, 250, 252);  // #f8fafc
+$cinzaEscuro = array(100, 116, 139); // #64748b
 
-// Cores personalizadas
-$pdf->SetTextColor(12, 43, 89); // Azul marinho
-$corLaranja = array(232, 98, 45); // Laranja
+// Header com logo pequeno no topo - APENAS JPEG
+$logoPath = __DIR__ . '/../src/assets/img/logo.jpeg';
 
-// Header do orçamento
-$pdf->SetFillColor(12, 43, 89);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetFont('helvetica', 'B', 20);
-$pdf->Cell(0, 15, 'N.D CONNECT', 0, 1, 'C', true);
+if (file_exists($logoPath)) {
+    // Tentar carregar como JPEG
+    $image = null;
+    if (function_exists('imagecreatefromjpeg')) {
+        $image = @imagecreatefromjpeg($logoPath);
+    }
 
-$pdf->SetFont('helvetica', 'B', 14);
-$pdf->Cell(0, 8, 'ORÇAMENTO N° ' . str_pad($orcamentoId, 6, '0', STR_PAD_LEFT), 0, 1, 'C', true);
+    if ($image) {
+        // Se conseguiu carregar com GD, processar
+        $width = imagesx($image);
+        $height = imagesy($image);
 
-// Voltar para cor normal
-$pdf->SetTextColor(0, 0, 0);
+        // Salvar como arquivo temporário JPEG
+        $tempJpeg = tempnam(sys_get_temp_dir(), 'logo_') . '.jpg';
+        imagejpeg($image, $tempJpeg, 90);
+
+        // Limpar memória
+        imagedestroy($image);
+
+        // Adicionar logo pequeno (60mm de largura) usando arquivo direto
+        $pdf->Image($tempJpeg, 75, 0, 60, 0, 'JPEG', '', 'C', false, 300, 'C', false, false, 0, false, false, false);
+        $pdf->Ln(40);
+
+        // Limpar arquivo temporário
+        unlink($tempJpeg);
+    } else {
+        // Se GD não funcionar, tentar arquivo direto
+        try {
+            $pdf->Image($logoPath, 75, 0, 60, 0, 'JPEG', '', 'C', false, 300, 'C', false, false, 0, false, false, false);
+            $pdf->Ln(40);
+        } catch (Exception $e) {
+            // Se falhar, usar texto
+            $pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetFont('helvetica', 'B', 24);
+            $pdf->Cell(0, 20, 'N.D CONNECT', 0, 1, 'C', true);
+        }
+    }
+} else {
+    // Fallback para texto se logo não encontrada
+    $pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->SetFont('helvetica', 'B', 24);
+    $pdf->Cell(0, 20, 'N.D CONNECT', 0, 1, 'C', true);
+}
+
+// Adicionar espaço antes da faixa azul
 $pdf->Ln(10);
 
-// Dados do cliente
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->SetFillColor(12, 43, 89);
+$pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
 $pdf->SetTextColor(255, 255, 255);
-$pdf->Cell(0, 8, 'DADOS DO CLIENTE', 0, 1, 'L', true);
+$pdf->SetFont('helvetica', '', 14);
+$pdf->Cell(0, 8, 'EQUIPAMENTOS PARA EVENTOS', 0, 1, 'C', true);
+
+// Número do orçamento com destaque
+$pdf->SetFillColor(255, 255, 255);
+$pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+$pdf->SetFont('helvetica', 'B', 16);
+$pdf->Cell(0, 12, 'ORÇAMENTO Nº ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT), 0, 1, 'C', true);
+
+$pdf->Ln(0);
+
+// Dados do cliente
+$pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+$pdf->SetTextColor(255, 255, 255);
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 10, 'DADOS DO CLIENTE', 0, 1, 'L', true);
 
 $pdf->SetTextColor(0, 0, 0);
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Ln(2);
+$pdf->Ln(8);
 
-// Informações do cliente em duas colunas
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(30, 5, 'Nome:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, $orcamento['cliente_nome'], 0, 0, 'L');
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(20, 5, 'Email:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(0, 5, $orcamento['email'], 0, 1, 'L');
+// Grid de dados do cliente
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(25, 6, 'NOME', 0, 0, 'L');
+$pdf->SetFont('helvetica', '', 11);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell(80, 6, $orcamento['cliente_nome'], 0, 0, 'L');
 
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(30, 5, 'Telefone:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(70, 5, $orcamento['telefone'], 0, 0, 'L');
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(20, 5, 'CPF/CNPJ:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(0, 5, $orcamento['cpf_cnpj'], 0, 1, 'L');
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(20, 6, 'E-MAIL', 0, 0, 'L');
+$pdf->SetFont('helvetica', '', 11);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell(0, 6, $orcamento['email'] ?? '', 0, 1, 'L');
 
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(30, 5, 'Endereço:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(0, 5, $orcamento['endereco'], 0, 1, 'L');
+$pdf->Ln(3);
 
-$pdf->Ln(5);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(25, 6, 'TELEFONE', 0, 0, 'L');
+$pdf->SetFont('helvetica', '', 11);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell(80, 6, $orcamento['telefone'] ?? '', 0, 0, 'L');
 
-// Datas
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(20, 6, 'CPF/CNPJ', 0, 0, 'L');
+$pdf->SetFont('helvetica', '', 11);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell(0, 6, $orcamento['cpf_cnpj'] ?? '', 0, 1, 'L');
+
+if (!empty($orcamento['endereco'])) {
+    $pdf->Ln(3);
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+    $pdf->Cell(25, 6, 'ENDEREÇO', 0, 0, 'L');
+    $pdf->SetFont('helvetica', '', 11);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(0, 6, $orcamento['endereco'], 0, 1, 'L');
+}
+
+$pdf->Ln(10);
+
+// Seção de datas
+$pdf->SetFillColor($cinzaClaro[0], $cinzaClaro[1], $cinzaClaro[2]);
+$pdf->Rect(15, $pdf->GetY(), 180, 15, 'F');
+
 $dataOrcamento = date('d/m/Y', strtotime($orcamento['data_orcamento']));
 $dataValidade = date('d/m/Y', strtotime($orcamento['data_validade']));
 
 $pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(30, 5, 'Data Orçamento:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(40, 5, $dataOrcamento, 0, 0, 'L');
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(60, 8, 'DATA DO ORÇAMENTO', 0, 0, 'C');
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+$pdf->Cell(60, 8, $dataOrcamento, 0, 0, 'C');
 $pdf->SetFont('helvetica', 'B', 9);
-$pdf->Cell(25, 5, 'Válido até:', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 9);
-$pdf->Cell(0, 5, $dataValidade, 0, 1, 'L');
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(30, 8, 'VÁLIDO ATÉ', 0, 0, 'C');
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+$pdf->Cell(0, 8, $dataValidade, 0, 1, 'C');
 
-$pdf->Ln(10);
+$pdf->Ln(15);
 
-// Itens do orçamento
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->SetFillColor(232, 98, 45);
+// Título da seção de itens
+$pdf->SetFillColor($laranja[0], $laranja[1], $laranja[2]);
 $pdf->SetTextColor(255, 255, 255);
-$pdf->Cell(0, 8, 'ITENS DO ORÇAMENTO', 0, 1, 'L', true);
-
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Ln(2);
-
-// Cabeçalho da tabela
-$pdf->SetFont('helvetica', 'B', 8);
-$pdf->SetFillColor(232, 98, 45);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->Cell(80, 6, 'PRODUTO', 1, 0, 'C', true);
-$pdf->Cell(15, 6, 'QTD', 1, 0, 'C', true);
-$pdf->Cell(25, 6, 'PREÇO UNIT.', 1, 0, 'C', true);
-$pdf->Cell(25, 6, 'SUBTOTAL', 1, 0, 'C', true);
-$pdf->Cell(20, 6, 'UNID.', 1, 1, 'C', true);
-
-// Itens
-$pdf->SetTextColor(0, 0, 0);
-$pdf->SetFont('helvetica', '', 8);
-
-foreach ($orcamento['itens'] as $item) {
-    $precoUnitario = number_format($item['preco_unitario'], 2, ',', '.');
-    $subtotal = number_format($item['subtotal'], 2, ',', '.');
-
-    $pdf->Cell(80, 5, $item['produto_nome'], 1, 0, 'L');
-    $pdf->Cell(15, 5, $item['quantidade'], 1, 0, 'C');
-    $pdf->Cell(25, 5, 'R$ ' . $precoUnitario, 1, 0, 'R');
-    $pdf->Cell(25, 5, 'R$ ' . $subtotal, 1, 0, 'R');
-    $pdf->Cell(20, 5, $item['unidade'], 1, 1, 'C');
-}
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 10, 'ITENS DO ORÇAMENTO', 0, 1, 'L', true);
 
 $pdf->Ln(5);
 
-// Totais
+// Cabeçalho da tabela
+$pdf->SetFillColor($laranja[0], $laranja[1], $laranja[2]);
+$pdf->SetTextColor(255, 255, 255);
 $pdf->SetFont('helvetica', 'B', 10);
-$subtotal = number_format($orcamento['subtotal'], 2, ',', '.');
-$desconto = number_format($orcamento['desconto'], 2, ',', '.');
-$total = number_format($orcamento['total'], 2, ',', '.');
 
-$pdf->Cell(120, 6, 'SUBTOTAL:', 0, 0, 'R');
-$pdf->Cell(30, 6, 'R$ ' . $subtotal, 0, 1, 'R');
+$pdf->Cell(80, 8, 'PRODUTO', 1, 0, 'L', true);
+$pdf->Cell(20, 8, 'QTD', 1, 0, 'C', true);
+$pdf->Cell(30, 8, 'PREÇO UNIT.', 1, 0, 'C', true);
+$pdf->Cell(30, 8, 'SUBTOTAL', 1, 0, 'C', true);
+$pdf->Cell(20, 8, 'UNID.', 1, 1, 'C', true);
 
-if ($orcamento['desconto'] > 0) {
-    $pdf->Cell(120, 6, 'DESCONTO:', 0, 0, 'R');
-    $pdf->Cell(30, 6, '- R$ ' . $desconto, 0, 1, 'R');
+// Itens da tabela
+$pdf->SetTextColor(0, 0, 0);
+$pdf->SetFont('helvetica', '', 9);
+
+foreach ($orcamento['itens'] as $index => $item) {
+    $bgColor = ($index % 2 == 0) ? array(255, 255, 255) : array(248, 250, 252);
+    $pdf->SetFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
+
+    // Nome do produto
+    $pdf->SetFont('helvetica', 'B', 9);
+    $pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+    $pdf->Cell(80, 8, $item['produto_nome'], 1, 0, 'L', true);
+
+    // Quantidade
+    $pdf->SetFont('helvetica', '', 9);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(20, 8, $item['quantidade'], 1, 0, 'C', true);
+
+    // Preço unitário
+    $pdf->SetTextColor(5, 150, 105);
+    $pdf->SetFont('helvetica', 'B', 9);
+    $pdf->Cell(30, 8, 'R$ ' . number_format($item['preco_unitario'], 2, ',', '.'), 1, 0, 'C', true);
+
+    // Subtotal
+    $pdf->Cell(30, 8, 'R$ ' . number_format($item['subtotal'], 2, ',', '.'), 1, 0, 'C', true);
+
+    // Unidade
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->SetFont('helvetica', '', 9);
+    $pdf->Cell(20, 8, $item['unidade'], 1, 1, 'C', true);
 }
 
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->SetTextColor(12, 43, 89);
-$pdf->Cell(120, 8, 'TOTAL:', 0, 0, 'R');
-$pdf->Cell(30, 8, 'R$ ' . $total, 0, 1, 'R');
+$pdf->Ln(10);
 
-// Observações
-if (!empty($orcamento['observacoes'])) {
-    $pdf->Ln(10);
-    $pdf->SetFont('helvetica', 'B', 10);
+// Seção de totais
+$pdf->SetFillColor($cinzaClaro[0], $cinzaClaro[1], $cinzaClaro[2]);
+$pdf->Rect(15, $pdf->GetY(), 180, 40, 'F');
+
+$pdf->SetFont('helvetica', 'B', 12);
+$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+$pdf->Cell(120, 8, 'SUBTOTAL:', 0, 0, 'R');
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell(60, 8, 'R$ ' . number_format($orcamento['subtotal'], 2, ',', '.'), 0, 1, 'R');
+
+if ($orcamento['desconto'] > 0) {
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
+    $pdf->Cell(120, 8, 'DESCONTO:', 0, 0, 'R');
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(0, 6, 'OBSERVAÇÕES:', 0, 1, 'L');
-    $pdf->SetFont('helvetica', '', 9);
-    $pdf->MultiCell(0, 5, $orcamento['observacoes'], 0, 'L');
+    $pdf->Cell(60, 8, '- R$ ' . number_format($orcamento['desconto'], 2, ',', '.'), 0, 1, 'R');
+}
+
+// Linha separadora
+$pdf->SetDrawColor($laranja[0], $laranja[1], $laranja[2]);
+$pdf->Line(15, $pdf->GetY() + 2, 195, $pdf->GetY() + 2);
+
+$pdf->Ln(5);
+
+// Total final
+$pdf->SetFont('helvetica', 'B', 16);
+$pdf->SetTextColor($laranja[0], $laranja[1], $laranja[2]);
+$pdf->Cell(120, 10, 'TOTAL:', 0, 0, 'R');
+$pdf->SetFont('helvetica', 'B', 18);
+$pdf->Cell(60, 10, 'R$ ' . number_format($orcamento['total'], 2, ',', '.'), 0, 1, 'R');
+
+$pdf->Ln(15);
+
+// Observações (se houver)
+if (!empty($orcamento['observacoes'])) {
+    $pdf->SetFillColor(254, 243, 199); // Amarelo claro
+    $pdf->SetDrawColor($amarelo[0], $amarelo[1], $amarelo[2]);
+    $pdf->Rect(15, $pdf->GetY(), 180, 25, 'FD');
+
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+    $pdf->Cell(0, 6, 'OBSERVAÇÕES', 0, 1, 'L');
+
+    $pdf->SetFont('helvetica', 'I', 10);
+    $pdf->SetTextColor(146, 64, 14); // Marrom escuro
+    $pdf->MultiCell(170, 5, $orcamento['observacoes'], 0, 'L');
+
+    $pdf->Ln(10);
 }
 
 // Footer
-$pdf->SetY(-30);
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetTextColor(12, 43, 89);
-$pdf->Cell(0, 5, 'N.D CONNECT - EQUIPAMENTOS PARA EVENTOS', 0, 1, 'C');
-$pdf->SetFont('helvetica', '', 8);
-$pdf->SetTextColor(100, 100, 100);
-$pdf->Cell(0, 4, 'Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED', 0, 1, 'C');
-$pdf->Cell(0, 4, 'Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br', 0, 1, 'C');
+$pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
+$pdf->SetTextColor(255, 255, 255);
+$pdf->SetFont('helvetica', 'B', 12);
+$pdf->Cell(0, 8, 'N.D CONNECT - EQUIPAMENTOS PARA EVENTOS', 0, 1, 'C', true);
+
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(0, 5, 'Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED', 0, 1, 'C', true);
+
+$pdf->SetFont('helvetica', '', 9);
+$pdf->SetTextColor(200, 200, 200);
+$pdf->Cell(0, 4, 'Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br', 0, 1, 'C', true);
 
 // Gerar PDF
-$pdf->Output('orcamento_' . $orcamentoId . '.pdf', 'D');
+$pdf->Output('orcamento_' . strtolower(explode(' ', $orcamento['cliente_nome'])[0]) . '_' . $orcamentoId . '.pdf', 'D');
 ?>

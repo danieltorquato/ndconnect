@@ -1,0 +1,253 @@
+// Variáveis CSS
+:root {
+  --nd-primary: #0A1F3F;
+  --nd-secondary: #E8622D;
+  --nd-accent: #F4A261;
+  --nd-success: #2A9D8F;
+  --nd-warning: #E76F51;
+  --nd-light: #F8F9FA;
+  --nd-dark: #212529;
+  --nd-gray-100: #F8F9FA;
+  --nd-gray-200: #E9ECEF;
+  --nd-gray-300: #DEE2E6;
+  --nd-gray-400: #CED4DA;
+  --nd-gray-500: #ADB5BD;
+  --nd-gray-600: #6C757D;
+  --nd-gray-700: #495057;
+  --nd-gray-800: #343A40;
+  --nd-gray-900: #212529;
+  --nd-gradient: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-secondary) 100%);
+  --nd-gradient-primary: linear-gradient(135deg, #E8622D 0%, #F4A261 100%);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-soft: 0 4px 20px rgba(10, 31, 63, 0.1);
+  --shadow-medium: 0 8px 30px rgba(10, 31, 63, 0.15);
+  --shadow-strong: 0 12px 40px rgba(10, 31, 63, 0.2);
+}
+
+// Header Glass Effect
+.header-glass {
+  ion-toolbar {
+    --background: rgba(255, 255, 255, 0.95);
+    --color: var(--nd-primary);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(232, 98, 45, 0.1);
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+// Toolbar Premium
+.toolbar-premium {
+  .toolbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+// Brand
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(232, 98, 45, 0.2);
+  }
+
+  .brand-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--nd-primary);
+    letter-spacing: -0.5px;
+  }
+}
+
+// Navigation Menu
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .nav-link {
+    padding: 12px 20px;
+    color: var(--nd-gray-700);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    transition: var(--transition-smooth);
+    position: relative;
+    cursor: pointer;
+    &:hover {
+      background: rgba(232, 98, 45, 0.1);
+      color: var(--nd-primary);
+      transform: translateY(-1px);
+    }
+
+    &.active {
+      background: var(--nd-secondary);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(232, 98, 45, 0.3);
+    }
+  }
+}
+
+// CTA Header Button
+.cta-header {
+  --color: white;
+  --background: var(--nd-secondary);
+  --border-radius: 10px;
+  --padding-start: 24px;
+  --padding-end: 24px;
+  height: 44px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-left: 16px;
+  box-shadow: 0 4px 16px rgba(232, 98, 45, 0.3);
+  transition: var(--transition-smooth);
+
+  &:hover {
+    --background: #d55a2a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(232, 98, 45, 0.4);
+  }
+}
+
+// Menu Toggle (Mobile)
+.menu-toggle {
+  display: none;
+  --color: var(--nd-primary);
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+// Mobile Menu
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 31, 63, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-smooth);
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h3 {
+      color: white;
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    ion-button {
+      --color: white;
+    }
+  }
+
+  .mobile-nav {
+    flex: 1;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 16px 20px;
+      border-radius: 12px;
+      transition: var(--transition-smooth);
+      background: rgba(255, 255, 255, 0.05);
+
+      &:hover {
+        background: rgba(232, 98, 45, 0.2);
+        color: white;
+        transform: translateX(8px);
+      }
+    }
+
+    ion-button {
+      margin-top: 20px;
+      --background: var(--nd-secondary);
+      --color: white;
+      --border-radius: 12px;
+      height: 50px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
+
+  .brand {
+    .brand-name {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar-container {
+    padding: 0 16px;
+  }
+
+  .brand {
+    .brand-logo {
+      width: 35px;
+      height: 35px;
+    }
+
+    .brand-name {
+      font-size: 1rem;
+    }
+  }
+}

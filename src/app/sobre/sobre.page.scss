@@ -1,0 +1,293 @@
+:root {
+  --nd-primary: #0C2B59;
+  --nd-secondary: #E8622D;
+  --nd-accent: #F7A64C;
+  --nd-gradient: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo {
+  height: 32px;
+  width: auto;
+  border-radius: 4px;
+}
+
+ion-toolbar ion-buttons ion-button {
+  --color: white;
+  font-weight: 600;
+}
+
+.hero-sobre {
+  position: relative;
+  height: 400px;
+  background: var(--nd-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+  }
+
+  p {
+    font-size: 1.3rem;
+    margin: 0;
+    opacity: 0.95;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 20px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--nd-primary);
+  text-align: center;
+  margin: 0 0 48px 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.content-text {
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--nd-primary);
+    margin: 0 0 24px 0;
+  }
+
+  p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #666;
+    margin: 0 0 20px 0;
+  }
+}
+
+.image-placeholder {
+  background: var(--nd-gradient);
+  border-radius: 16px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 200px;
+    color: white;
+    opacity: 0.8;
+  }
+}
+
+.mvv-section {
+  background: #f8f9fa;
+}
+
+.mvv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.mvv-card {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--nd-primary);
+    margin: 0 0 16px 0;
+  }
+
+  p, ul {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #666;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin: 12px 0;
+      padding-left: 24px;
+      position: relative;
+
+      &::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--nd-secondary);
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.mvv-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--nd-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 24px 0;
+
+  ion-icon {
+    font-size: 40px;
+    color: white;
+  }
+}
+
+.diferenciais-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+}
+
+.diferencial-item {
+  position: relative;
+  padding: 24px 24px 24px 80px;
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--nd-primary);
+    margin: 0 0 12px 0;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+  }
+}
+
+.diferencial-number {
+  position: absolute;
+  left: 0;
+  top: 24px;
+  width: 60px;
+  height: 60px;
+  background: var(--nd-gradient);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+}
+
+.stats-section {
+  background: var(--nd-primary);
+  color: white;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: var(--nd-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.cta-final {
+  background: var(--nd-gradient);
+  color: white;
+  text-align: center;
+
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+  }
+
+  p {
+    font-size: 1.3rem;
+    margin: 0 0 32px 0;
+  }
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.whatsapp-button {
+  --background: #25D366;
+  --border-radius: 12px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+  height: 56px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.email-button {
+  --color: white;
+  --border-color: white;
+  --border-width: 2px;
+  --border-radius: 12px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+  height: 56px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero-sobre h1 {
+    font-size: 2rem;
+  }
+
+  ion-toolbar ion-buttons {
+    display: none;
+  }
+}

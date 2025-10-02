@@ -1,0 +1,141 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Gerenciar Produtos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="voltarHome()">
+        <ion-icon name="home"></ion-icon>
+      </ion-button>
+      <ion-button (click)="adicionarProduto()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <!-- Filtros -->
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-label>Categoria:</ion-label>
+          <ion-select [(ngModel)]="categoriaFiltro" (ionChange)="filtrarProdutos()">
+            <ion-select-option value="">Todas as categorias</ion-select-option>
+            <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
+              {{ categoria.nome }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Buscar:</ion-label>
+          <ion-input [(ngModel)]="termoBusca"
+                     (ionInput)="filtrarProdutos()"
+                     placeholder="Digite o nome do produto"></ion-input>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Lista de Produtos -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Produtos ({{ produtosFiltrados.length }})</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let produto of produtosFiltrados" button (click)="editarProduto(produto)">
+            <ion-label>
+              <h3>{{ produto.nome }}</h3>
+              <p>{{ produto.descricao }}</p>
+              <p class="info-produto">
+                <span class="preco">R$ {{ produto.preco_unitario | number:'1.2-2' }}</span>
+                <span class="unidade">{{ produto.unidade }}</span>
+                <span class="categoria">{{ produto.categoria_nome }}</span>
+              </p>
+            </ion-label>
+            <ion-button slot="end" fill="clear" (click)="excluirProduto(produto.id, $event); $event.stopPropagation();">
+              <ion-icon name="trash" color="danger"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Modal de Edição/Adição -->
+  <ion-modal [isOpen]="modalAberto" (didDismiss)="fecharModal()">
+    <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ produtoEditando.id ? 'Editar' : 'Adicionar' }} Produto</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-card>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Nome *</ion-label>
+              <ion-input [(ngModel)]="produtoEditando.nome" placeholder="Nome do produto"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Descrição</ion-label>
+              <ion-textarea [(ngModel)]="produtoEditando.descricao"
+                           placeholder="Descrição do produto"
+                           rows="3"></ion-textarea>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Preço Unitário *</ion-label>
+              <ion-input type="number"
+                        [(ngModel)]="produtoEditando.preco_unitario"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Unidade *</ion-label>
+              <ion-input [(ngModel)]="produtoEditando.unidade"
+                        placeholder="Ex: unidade, metro, kg"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Categoria *</ion-label>
+              <ion-select [(ngModel)]="produtoEditando.categoria_id">
+                <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
+                  {{ categoria.nome }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Popularidade</ion-label>
+              <ion-input type="number"
+                        [(ngModel)]="produtoEditando.popularidade"
+                        placeholder="0"
+                        min="0"
+                        max="100"></ion-input>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+
+        <div class="botoes-modal">
+          <ion-button expand="block" (click)="salvarProduto()" [disabled]="!validarProduto()">
+            <ion-icon name="save" slot="start"></ion-icon>
+            Salvar
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" (click)="fecharModal()">
+            <ion-icon name="close" slot="start"></ion-icon>
+            Cancelar
+          </ion-button>
+        </div>
+      </ion-content>
+  </ion-modal>
+</ion-content>

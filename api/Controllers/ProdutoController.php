@@ -163,15 +163,16 @@ class ProdutoController {
     public function create($data) {
         try {
             $query = "INSERT INTO " . $this->table_name . "
-                      (nome, descricao, preco, unidade, categoria_id)
-                      VALUES (:nome, :descricao, :preco, :unidade, :categoria_id)";
+                      (nome, descricao, preco_unitario, unidade, categoria_id, popularidade)
+                      VALUES (:nome, :descricao, :preco_unitario, :unidade, :categoria_id, :popularidade)";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nome', $data['nome']);
             $stmt->bindParam(':descricao', $data['descricao']);
-            $stmt->bindParam(':preco', $data['preco']);
+            $stmt->bindParam(':preco_unitario', $data['preco_unitario']);
             $stmt->bindParam(':unidade', $data['unidade']);
             $stmt->bindParam(':categoria_id', $data['categoria_id']);
+            $stmt->bindParam(':popularidade', $data['popularidade']);
             $stmt->execute();
 
             return [
@@ -184,6 +185,59 @@ class ProdutoController {
                 'success' => false,
                 'data' => null,
                 'message' => 'Erro ao criar produto: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function update($id, $data) {
+        try {
+            $query = "UPDATE " . $this->table_name . "
+                      SET nome = :nome, descricao = :descricao, preco_unitario = :preco_unitario,
+                          unidade = :unidade, categoria_id = :categoria_id, popularidade = :popularidade
+                      WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':nome', $data['nome']);
+            $stmt->bindParam(':descricao', $data['descricao']);
+            $stmt->bindParam(':preco_unitario', $data['preco_unitario']);
+            $stmt->bindParam(':unidade', $data['unidade']);
+            $stmt->bindParam(':categoria_id', $data['categoria_id']);
+            $stmt->bindParam(':popularidade', $data['popularidade']);
+            $stmt->execute();
+
+            return [
+                'success' => true,
+                'data' => ['id' => $id],
+                'message' => 'Produto atualizado com sucesso'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao atualizar produto: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function delete($id) {
+        try {
+            $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            return [
+                'success' => true,
+                'data' => ['id' => $id],
+                'message' => 'Produto excluído com sucesso'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao excluir produto: ' . $e->getMessage()
             ];
         }
     }

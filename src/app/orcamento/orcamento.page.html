@@ -1,0 +1,301 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>
+      <div class="header-content">
+        <img src="assets/img/logo.jpeg" alt="N.D Connect" class="header-logo">
+        <span>Orçamentos</span>
+        <ion-badge color="secondary" *ngIf="itensOrcamento.length > 0">{{itensOrcamento.length}} itens</ion-badge>
+        <ion-button
+          fill="clear"
+          color="light"
+          size="small"
+          (click)="abrirHistorico()"
+          class="historico-btn">
+          <ion-icon name="list" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Orçamentos</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Seção de Filtros e Pesquisa -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Filtrar e Pesquisar Produtos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Pesquisar produtos</ion-label>
+        <ion-input
+          [(ngModel)]="termoPesquisa"
+          (ionInput)="pesquisarProdutos()"
+          placeholder="Digite o nome, descrição ou categoria do produto..."
+          clearInput="true">
+          <ion-icon name="search" slot="start"></ion-icon>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Categoria</ion-label>
+        <ion-select [(ngModel)]="categoriaSelecionada" (ionChange)="filtrarPorCategoria()" placeholder="Todas as categorias">
+          <ion-select-option [value]="0">Todas as categorias</ion-select-option>
+          <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
+            {{categoria.nome}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item *ngIf="termoPesquisa.trim() || categoriaSelecionada !== 0">
+        <ion-button
+          fill="outline"
+          color="medium"
+          (click)="limparFiltros()"
+          expand="block">
+          <ion-icon name="close" slot="start"></ion-icon>
+          Limpar Filtros
+        </ion-button>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção de Produtos -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <span *ngIf="!mostrarTodosProdutos && !termoPesquisa.trim() && categoriaSelecionada === 0">
+          Produtos Mais Populares
+        </span>
+        <span *ngIf="mostrarTodosProdutos || termoPesquisa.trim() || categoriaSelecionada !== 0">
+          Produtos Disponíveis
+        </span>
+        <ion-badge color="primary">{{produtosFiltrados.length}} produtos</ion-badge>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div *ngIf="produtosFiltrados.length === 0" class="no-results">
+        <ion-icon name="search" size="large" color="medium"></ion-icon>
+        <h3>Nenhum produto encontrado</h3>
+        <p>Tente ajustar os filtros ou termo de pesquisa</p>
+      </div>
+
+      <!-- Botão para alternar entre produtos populares e todos os produtos -->
+      <div *ngIf="!termoPesquisa.trim() && categoriaSelecionada === 0 && produtosFiltrados.length > 0" class="ver-todos-container">
+        <ion-button
+          fill="outline"
+          color="secondary"
+          (click)="alternarVisualizacao()"
+          expand="block">
+          <ion-icon [name]="mostrarTodosProdutos ? 'list' : 'star'" slot="start"></ion-icon>
+          {{ mostrarTodosProdutos ? 'Mostrar Somente Populares' : 'Ver Todos os Produtos' }}
+        </ion-button>
+      </div>
+
+      <ion-grid *ngIf="produtosFiltrados.length > 0">
+        <ion-row>
+          <ion-col size="12" size-md="6" size-lg="4" *ngFor="let produto of produtosFiltrados; trackBy: trackByProdutoId">
+            <ion-card class="produto-card">
+              <ion-card-content>
+                <div class="produto-header">
+                  <h3>{{produto.nome}}</h3>
+                  <ion-badge color="secondary" class="categoria-badge">{{produto.categoria_nome}}</ion-badge>
+                </div>
+                <p class="descricao">{{produto.descricao}}</p>
+                <div class="preco-container">
+                  <span class="preco">R$ {{produto.preco | number:'1.2-2'}}</span>
+                  <span class="unidade">/ {{produto.unidade}}</span>
+                </div>
+                <ion-button
+                  expand="block"
+                  fill="outline"
+                  color="primary"
+                  (click)="adicionarItem(produto)"
+                  class="add-button">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção do Orçamento -->
+  <ion-card *ngIf="itensOrcamento.length > 0">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="document"></ion-icon>
+        Orçamento Atual
+        <ion-badge color="primary">{{itensOrcamento.length}} itens</ion-badge>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let item of itensOrcamento; trackBy: trackByItemId" class="item-orcamento">
+          <div class="item-content">
+            <div class="item-info">
+              <h4>{{item.produto_nome}}</h4>
+              <p class="categoria">{{item.categoria_nome}}</p>
+              <p class="preco-unitario">R$ {{item.preco_unitario | number:'1.2-2'}} / {{item.unidade}}</p>
+            </div>
+            <div class="item-controls">
+              <ion-button
+                fill="outline"
+                size="small"
+                (click)="atualizarQuantidade(item.produto_id, item.quantidade - 1)">
+                <ion-icon name="remove"></ion-icon>
+              </ion-button>
+              <span class="quantidade">{{item.quantidade}}</span>
+              <ion-button
+                fill="outline"
+                size="small"
+                (click)="atualizarQuantidade(item.produto_id, item.quantidade + 1)">
+                <ion-icon name="add"></ion-icon>
+              </ion-button>
+              <span class="subtotal">R$ {{item.subtotal | number:'1.2-2'}}</span>
+            </div>
+          </div>
+        </ion-item>
+      </ion-list>
+
+      <div class="totais">
+        <ion-item>
+          <ion-label>Subtotal:</ion-label>
+          <ion-label slot="end">R$ {{subtotal | number:'1.2-2'}}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>Desconto:</ion-label>
+          <ion-input
+            type="number"
+            [(ngModel)]="desconto"
+            (ionInput)="calcularTotal()"
+            placeholder="0.00"
+            slot="end">
+          </ion-input>
+        </ion-item>
+        <ion-item class="total-item">
+          <ion-label><strong>TOTAL:</strong></ion-label>
+          <ion-label slot="end"><strong>R$ {{total | number:'1.2-2'}}</strong></ion-label>
+        </ion-item>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção de Dados do Cliente -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="person"></ion-icon>
+        Dados do Cliente
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Nome *</ion-label>
+        <ion-input [(ngModel)]="cliente.nome" placeholder="Nome completo do cliente"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">E-mail *</ion-label>
+        <ion-input
+          type="email"
+          [(ngModel)]="cliente.email"
+          (ionInput)="validarEmailInput($event)"
+          placeholder="email@exemplo.com">
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Telefone *</ion-label>
+        <ion-input
+          type="tel"
+          [(ngModel)]="cliente.telefone"
+          (ionInput)="formatarTelefone($event)"
+          placeholder="(11) 99999-9999"
+          maxlength="15">
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Endereço</ion-label>
+        <ion-input [(ngModel)]="cliente.endereco" placeholder="Endereço completo"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">CPF/CNPJ</ion-label>
+        <ion-input [(ngModel)]="cliente.cpf_cnpj" placeholder="000.000.000-00 ou 00.000.000/0000-00"></ion-input>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção de Validade do Orçamento -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="calendar"></ion-icon>
+        Validade do Orçamento
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Data de Validade *</ion-label>
+        <ion-datetime
+          [(ngModel)]="dataValidade"
+          presentation="date"
+          [min]="dataMinima"
+          (ionChange)="onDataValidadeChange()"
+          placeholder="Selecione a data de validade">
+        </ion-datetime>
+      </ion-item>
+      <ion-note color="medium">
+        <p><ion-icon name="warning" color="warning"></ion-icon> <strong>Validade mínima:</strong> 10 dias conforme legislação brasileira</p>
+        <p>Você pode alterar a data conforme necessário</p>
+      </ion-note>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção de Observações -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="document-text"></ion-icon>
+        Observações
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-textarea
+          [(ngModel)]="observacoes"
+          placeholder="Observações adicionais para o orçamento..."
+          rows="3">
+        </ion-textarea>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Botões de Ação -->
+  <ion-card *ngIf="itensOrcamento.length > 0">
+    <ion-card-content>
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="gerarOrcamento()"
+        class="action-button">
+        <ion-icon name="calculator" slot="start"></ion-icon>
+        Gerar Orçamento
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="medium"
+        (click)="limparOrcamento()"
+        class="action-button">
+        <ion-icon name="trash" slot="start"></ion-icon>
+        Limpar Orçamento
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

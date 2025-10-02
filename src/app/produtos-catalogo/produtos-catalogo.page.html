@@ -1,0 +1,74 @@
+<app-navbar></app-navbar>
+<ion-content class="catalogo-content">
+  <!-- Hero Section -->
+  <section class="hero-catalogo">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Nossos Produtos</h1>
+        <p>Equipamentos profissionais para eventos de todos os tamanhos</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Produtos -->
+  <section class="produtos-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Equipamentos Disponíveis</h2>
+        <p>Conheça nossa linha completa de equipamentos</p>
+      </div>
+
+      <!-- Lista de Produtos -->
+      <div class="produtos-grid">
+        <ion-card *ngFor="let produto of produtos" class="produto-card">
+          <div class="produto-imagem">
+            <ion-icon [name]="produto.icone" class="produto-icon"></ion-icon>
+          </div>
+
+          <ion-card-content>
+            <h3 class="produto-nome">{{produto.nome}}</h3>
+            <p class="produto-descricao">{{produto.descricao}}</p>
+
+            <div class="produto-info">
+              <div class="produto-disponibilidade" [class.disponivel]="produto.disponivel">
+                <ion-icon [name]="produto.disponivel ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                <span>{{produto.disponivel ? 'Disponível' : 'Indisponível'}}</span>
+              </div>
+            </div>
+
+            <div class="produto-actions">
+              <ion-button
+                expand="block"
+                fill="solid"
+                color="success"
+                (click)="contatarWhatsApp(produto)">
+                <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+                Tenho Interesse
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Precisa de algo específico?</h2>
+        <p>Não encontrou o que procura? Entre em contato conosco para uma consultoria personalizada!</p>
+        <div class="cta-actions">
+          <ion-button size="large" color="success" (click)="contatarWhatsAppPersonalizado()">
+            <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+            WhatsApp: (11) 95389-8557
+          </ion-button>
+          <ion-button size="large" fill="outline" (click)="solicitarOrcamento()">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            Solicitar Orçamento
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </section>
+</ion-content>

@@ -1,0 +1,269 @@
+:root {
+  --nd-primary: #0C2B59;
+  --nd-secondary: #E8622D;
+  --nd-accent: #F7A64C;
+  --nd-gradient: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%);
+  --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-glass {
+  &::after { display: none; }
+}
+
+.toolbar-premium {
+  --background: #0C2B59;
+  border-bottom: 3px solid var(--nd-secondary);
+  height: 70px;
+}
+
+.toolbar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.brand-logo {
+  height: 48px;
+  border-radius: 8px;
+}
+
+.brand-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 10px 20px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border-radius: 8px;
+
+  &:hover, &.active {
+    background: var(--nd-secondary);
+    color: white;
+  }
+}
+
+.cta-header {
+  --background: var(--nd-secondary);
+  --border-radius: 8px;
+  height: 42px;
+  font-weight: 700;
+  margin-left: 16px;
+
+  &:hover {
+    --background: var(--nd-accent);
+  }
+}
+
+.hero-portfolio {
+  background: var(--nd-gradient);
+  padding: 100px 20px;
+  text-align: center;
+  color: white;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 0 0 16px 0;
+  }
+
+  p {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    font-weight: 500;
+  }
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 20px;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+  margin-bottom: 80px;
+}
+
+.portfolio-item {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid #E2E8F0;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    border-color: var(--nd-secondary);
+  }
+}
+
+.portfolio-image {
+  height: 250px;
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.1), rgba(232, 98, 45, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 100px;
+    color: var(--nd-secondary);
+    opacity: 0.8;
+  }
+}
+
+.portfolio-info {
+  padding: 24px;
+}
+
+.portfolio-category {
+  display: inline-block;
+  padding: 6px 16px;
+  background: var(--nd-secondary);
+  color: white;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.portfolio-item h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0A1F3F;
+  margin: 0 0 12px 0;
+}
+
+.portfolio-item p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #475569;
+  margin: 0 0 16px 0;
+  font-weight: 600;
+}
+
+.portfolio-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  span {
+    padding: 6px 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+  }
+}
+
+.cta-portfolio {
+  text-align: center;
+  padding: 60px 40px;
+  background: white;
+  border-radius: 24px;
+  border: 3px solid var(--nd-secondary);
+
+  h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #0A1F3F;
+    margin: 0 0 16px 0;
+  }
+
+  p {
+    font-size: 1.25rem;
+    color: #475569;
+    margin: 0 0 32px 0;
+    font-weight: 600;
+  }
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  --background: #25D366;
+  --border-radius: 12px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+  height: 56px;
+  font-weight: 700;
+  font-size: 1.1rem;
+
+  &:hover {
+    --background: #20c55a;
+    transform: translateY(-2px);
+  }
+}
+
+.btn-secondary {
+  --color: var(--nd-primary);
+  --border-color: var(--nd-primary);
+  --border-width: 2px;
+  --border-radius: 12px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+  height: 56px;
+  font-weight: 700;
+  font-size: 1.1rem;
+
+  &:hover {
+    --background: var(--nd-primary);
+    --color: white;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-portfolio h2 {
+    font-size: 2rem;
+  }
+}

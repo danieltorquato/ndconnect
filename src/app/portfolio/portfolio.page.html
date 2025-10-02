@@ -1,0 +1,127 @@
+<app-navbar></app-navbar>
+
+<ion-content [fullscreen]="true">
+  <section class="hero-portfolio">
+    <div class="hero-content">
+      <h1>Nosso Portfólio</h1>
+      <p>Confira alguns dos eventos que tivemos o prazer de fazer parte</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- Grid de Eventos -->
+    <div class="portfolio-grid">
+      <div class="portfolio-item">
+        <div class="portfolio-image">
+          <ion-icon name="musical-notes"></ion-icon>
+        </div>
+        <div class="portfolio-info">
+          <span class="portfolio-category">Casamento</span>
+          <h3>Casamento Sarah & João</h3>
+          <p>Evento completo com som, iluminação e palco para 300 convidados</p>
+          <div class="portfolio-tags">
+            <span>Som Premium</span>
+            <span>Iluminação</span>
+            <span>Palco</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image">
+          <ion-icon name="business"></ion-icon>
+        </div>
+        <div class="portfolio-info">
+          <span class="portfolio-category">Corporativo</span>
+          <h3>Convenção TechCorp 2024</h3>
+          <p>Evento corporativo com estrutura completa para 500 pessoas</p>
+          <div class="portfolio-tags">
+            <span>Painéis LED</span>
+            <span>Som</span>
+            <span>Gerador</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image">
+          <ion-icon name="pizza"></ion-icon>
+        </div>
+        <div class="portfolio-info">
+          <span class="portfolio-category">Festa</span>
+          <h3>Aniversário 50 Anos</h3>
+          <p>Festa temática com iluminação especial e efeitos</p>
+          <div class="portfolio-tags">
+            <span>Iluminação</span>
+            <span>Efeitos</span>
+            <span>DJ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image">
+          <ion-icon name="school"></ion-icon>
+        </div>
+        <div class="portfolio-info">
+          <span class="portfolio-category">Formatura</span>
+          <h3>Formatura Medicina 2024</h3>
+          <p>Estrutura completa para cerimônia e festa de formatura</p>
+          <div class="portfolio-tags">
+            <span>Palco</span>
+            <span>Som</span>
+            <span>Luz</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image">
+          <ion-icon name="mic"></ion-icon>
+        </div>
+        <div class="portfolio-info">
+          <span class="portfolio-category">Show</span>
+          <h3>Festival de Música Local</h3>
+          <p>Palco profissional com line array e iluminação cênica</p>
+          <div class="portfolio-tags">
+            <span>Line Array</span>
+            <span>Moving Head</span>
+            <span>Treliça</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-item">
+        <div class="portfolio-image">
+          <ion-icon name="heart"></ion-icon>
+        </div>
+        <div class="portfolio-info">
+          <span class="portfolio-category">Casamento</span>
+          <h3>Casamento ao Ar Livre</h3>
+          <p>Cerimônia e festa com gerador silencioso e iluminação ambiente</p>
+          <div class="portfolio-tags">
+            <span>Gerador</span>
+            <span>Som</span>
+            <span>Iluminação</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <section class="cta-portfolio">
+      <h2>Quer Seu Evento em Nosso Portfólio?</h2>
+      <p>Entre em contato e vamos criar algo incrível juntos!</p>
+      <div class="cta-buttons">
+        <ion-button size="large" class="btn-primary" (click)="abrirWhatsApp()">
+          <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+          Falar no WhatsApp
+        </ion-button>
+        <ion-button size="large" fill="outline" class="btn-secondary" (click)="irPara('/orcamento-cliente')">
+          <ion-icon name="mail" slot="start"></ion-icon>
+          Solicitar Orçamento
+        </ion-button>
+      </div>
+    </section>
+  </div>
+</ion-content>

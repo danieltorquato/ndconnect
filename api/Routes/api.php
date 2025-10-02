@@ -29,6 +29,9 @@ try {
             $controller = new ProdutoController();
             if ($request_method == 'GET') {
                 $response = $controller->getAll();
+            } elseif ($request_method == 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->create($input);
             }
             break;
 
@@ -62,6 +65,19 @@ try {
             $id = $matches[1];
             if ($request_method == 'GET') {
                 $response = $controller->getById($id);
+            }
+            break;
+
+        case (preg_match('/^produtos\/(\d+)$/', $uri, $matches) ? true : false):
+            $controller = new ProdutoController();
+            $id = $matches[1];
+            if ($request_method == 'GET') {
+                $response = $controller->getById($id);
+            } elseif ($request_method == 'PUT') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->update($id, $input);
+            } elseif ($request_method == 'DELETE') {
+                $response = $controller->delete($id);
             }
             break;
 

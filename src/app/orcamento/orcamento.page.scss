@@ -1,0 +1,584 @@
+// Cores oficiais da N.D Connect
+:root {
+  --nd-primary: #0C2B59;
+  --nd-secondary: #E8622D;
+  --nd-accent: #F7A64C;
+  --nd-light: #FFFFFF;
+  --nd-dark: #0C2B59;
+  --nd-medium: #64748b;
+  --nd-success: #10b981;
+  --nd-warning: #F7A64C;
+  --nd-danger: #ef4444;
+
+  // Gradientes
+  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
+  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%);
+}
+
+// Header personalizado
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  position: relative;
+
+  .header-logo {
+    height: 32px;
+    width: auto;
+    border-radius: 4px;
+  }
+
+  .historico-btn {
+    position: absolute;
+    right: 0;
+    --color: var(--nd-light);
+    --background: transparent;
+    --border-radius: 50%;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      --background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    ion-icon {
+      font-size: 20px;
+    }
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
+// Cards de produtos
+.produto-card {
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(12, 43, 89, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(12, 43, 89, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(12, 43, 89, 0.2);
+    border-color: var(--nd-secondary);
+  }
+
+  .produto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--nd-primary);
+      flex: 1;
+    }
+
+    .categoria-badge {
+      font-size: 0.75rem;
+      margin-left: 8px;
+      background: var(--nd-gradient);
+      color: var(--nd-light);
+      font-weight: 600;
+    }
+  }
+
+  .descricao {
+    color: var(--nd-medium);
+    font-size: 0.9rem;
+    margin: 8px 0;
+    line-height: 1.4;
+  }
+
+  .preco-container {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin: 12px 0;
+
+    .preco {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: var(--nd-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .unidade {
+      font-size: 0.9rem;
+      color: var(--nd-medium);
+    }
+  }
+
+  .add-button {
+    --border-radius: 8px;
+    font-weight: 600;
+    background: var(--nd-gradient);
+    --color: var(--nd-light);
+    --border-color: transparent;
+
+    &:hover {
+      --background: var(--nd-gradient-reverse);
+    }
+  }
+}
+
+// Mensagem de nenhum resultado
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+
+  ion-icon {
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    color: #64748b;
+    font-size: 18px;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    color: #94a3b8;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// Container do botão "Ver todos os produtos"
+.ver-todos-container {
+  margin: 16px 0;
+  padding: 16px 0;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+
+  ion-button {
+    --border-radius: 8px;
+    font-weight: 600;
+    height: 44px;
+  }
+}
+
+// Itens do orçamento
+.item-orcamento {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(12, 43, 89, 0.1);
+  border: 1px solid rgba(12, 43, 89, 0.1);
+
+  .item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 16px;
+  }
+
+  .item-info {
+    flex: 1;
+    min-width: 0;
+
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--nd-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .categoria {
+      margin: 0 0 4px 0;
+      font-size: 0.8rem;
+      color: var(--nd-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .preco-unitario {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--nd-medium);
+    }
+  }
+
+  .item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+
+    .quantidade {
+      min-width: 24px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--nd-primary);
+    }
+
+    .subtotal {
+      min-width: 80px;
+      text-align: right;
+      font-weight: 600;
+      background: var(--nd-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.1rem;
+    }
+
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      --border-radius: 6px;
+      height: 32px;
+      width: 32px;
+      --color: var(--nd-primary);
+      --border-color: var(--nd-primary);
+
+      &:hover {
+        --background: var(--nd-gradient);
+        --color: var(--nd-light);
+        --border-color: transparent;
+      }
+    }
+  }
+}
+
+// Resumo do orçamento
+.resumo-orcamento {
+  background: var(--nd-light);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+
+  .total-final {
+    border-top: 2px solid var(--nd-primary);
+    padding-top: 12px;
+    margin-top: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--nd-primary);
+  }
+}
+
+// Botões de ação
+.action-button {
+  margin: 8px 0;
+  --border-radius: 8px;
+  font-weight: 600;
+  height: 48px;
+
+  &[color="primary"] {
+    background: var(--nd-gradient);
+    --color: var(--nd-light);
+    --border-color: transparent;
+
+    &:hover {
+      --background: var(--nd-gradient-reverse);
+    }
+  }
+
+  &[color="success"] {
+    --color: var(--nd-light);
+    --background: var(--nd-success);
+  }
+
+  &[color="secondary"] {
+    --color: var(--nd-primary);
+    --background: var(--nd-light);
+    --border-color: var(--nd-primary);
+
+    &:hover {
+      --background: var(--nd-gradient);
+      --color: var(--nd-light);
+      --border-color: transparent;
+    }
+  }
+}
+
+// Container do botão ver todos
+.ver-todos-container {
+  margin: 20px 0;
+  padding: 0 16px;
+
+  ion-button {
+    --background: var(--nd-gradient);
+    --background-hover: var(--nd-gradient-reverse);
+    --color: var(--nd-light);
+    --border-radius: 12px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    font-weight: 600;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(12, 43, 89, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(12, 43, 89, 0.3);
+    }
+
+    ion-icon {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+  }
+}
+
+// Botões de compartilhamento
+.share-buttons {
+  margin: 16px 0;
+  padding: 20px 0;
+  border-top: 2px solid var(--nd-secondary);
+  border-bottom: 1px solid rgba(12, 43, 89, 0.1);
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.02) 0%, rgba(232, 98, 45, 0.02) 100%);
+  border-radius: 8px;
+
+  .share-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--nd-primary);
+  }
+
+  .share-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .share-button {
+    height: 48px;
+    font-weight: 600;
+    --border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &.whatsapp-button {
+      --background: #25D366;
+      --color: white;
+      --border-color: transparent;
+
+      &:hover {
+        --background: #20c55a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+      }
+    }
+
+    &.download-button {
+      background: var(--nd-gradient);
+      --color: white;
+      --border-color: transparent;
+
+      &:hover {
+        --background: var(--nd-gradient-reverse);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(12, 43, 89, 0.3);
+      }
+    }
+
+    &.share-native-button {
+      --color: var(--nd-secondary);
+      --border-color: var(--nd-secondary);
+
+      &:hover {
+        --background: var(--nd-secondary);
+        --color: white;
+        --border-color: transparent;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.copy-button {
+      --color: var(--nd-accent);
+      --border-color: var(--nd-accent);
+
+      &:hover {
+        --background: var(--nd-accent);
+        --color: var(--nd-primary);
+        --border-color: transparent;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .header-content {
+    .header-logo {
+      height: 28px;
+    }
+  }
+
+  .produto-card {
+    .produto-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .categoria-badge {
+        margin-left: 0;
+        align-self: flex-start;
+      }
+    }
+  }
+
+  .item-orcamento {
+    .item-content {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .item-controls {
+      justify-content: space-between;
+    }
+  }
+}
+
+// Estilos para seções
+ion-card {
+  margin: 16px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(12, 43, 89, 0.1);
+  border: 1px solid rgba(12, 43, 89, 0.05);
+
+  ion-card-header {
+    padding-bottom: 8px;
+    background: linear-gradient(135deg, rgba(12, 43, 89, 0.02) 0%, rgba(232, 98, 45, 0.02) 100%);
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--nd-primary);
+    }
+  }
+}
+
+// Inputs e selects
+ion-item {
+  --border-radius: 8px;
+  margin-bottom: 8px;
+  --border-color: rgba(12, 43, 89, 0.2);
+  --highlight-color: var(--nd-secondary);
+
+  ion-label {
+    font-weight: 500;
+    color: var(--nd-primary);
+  }
+
+  ion-input, ion-textarea, ion-select {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --color: var(--nd-primary);
+
+    &:focus {
+      --border-color: var(--nd-secondary);
+      --highlight-color: var(--nd-secondary);
+    }
+  }
+
+  &.item-has-focus {
+    --border-color: var(--nd-secondary);
+    --highlight-color: var(--nd-secondary);
+  }
+}
+
+// Badges
+ion-badge {
+  font-weight: 600;
+  font-size: 0.8rem;
+
+  &[color="primary"] {
+    background: var(--nd-gradient);
+    color: var(--nd-light);
+  }
+
+  &[color="secondary"] {
+    background: var(--nd-secondary);
+    color: var(--nd-light);
+  }
+}
+
+// Notas informativas
+ion-note {
+  font-size: 0.9rem;
+  line-height: 1.4;
+
+  p {
+    margin: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+// Totais
+.totais {
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.02) 0%, rgba(232, 98, 45, 0.02) 100%);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid rgba(12, 43, 89, 0.1);
+
+  ion-item {
+    --background: transparent;
+    --padding-start: 0;
+    --padding-end: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .total-item {
+    border-top: 2px solid var(--nd-secondary);
+    padding-top: 12px;
+    margin-top: 12px;
+
+    ion-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: var(--nd-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+}
