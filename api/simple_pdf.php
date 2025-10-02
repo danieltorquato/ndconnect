@@ -65,7 +65,7 @@ function gerarPDFSimples($orcamento) {
 
             /* Header */
             .header {
-                background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+                background: linear-gradient(135deg,rgba(255, 106, 0, 0.7) 0%, #0C2B59 100%);
                 color: white;
                 padding: 30px;
                 text-align: center;

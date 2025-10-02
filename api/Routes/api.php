@@ -1,4 +1,14 @@
 <?php
+// Suprimir todos os avisos e notices para evitar interferência no JSON
+error_reporting(0);
+ini_set('display_errors', 0);
+ini_set('log_errors', 0);
+
+// Limpar qualquer output anterior
+if (ob_get_level()) {
+    ob_clean();
+}
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -99,6 +109,22 @@ try {
             if ($request_method == 'POST') {
                 $input = json_decode(file_get_contents('php://input'), true);
                 $response = $controller->vincularPedido($id, $input['pedido_id']);
+            }
+            break;
+
+        case 'orcamentos/from-lead':
+            $controller = new OrcamentoController();
+            if ($request_method == 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                if (isset($input['lead_id']) && !empty($input['lead_id'])) {
+                    $response = $controller->createFromLead($input['lead_id']);
+                } else {
+                    $response = [
+                        'success' => false,
+                        'data' => null,
+                        'message' => 'Lead ID é obrigatório'
+                    ];
+                }
             }
             break;
 

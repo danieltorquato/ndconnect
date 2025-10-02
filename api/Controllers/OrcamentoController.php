@@ -80,30 +80,48 @@ class OrcamentoController {
     }
 
     private function createOrGetCliente($cliente_data) {
-        // Verificar se cliente já existe pelo CPF/CNPJ
-        if (!empty($cliente_data['cpf_cnpj'])) {
-            $query = "SELECT id FROM " . $this->table_cliente . " WHERE cpf_cnpj = :cpf_cnpj";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':cpf_cnpj', $cliente_data['cpf_cnpj']);
-            $stmt->execute();
+        // Verificar se cliente já existe por CPF/CNPJ, email ou telefone
+        $query = "SELECT id FROM " . $this->table_cliente . "
+                 WHERE (cpf_cnpj = :cpf_cnpj AND cpf_cnpj != '')
+                 OR (email = :email AND email != '')
+                 OR (telefone = :telefone AND telefone != '')";
 
-            if ($stmt->rowCount() > 0) {
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                return $result['id'];
-            }
+        $stmt = $this->conn->prepare($query);
+        $cpf_cnpj = isset($cliente_data['cpf_cnpj']) ? $cliente_data['cpf_cnpj'] : '';
+        $email = isset($cliente_data['email']) ? $cliente_data['email'] : '';
+        $telefone = isset($cliente_data['telefone']) ? $cliente_data['telefone'] : '';
+        
+        $stmt->bindParam(':cpf_cnpj', $cpf_cnpj);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':telefone', $telefone);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['id'];
         }
 
         // Criar novo cliente
         $query = "INSERT INTO " . $this->table_cliente . "
-                 (nome, email, telefone, endereco, cpf_cnpj)
-                 VALUES (:nome, :email, :telefone, :endereco, :cpf_cnpj)";
+                 (nome, email, telefone, endereco, cpf_cnpj, tipo, status)
+                 VALUES (:nome, :email, :telefone, :endereco, :cpf_cnpj, :tipo, :status)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nome', $cliente_data['nome']);
-        $stmt->bindParam(':email', $cliente_data['email']);
-        $stmt->bindParam(':telefone', $cliente_data['telefone']);
-        $stmt->bindParam(':endereco', $cliente_data['endereco']);
-        $stmt->bindParam(':cpf_cnpj', $cliente_data['cpf_cnpj']);
+        
+        $email = isset($cliente_data['email']) ? $cliente_data['email'] : '';
+        $telefone = isset($cliente_data['telefone']) ? $cliente_data['telefone'] : '';
+        $endereco = isset($cliente_data['endereco']) ? $cliente_data['endereco'] : '';
+        $cpf_cnpj = isset($cliente_data['cpf_cnpj']) ? $cliente_data['cpf_cnpj'] : '';
+        $tipo = isset($cliente_data['tipo']) ? $cliente_data['tipo'] : 'pessoa_fisica';
+        $status = isset($cliente_data['status']) ? $cliente_data['status'] : 'ativo';
+        
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':telefone', $telefone);
+        $stmt->bindParam(':endereco', $endereco);
+        $stmt->bindParam(':cpf_cnpj', $cpf_cnpj);
+        $stmt->bindParam(':tipo', $tipo);
+        $stmt->bindParam(':status', $status);
         $stmt->execute();
 
         return $this->conn->lastInsertId();
@@ -240,10 +258,10 @@ class OrcamentoController {
 
             // Registrar no histórico (se a tabela existir)
             try {
-                $query = "INSERT INTO orcamento_historico 
+                $query = "INSERT INTO orcamento_historico
                          (orcamento_id, status_anterior, status_novo, observacao, usuario)
                          VALUES (:orcamento_id, :status_anterior, :status_novo, :observacao, 'admin')";
-                
+
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':orcamento_id', $id);
                 $stmt->bindParam(':status_anterior', $statusAnterior);
@@ -256,22 +274,25 @@ class OrcamentoController {
 
             // Se o status for 'vendido', atualizar data de venda
             if ($novoStatus === 'vendido') {
-                $query = "UPDATE " . $this->table_orcamento . " 
-                         SET data_venda = CURDATE() 
+                $query = "UPDATE " . $this->table_orcamento . "
+                         SET data_venda = CURDATE()
                          WHERE id = :id";
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':id', $id);
                 $stmt->execute();
             }
 
-            // Se o status for 'aprovado', atualizar data de aprovação
+            // Se o status for 'aprovado', atualizar data de aprovação e converter lead para cliente
             if ($novoStatus === 'aprovado') {
-                $query = "UPDATE " . $this->table_orcamento . " 
-                         SET data_aprovacao = CURDATE() 
+                $query = "UPDATE " . $this->table_orcamento . "
+                         SET data_aprovacao = CURDATE()
                          WHERE id = :id";
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':id', $id);
                 $stmt->execute();
+
+                // Converter lead para cliente se existir
+                $this->converterLeadParaCliente($id);
             }
 
             $this->conn->commit();
@@ -294,10 +315,10 @@ class OrcamentoController {
 
     public function vincularPedido($orcamentoId, $pedidoId) {
         try {
-            $query = "UPDATE " . $this->table_orcamento . " 
+            $query = "UPDATE " . $this->table_orcamento . "
                      SET status = 'vendido', data_venda = CURDATE()
                      WHERE id = :id";
-            
+
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $orcamentoId);
             $stmt->execute();
@@ -349,6 +370,167 @@ class OrcamentoController {
                 'message' => 'Erro ao excluir orçamento: ' . $e->getMessage()
             ];
         }
+    }
+
+    // Criar orçamento a partir de lead (sem criar cliente automaticamente)
+    public function createFromLead($leadId) {
+        try {
+            $this->conn->beginTransaction();
+
+            // Buscar dados do lead
+            $query = "SELECT id, nome, email, telefone, COALESCE(empresa, '') as empresa, COALESCE(mensagem, '') as mensagem FROM leads WHERE id = :lead_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':lead_id', $leadId);
+            $stmt->execute();
+            $lead = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$lead) {
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'message' => 'Lead não encontrado'
+                ];
+            }
+
+            // Gerar número do orçamento
+            $numero_orcamento = $this->generateNumeroOrcamento();
+
+            // Definir data de validade (padrão: 10 dias)
+            $data_validade = date('Y-m-d', strtotime('+10 days'));
+
+            // Preparar observações com dados do lead
+            $observacoes = $lead['mensagem'];
+            $observacoes .= "\n\nDados do Lead:\n";
+            $observacoes .= "Nome: " . $lead['nome'] . "\n";
+            $observacoes .= "Email: " . $lead['email'] . "\n";
+            $observacoes .= "Telefone: " . $lead['telefone'] . "\n";
+            $observacoes .= "Empresa: " . $lead['empresa'] . "\n";
+
+            // Inserir orçamento sem cliente (cliente_id será NULL)
+            $query = "INSERT INTO " . $this->table_orcamento . "
+                     (cliente_id, numero_orcamento, data_orcamento, data_validade, subtotal, desconto, total, observacoes, status)
+                     VALUES (NULL, :numero_orcamento, :data_orcamento, :data_validade, 0, 0, 0, :observacoes, 'pendente')";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':numero_orcamento', $numero_orcamento);
+            $stmt->bindParam(':data_orcamento', date('Y-m-d'));
+            $stmt->bindParam(':data_validade', $data_validade);
+            $stmt->bindParam(':observacoes', $observacoes);
+            $stmt->execute();
+
+            $orcamento_id = $this->conn->lastInsertId();
+
+            $this->conn->commit();
+
+            return [
+                'success' => true,
+                'data' => [
+                    'id' => $orcamento_id,
+                    'numero_orcamento' => $numero_orcamento,
+                    'lead_id' => $leadId
+                ],
+                'message' => 'Orçamento criado com sucesso'
+            ];
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Erro ao criar orçamento: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    // Converter lead para cliente quando orçamento for aprovado
+    private function converterLeadParaCliente($orcamentoId) {
+        try {
+            // Buscar dados do orçamento
+            $query = "SELECT * FROM " . $this->table_orcamento . " WHERE id = :orcamento_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':orcamento_id', $orcamentoId);
+            $stmt->execute();
+            $orcamento = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$orcamento) {
+                return;
+            }
+
+            // Extrair dados do lead das observações
+            $observacoes = $orcamento['observacoes'];
+            $dadosLead = $this->extrairDadosLead($observacoes);
+
+            if (!$dadosLead) {
+                return;
+            }
+
+            // Verificar se já existe um lead com os mesmos dados
+            $queryLead = "SELECT id FROM leads
+                         WHERE (email = :email AND email != '')
+                         OR (telefone = :telefone AND telefone != '')
+                         ORDER BY id DESC LIMIT 1";
+
+            $stmtLead = $this->conn->prepare($queryLead);
+            $stmtLead->bindParam(':email', $dadosLead['email']);
+            $stmtLead->bindParam(':telefone', $dadosLead['telefone']);
+            $stmtLead->execute();
+            $lead = $stmtLead->fetch(PDO::FETCH_ASSOC);
+
+            if ($lead) {
+                // Criar ou buscar cliente
+                $cliente_id = $this->createOrGetCliente([
+                    'nome' => $dadosLead['nome'],
+                    'email' => isset($dadosLead['email']) ? $dadosLead['email'] : '',
+                    'telefone' => isset($dadosLead['telefone']) ? $dadosLead['telefone'] : '',
+                    'empresa' => isset($dadosLead['empresa']) ? $dadosLead['empresa'] : '',
+                    'tipo' => 'pessoa_fisica',
+                    'status' => 'ativo'
+                ]);
+
+                // Atualizar orçamento com cliente_id
+                $queryUpdateOrcamento = "UPDATE " . $this->table_orcamento . "
+                                        SET cliente_id = :cliente_id
+                                        WHERE id = :orcamento_id";
+                $stmtUpdateOrcamento = $this->conn->prepare($queryUpdateOrcamento);
+                $stmtUpdateOrcamento->bindParam(':cliente_id', $cliente_id);
+                $stmtUpdateOrcamento->bindParam(':orcamento_id', $orcamentoId);
+                $stmtUpdateOrcamento->execute();
+
+                // Atualizar status do lead para "convertido"
+                $queryUpdateLead = "UPDATE leads SET status = 'convertido' WHERE id = :lead_id";
+                $stmtUpdateLead = $this->conn->prepare($queryUpdateLead);
+                $stmtUpdateLead->bindParam(':lead_id', $lead['id']);
+                $stmtUpdateLead->execute();
+            }
+
+        } catch (Exception $e) {
+            // Log do erro mas não interrompe o processo
+            error_log("Erro ao converter lead para cliente: " . $e->getMessage());
+        }
+    }
+
+    // Extrair dados do lead das observações
+    private function extrairDadosLead($observacoes) {
+        if (strpos($observacoes, 'Dados do Lead:') === false) {
+            return null;
+        }
+
+        $dados = [];
+        $linhas = explode("\n", $observacoes);
+
+        foreach ($linhas as $linha) {
+            if (strpos($linha, 'Nome:') !== false) {
+                $dados['nome'] = trim(str_replace('Nome:', '', $linha));
+            } elseif (strpos($linha, 'Email:') !== false) {
+                $dados['email'] = trim(str_replace('Email:', '', $linha));
+            } elseif (strpos($linha, 'Telefone:') !== false) {
+                $dados['telefone'] = trim(str_replace('Telefone:', '', $linha));
+            } elseif (strpos($linha, 'Empresa:') !== false) {
+                $dados['empresa'] = trim(str_replace('Empresa:', '', $linha));
+            }
+        }
+
+        return !empty($dados['nome']) ? $dados : null;
     }
 }
 ?>

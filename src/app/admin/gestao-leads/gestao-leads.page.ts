@@ -5,8 +5,7 @@ import { addIcons } from 'ionicons';
 import {
   arrowBack, personAdd, call, mail, business, chatbubbles,
   checkmarkCircle, closeCircle, time, search, create, trash,
-  swapHorizontal
-} from 'ionicons/icons';
+  swapHorizontal, documentText } from 'ionicons/icons';
 import {
   IonHeader,
   IonToolbar,
@@ -111,11 +110,7 @@ export class GestaoLeadsPage implements OnInit {
     private router: Router,
     private alertController: AlertController
   ) {
-    addIcons({
-      arrowBack, personAdd, call, mail, business, chatbubbles,
-      checkmarkCircle, closeCircle, time, search, create, trash,
-      swapHorizontal
-    });
+    addIcons({arrowBack,personAdd,call,mail,time,chatbubbles,create,documentText,swapHorizontal,trash,closeCircle,business,checkmarkCircle,search});
   }
 
   ngOnInit() {
@@ -311,7 +306,7 @@ export class GestaoLeadsPage implements OnInit {
 
   enviarWhatsApp(telefone: string, nome: string) {
     const mensagem = `Olá ${nome}! Recebi sua solicitação de orçamento pela N.D Connect. Como posso ajudar?`;
-    const whatsappUrl = `https://wa.me/${telefone.replace(/\D/g, '')}?text=${encodeURIComponent(mensagem)}`;
+    const whatsappUrl = `https://wa.me/+55${telefone.replace(/\D/g, '')}?text=${encodeURIComponent(mensagem)}`;
     window.open(whatsappUrl, '_blank');
   }
 
@@ -356,6 +351,47 @@ export class GestaoLeadsPage implements OnInit {
       case 'outros': return 'Outros';
       default: return origem;
     }
+  }
+
+  criarOrcamento(lead: any) {
+    console.log('Criando orçamento para lead:', lead);
+
+    // Criar orçamento a partir do lead
+    this.http.post<any>(`${this.apiUrl}/orcamentos/from-lead`, { lead_id: lead.id }).subscribe({
+      next: async (response) => {
+        console.log('Resposta da API:', response);
+
+        // Sempre redirecionar, mesmo se houver erro na resposta
+        console.log('Redirecionando para página de orçamento...');
+        this.router.navigate(['/orcamento'], {
+          queryParams: {
+            leadId: lead.id,
+            orcamentoId: response?.data?.id || '',
+            nome: lead.nome,
+            email: lead.email,
+            telefone: lead.telefone,
+            empresa: lead.empresa || '',
+            mensagem: lead.mensagem || ''
+          }
+        });
+      },
+      error: async (error) => {
+        console.error('Erro HTTP ao criar orçamento:', error);
+
+        // Mesmo com erro, redirecionar para página de orçamento
+        console.log('Erro na API, mas redirecionando mesmo assim...');
+        this.router.navigate(['/orcamento'], {
+          queryParams: {
+            leadId: lead.id,
+            nome: lead.nome,
+            email: lead.email,
+            telefone: lead.telefone,
+            empresa: lead.empresa || '',
+            mensagem: lead.mensagem || ''
+          }
+        });
+      }
+    });
   }
 
   voltarPainel() {

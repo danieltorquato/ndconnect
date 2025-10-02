@@ -100,19 +100,19 @@
             Status
           </ion-button>
 
-          <ion-button 
-            *ngIf="orcamento.status === 'aprovado'" 
-            fill="clear" 
-            size="small" 
+          <ion-button
+            *ngIf="orcamento.status === 'aprovado'"
+            fill="clear"
+            size="small"
             color="success"
             (click)="vincularPedido(orcamento)">
             <ion-icon name="cart" slot="start"></ion-icon>
             Pedido
           </ion-button>
 
-          <ion-button 
-            fill="clear" 
-            size="small" 
+          <ion-button
+            fill="clear"
+            size="small"
             color="danger"
             (click)="excluirOrcamento(orcamento, $event)">
             <ion-icon name="trash" slot="start"></ion-icon>
@@ -212,8 +212,8 @@
               </ion-textarea>
             </ion-item>
 
-            <ion-button 
-              expand="block" 
+            <ion-button
+              expand="block"
               (click)="atualizarStatus()"
               [disabled]="!novoStatus">
               Salvar

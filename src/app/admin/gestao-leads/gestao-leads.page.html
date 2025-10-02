@@ -112,6 +112,15 @@
           </ion-button>
 
           <ion-button
+            fill="clear"
+            size="small"
+            color="warning"
+            (click)="criarOrcamento(lead)">
+            <ion-icon name="document-text" slot="start"></ion-icon>
+            Orçamento
+          </ion-button>
+
+          <ion-button
             *ngIf="lead.status === 'qualificado'"
             fill="clear"
             size="small"

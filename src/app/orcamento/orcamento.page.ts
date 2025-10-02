@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DOCUMENT } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 interface Produto {
   id: number;
@@ -39,6 +39,7 @@ interface Cliente {
   telefone: string;
   endereco: string;
   cpf_cnpj: string;
+  empresa: string;
 }
 
 @Component({
@@ -63,7 +64,8 @@ export class OrcamentoPage implements OnInit {
     email: '',
     telefone: '',
     endereco: '',
-    cpf_cnpj: ''
+    cpf_cnpj: '',
+    empresa: ''
   };
 
   observacoes: string = '';
@@ -79,7 +81,8 @@ export class OrcamentoPage implements OnInit {
   constructor(
     private http: HttpClient,
     @Inject(DOCUMENT) private document: Document,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     addIcons({list,search,close,add,remove,person,calendar,warning,documentText,calculator,trash,document:documentIcon,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,informationCircle,star,home});
   }
@@ -87,6 +90,7 @@ export class OrcamentoPage implements OnInit {
   ngOnInit() {
     this.carregarCategorias();
     this.carregarProdutosIniciais();
+    this.carregarDadosDoLead();
     this.definirDataValidadePadrao();
     this.definirDataMinima();
   }
@@ -593,7 +597,8 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
       email: '',
       telefone: '',
       endereco: '',
-      cpf_cnpj: ''
+      cpf_cnpj: '',
+      empresa: ''
     };
     this.observacoes = '';
     this.desconto = 0;
@@ -723,6 +728,22 @@ Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br`;
     } catch (error) {
       this.mostrarNotificacao('Erro ao abrir cliente de e-mail', 'error');
     }
+  }
+
+  carregarDadosDoLead() {
+    this.route.queryParams.subscribe(params => {
+      if (params['leadId']) {
+        // Preencher dados do lead
+        this.cliente.nome = params['nome'] || '';
+        this.cliente.email = params['email'] || '';
+        this.cliente.telefone = params['telefone'] || '';
+        this.cliente.empresa = params['empresa'] || '';
+        this.observacoes = params['mensagem'] || '';
+
+        // Mostrar notificação de dados preenchidos
+        this.mostrarNotificacao('Dados do lead carregados automaticamente!', 'success');
+      }
+    });
   }
 
   voltarHome() {

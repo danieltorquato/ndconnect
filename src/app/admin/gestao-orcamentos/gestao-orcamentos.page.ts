@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { 
-  arrowBack, documentText, checkmarkCircle, closeCircle, 
+import {
+  arrowBack, documentText, checkmarkCircle, closeCircle,
   timeOutline, cashOutline, search, filterOutline, eye,
   trash, create, cart, calendar
 } from 'ionicons/icons';
@@ -115,8 +115,8 @@ export class GestaoOrcamentosPage implements OnInit {
     private router: Router,
     private alertController: AlertController
   ) {
-    addIcons({ 
-      arrowBack, documentText, checkmarkCircle, closeCircle, 
+    addIcons({
+      arrowBack, documentText, checkmarkCircle, closeCircle,
       timeOutline, cashOutline, search, filterOutline, eye,
       trash, create, cart, calendar
     });
@@ -127,7 +127,7 @@ export class GestaoOrcamentosPage implements OnInit {
   }
 
   carregarOrcamentos() {
-    const endpoint = this.statusFiltro === 'todos' 
+    const endpoint = this.statusFiltro === 'todos'
       ? `${this.apiUrl}/orcamentos`
       : `${this.apiUrl}/orcamentos?status=${this.statusFiltro}`;
 
