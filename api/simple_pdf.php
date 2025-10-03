@@ -682,13 +682,60 @@ function gerarPDFSimples($orcamento) {
         </div>
 
         <script>
-        function shareWhatsApp() {
+        async function shareWhatsApp() {
             try {
-                const orcamentoUrl = window.location.href;
                 const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $id . '";
+                const message = "🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*\\n\\nOlá ' . htmlspecialchars($cliente_nome) . '! 👋\\n\\nSegue o orçamento solicitado:\\n\\n📋 *Orçamento Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '*\\n💰 *Valor Total: R$ ' . number_format($total, 2, ',', '.') . '*\\n📅 *Válido até: ' . date('d/m/Y', strtotime($data_validade)) . '*\\n\\n📄 *PDF em anexo*\\n\\n✨ *Agradecemos pela preferência!*\\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*";
 
-                const message = "🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*\\n\\nOlá ' . htmlspecialchars($cliente_nome) . '! 👋\\n\\nSegue o orçamento solicitado:\\n\\n📋 *Orçamento Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '*\\n💰 *Valor Total: R$ ' . number_format($total, 2, ',', '.') . '*\\n📅 *Válido até: ' . date('d/m/Y', strtotime($data_validade)) . '*\\n\\n📄 *Baixar PDF:* " + pdfUrl + "\\n\\n✨ *Agradecemos pela preferência!*\\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*";
+                // Mostrar loading no botão
+                const button = event?.target || document.querySelector(".btn-whatsapp");
+                const originalText = button.innerHTML;
+                button.innerHTML = "⏳ Baixando PDF...";
+                button.disabled = true;
 
+                console.log("Baixando PDF para compartilhamento...");
+
+                // Baixar o PDF
+                const response = await fetch(pdfUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                console.log("PDF baixado, tamanho:", blob.size, "bytes");
+
+                // Criar arquivo para compartilhamento
+                const fileName = "' . 'orcamento_' . strtolower(explode(' ', $cliente_nome)[0]) . '_' . $id . '.pdf' . '";
+                const file = new File([blob], fileName, { type: "application/pdf" });
+
+                console.log("Arquivo criado:", file.name, "tamanho:", file.size);
+
+                // Tentar usar Web Share API para anexar o arquivo
+                if (navigator.share && navigator.canShare) {
+                    try {
+                        if (navigator.canShare({ files: [file] })) {
+                            console.log("Compartilhando arquivo via Web Share API...");
+                            await navigator.share({
+                                title: "Orçamento N.D Connect - ' . $numero_orcamento . '",
+                                text: message,
+                                files: [file]
+                            });
+                            console.log("Arquivo compartilhado com sucesso!");
+
+                            button.innerHTML = originalText;
+                            button.disabled = false;
+                            return;
+                        } else {
+                            console.log("Arquivo não pode ser compartilhado via Web Share API");
+                        }
+                    } catch (e) {
+                        console.log("Erro na Web Share API:", e);
+                    }
+                }
+
+                // Fallback: abrir WhatsApp Web com link para download
+                console.log("Usando fallback para WhatsApp Web...");
                 const telefone = "' . addslashes(htmlspecialchars($cliente_telefone)) . '";
                 let whatsappUrl;
 
@@ -696,22 +743,31 @@ function gerarPDFSimples($orcamento) {
                     // Limpar e formatar telefone
                     const telefoneLimpo = telefone.replace(/[^0-9]/g, "");
                     const telefoneFormatado = telefoneLimpo.startsWith("55") ? telefoneLimpo : "55" + telefoneLimpo;
-                    whatsappUrl = "https://wa.me/" + telefoneFormatado + "?text=" + encodeURIComponent(message);
+                    whatsappUrl = "https://wa.me/" + telefoneFormatado + "?text=" + encodeURIComponent(message + "\\n\\n📄 *Baixar PDF:* " + pdfUrl);
                 } else {
-                    whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
+                    whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message + "\\n\\n📄 *Baixar PDF:* " + pdfUrl);
                 }
 
                 window.open(whatsappUrl, "_blank");
 
+                button.innerHTML = originalText;
+                button.disabled = false;
+
             } catch (error) {
                 console.error("Erro ao compartilhar no WhatsApp:", error);
-                alert("Erro ao abrir WhatsApp. Tente novamente.");
+                alert("Erro ao baixar PDF. Tente novamente.");
+
+                const button = event?.target || document.querySelector(".btn-whatsapp");
+                if (button) {
+                    button.innerHTML = "📱 WhatsApp";
+                    button.disabled = false;
+                }
             }
         }
 
         function downloadPDF() {
             try {
-                window.open("pdf_real.php?id=' . $id . '", "_blank");
+                window.open("/pdf_real.php?id=' . $id . '", "_blank");
             } catch (error) {
                 console.error("Erro ao baixar PDF:", error);
                 alert("Erro ao baixar PDF. Tente novamente.");
@@ -742,7 +798,7 @@ function gerarPDFSimples($orcamento) {
                     try {
                         const response = await fetch(pdfUrl);
                         const blob = await response.blob();
-                        const file = new File([blob], "orcamento_' . strtolower(explode(' ', $cliente_nome)[0]) . '_' . $id . '.pdf", { type: "application/pdf" });
+                        const file = new File([blob], "' . 'orcamento_' . strtolower(explode(' ', $cliente_nome)[0]) . '_' . $id . '.pdf' . '", { type: "application/pdf" });
 
                         if (navigator.canShare({ files: [file] })) {
                             await navigator.share({
