@@ -4,6 +4,14 @@
       <ion-icon name="calculator" slot="start"></ion-icon>
       Painel de Orçamentos
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="navegarPara('/painel-orcamento')">
+        <ion-icon name="home"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="logout()">
+        <ion-icon name="log-out"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -95,7 +103,7 @@
     </ion-row>
   </ion-grid>
 
-  
+
 
 
 </ion-content>

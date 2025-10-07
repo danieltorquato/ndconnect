@@ -1,0 +1,58 @@
+<div class="unauthorized-content">
+  <div class="unauthorized-container">
+    <div class="unauthorized-card">
+      <!-- Ícone de Acesso Negado -->
+      <div class="icon-container">
+        <ion-icon name="lock-closed" class="lock-icon"></ion-icon>
+      </div>
+
+      <!-- Título -->
+      <h1 class="title">Acesso Negado</h1>
+
+      <!-- Mensagem -->
+      <p class="message">
+        Você não tem permissão para acessar esta página.
+        <br>
+        Entre em contato com o administrador se acredita que isso é um erro.
+      </p>
+
+      <!-- Informações do usuário -->
+      <div class="user-info" *ngIf="usuario">
+        <p class="user-level">
+          <strong>Seu nível de acesso:</strong>
+          <span class="level-badge">{{ getNivelDisplay(usuario.nivel_acesso) }}</span>
+        </p>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="action-buttons">
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="goToPainel()"
+          class="action-button">
+          <ion-icon name="home" slot="start"></ion-icon>
+          Ir para o Painel
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          fill="solid"
+          (click)="goToHome()"
+          class="action-button">
+          <ion-icon name="arrow-back" slot="start"></ion-icon>
+          Voltar ao Site
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          fill="clear"
+          (click)="logout()"
+          class="logout-button">
+          <ion-icon name="log-out" slot="start"></ion-icon>
+          Fazer Logout
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+# Configuração para API PHP - N.D Connect
+RewriteEngine On
+
+# Permitir acesso direto aos arquivos PHP
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^.*$ - [L]
+
+# Redirecionar requisições para index.php se o arquivo não existir
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ index.php [L,QSA]
+
+# Configurações de CORS para API
+<IfModule mod_headers.c>
+    # Permitir CORS para desenvolvimento e produção
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+    Header always set Access-Control-Max-Age "3600"
+
+    # Responder a requisições OPTIONS (preflight)
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^.*$ - [R=200,L]
+</IfModule>
+
+# Configurações de segurança para API
+<IfModule mod_headers.c>
+    # Prevenir clickjacking
+    Header always append X-Frame-Options SAMEORIGIN
+
+    # Prevenir MIME type sniffing
+    Header set X-Content-Type-Options nosniff
+
+    # Habilitar XSS protection
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Configurações de MIME types para API
+<IfModule mod_mime.c>
+    AddType application/json .json
+    AddType application/pdf .pdf
+    AddType text/html .html
+    AddType text/plain .txt
+    AddType application/javascript .js
+    AddType text/css .css
+</IfModule>
+
+# Configurações de cache para API
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Cache para respostas JSON da API (curto tempo)
+    ExpiresByType application/json "access plus 5 minutes"
+
+    # Cache para PDFs
+    ExpiresByType application/pdf "access plus 1 hour"
+
+    # Sem cache para HTML dinâmico
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Desabilitar listagem de diretórios
+Options -Indexes
+
+# Proteger arquivos sensíveis
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak|sql)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Proteger arquivos de configuração
+<FilesMatch "^(config|database|auth)\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

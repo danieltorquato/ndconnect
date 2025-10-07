@@ -16,8 +16,7 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonBadge
-} from '@ionic/angular/standalone';
+  IonBadge, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   calculator,
@@ -31,15 +30,14 @@ import {
   analytics,
   cog,
   checkmarkCircle,
-  trendingUp
-} from 'ionicons/icons';
+  trendingUp, home, logOut } from 'ionicons/icons';
 
 @Component({
   selector: 'app-painel-orcamento',
   templateUrl: './painel-orcamento.page.html',
   styleUrls: ['./painel-orcamento.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonButtons,
     IonContent,
     IonHeader,
     IonTitle,
@@ -61,7 +59,7 @@ import {
 export class PainelOrcamentoPage implements OnInit {
 
   constructor(private router: Router) {
-    addIcons({calculator,cube,time,settings,analytics,addCircle,list,statsChart,documentText,checkmarkCircle,trendingUp,cog});
+    addIcons({calculator,home,logOut,cube,time,settings,analytics,addCircle,list,statsChart,documentText,checkmarkCircle,trendingUp,cog});
   }
 
   ngOnInit() {
@@ -90,6 +88,19 @@ export class PainelOrcamentoPage implements OnInit {
 
   irParaConfiguracoes() {
     this.router.navigate(['/admin/gestao-orcamentos']);
+  }
+
+  navegarPara(rota: string) {
+    this.router.navigate([rota]);
+  }
+
+  logout() {
+    // Limpar dados de autenticação
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+
+    // Redirecionar para login
+    this.router.navigate(['/login']);
   }
 
 }

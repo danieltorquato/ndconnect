@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DOCUMENT } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 interface Produto {
   id: number;
@@ -76,7 +77,7 @@ export class OrcamentoPage implements OnInit {
   ultimoOrcamentoId: number | null = null;
   dataMinima: string = '';
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

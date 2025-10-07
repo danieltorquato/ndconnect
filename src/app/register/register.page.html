@@ -1,0 +1,118 @@
+<ion-content class="register-content">
+  <div class="register-container">
+    <div class="register-card">
+      <!-- Logo -->
+      <div class="logo-container">
+        <img src="assets/img/logo.jpeg" alt="N.D Connect" class="logo">
+        <h1 class="company-name">N.D CONNECT</h1>
+        <p class="company-tagline">Criar Nova Conta</p>
+      </div>
+
+      <!-- Formulário de Registro -->
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="register-form">
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">Nome Completo</ion-label>
+            <ion-input
+              type="text"
+              formControlName="nome"
+              placeholder="Seu nome completo"
+              [class.error]="registerForm.get('nome')?.invalid && registerForm.get('nome')?.touched">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('nome')?.invalid && registerForm.get('nome')?.touched">
+            <span *ngIf="registerForm.get('nome')?.errors?.['required']">Nome é obrigatório</span>
+            <span *ngIf="registerForm.get('nome')?.errors?.['minlength']">Nome deve ter pelo menos 3 caracteres</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">E-mail</ion-label>
+            <ion-input
+              type="email"
+              formControlName="email"
+              placeholder="seu@email.com"
+              [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            </ion-input>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">E-mail é obrigatório</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">E-mail inválido</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">Senha</ion-label>
+            <ion-input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="senha"
+              placeholder="Mínimo 6 caracteres"
+              [class.error]="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched">
+            </ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="togglePassword()"
+              class="password-toggle">
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched">
+            <span *ngIf="registerForm.get('senha')?.errors?.['required']">Senha é obrigatória</span>
+            <span *ngIf="registerForm.get('senha')?.errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <ion-item>
+            <ion-label position="stacked">Confirmar Senha</ion-label>
+            <ion-input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmarSenha"
+              placeholder="Confirme sua senha"
+              [class.error]="registerForm.get('confirmarSenha')?.invalid && registerForm.get('confirmarSenha')?.touched">
+            </ion-input>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="toggleConfirmPassword()"
+              class="password-toggle">
+              <ion-icon [name]="showConfirmPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <div class="error-message" *ngIf="registerForm.get('confirmarSenha')?.invalid && registerForm.get('confirmarSenha')?.touched">
+            <span *ngIf="registerForm.get('confirmarSenha')?.errors?.['required']">Confirmação de senha é obrigatória</span>
+            <span *ngIf="registerForm.get('confirmarSenha')?.errors?.['mismatch']">Senhas não coincidem</span>
+          </div>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <div class="error-message" *ngIf="errorMessage" class="register-error">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Botão de Registro -->
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="registerForm.invalid || isLoading"
+          class="register-button">
+          <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+          <span *ngIf="!isLoading">Criar Conta</span>
+        </ion-button>
+      </form>
+
+      <!-- Links -->
+      <div class="register-links">
+        <p>Já tem uma conta?
+          <a (click)="goToLogin()" class="link">Faça login</a>
+        </p>
+        <p>
+          <a (click)="goToHome()" class="link">Voltar ao site</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</ion-content>

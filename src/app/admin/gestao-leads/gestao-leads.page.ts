@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import {
   arrowBack, personAdd, call, mail, business, chatbubbles,
@@ -103,7 +104,7 @@ export class GestaoLeadsPage implements OnInit {
     perdidos: 0
   };
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
@@ -395,6 +396,6 @@ export class GestaoLeadsPage implements OnInit {
   }
 
   voltarPainel() {
-    this.router.navigate(['/painel']);
+    this.router.navigate(['/painel-orcamento']);
   }
 }

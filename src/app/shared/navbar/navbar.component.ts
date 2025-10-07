@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import {
   menu, close, mailOutline, logoWhatsapp, home, informationCircle,
-  cube, images, call, logoInstagram, logoFacebook, logoYoutube, logoLinkedin
-} from 'ionicons/icons';
+  cube, images, call, logoInstagram, logoFacebook, logoYoutube, logoLinkedin,
+  personCircle, chevronDown, documentText, people, business, cash, calendar, barChart, logOut } from 'ionicons/icons';
 import {
   IonHeader, IonToolbar, IonButton, IonIcon
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { AuthService, Usuario } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -17,8 +19,12 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [IonHeader, IonToolbar, IonButton, IonIcon, CommonModule]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   menuOpen = false;
+  userMenuOpen = false;
+  isLoggedIn = false;
+  usuario: Usuario | null = null;
+  private authSubscription?: Subscription;
 
   private linksUteis = {
     instagram: 'https://instagram.com/ndconnect_oficial',
@@ -27,20 +33,80 @@ export class NavbarComponent {
     linkedin: 'https://linkedin.com/company/ndconnect'
   };
 
-  constructor(public router: Router) {
-    addIcons({
-      menu, close, mailOutline, logoWhatsapp, home, informationCircle,
-      cube, images, call, logoInstagram, logoFacebook, logoYoutube, logoLinkedin
+  constructor(
+    public router: Router,
+    private authService: AuthService
+  ) {
+    addIcons({personCircle,chevronDown,home,documentText,cube,people,business,cash,calendar,barChart,menu,close,logOut,mailOutline,logoWhatsapp,informationCircle,images,call,logoInstagram,logoFacebook,logoYoutube,logoLinkedin});
+  }
+
+  ngOnInit() {
+    this.authSubscription = this.authService.usuario$.subscribe(usuario => {
+      this.usuario = usuario;
+      this.isLoggedIn = !!usuario;
     });
+  }
+
+  ngOnDestroy() {
+    this.authSubscription?.unsubscribe();
   }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
+    this.userMenuOpen = false;
+  }
+
+  toggleUserMenu() {
+    this.userMenuOpen = !this.userMenuOpen;
+    this.menuOpen = false;
   }
 
   irPara(rota: string) {
     this.router.navigate([rota]);
     this.menuOpen = false;
+    this.userMenuOpen = false;
+  }
+
+  async logout() {
+    await this.authService.logout().toPromise();
+    this.router.navigate(['/home']);
+    this.userMenuOpen = false;
+    this.menuOpen = false;
+  }
+
+  canAccess(pagina: string): boolean {
+    if (!this.usuario) return false;
+
+    // Verificação básica de níveis
+    const niveis = ['cliente', 'vendedor', 'gerente', 'admin'];
+    const nivelUsuario = niveis.indexOf(this.usuario.nivel_acesso);
+
+    // Páginas administrativas
+    if (pagina.startsWith('admin/')) {
+      return nivelUsuario >= 1; // vendedor ou superior
+    }
+
+    // Páginas específicas
+    switch (pagina) {
+      case 'orcamento':
+        return nivelUsuario >= 1; // vendedor ou superior
+      case 'produtos':
+        return nivelUsuario >= 1; // vendedor ou superior
+      case 'painel':
+        return true; // todos podem acessar
+      default:
+        return true;
+    }
+  }
+
+  getNivelDisplay(nivel?: string): string {
+    const niveis: { [key: string]: string } = {
+      'admin': 'Administrador',
+      'gerente': 'Gerente',
+      'vendedor': 'Vendedor',
+      'cliente': 'Cliente'
+    };
+    return niveis[nivel || ''] || 'Cliente';
   }
 
   abrirWhatsApp() {

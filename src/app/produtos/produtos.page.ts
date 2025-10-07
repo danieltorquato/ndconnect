@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 import { addIcons } from 'ionicons';
 import { home, add, trash, close, save, cube, swapHorizontal, alertCircle, checkmarkCircle } from 'ionicons/icons';
 import {
@@ -122,7 +123,7 @@ export class ProdutosPage implements OnInit {
   }
 
   carregarProdutos() {
-    this.http.get<any>('http://localhost:8000/produtos').subscribe(
+    this.http.get<any>(`${environment.apiUrl}/produtos`).subscribe(
       (response) => {
         if (response.success) {
           // Mapear preco para preco_unitario para compatibilidade com a interface
@@ -144,7 +145,7 @@ export class ProdutosPage implements OnInit {
   }
 
   carregarCategorias() {
-    this.http.get<any>('http://localhost:8000/categorias').subscribe(
+    this.http.get<any>(`${environment.apiUrl}/categorias`).subscribe(
       (response) => {
         if (response.success) {
           this.categorias = response.data;
@@ -220,8 +221,8 @@ export class ProdutosPage implements OnInit {
     }
 
     const url = this.produtoEditando.id
-      ? `http://localhost:8000/produtos/${this.produtoEditando.id}`
-      : 'http://localhost:8000/produtos';
+      ? `${environment.apiUrl}/produtos/${this.produtoEditando.id}`
+      : `${environment.apiUrl}/produtos`;
 
     const method = this.produtoEditando.id ? 'PUT' : 'POST';
 
@@ -249,7 +250,7 @@ export class ProdutosPage implements OnInit {
     if (!produtoId) return;
 
     if (confirm('Tem certeza que deseja excluir este produto?')) {
-      this.http.delete(`http://localhost:8000/produtos/${produtoId}`).subscribe(
+      this.http.delete(`${environment.apiUrl}/produtos/${produtoId}`).subscribe(
         (response) => {
           this.mostrarNotificacao('Produto excluído!', 'success');
           this.carregarProdutos();
@@ -276,7 +277,7 @@ export class ProdutosPage implements OnInit {
   // ============================================
 
   carregarEstoqueAtual() {
-    this.http.get<any>('http://localhost:8000/estoque').subscribe({
+    this.http.get<any>(`${environment.apiUrl}/estoque`).subscribe({
       next: (response) => {
         if (response.success) {
           response.data.forEach((item: any) => {
@@ -291,7 +292,7 @@ export class ProdutosPage implements OnInit {
   }
 
   carregarAlertasEstoque() {
-    this.http.get<any>('http://localhost:8000/estoque/alertas').subscribe({
+    this.http.get<any>(`${environment.apiUrl}/estoque/alertas`).subscribe({
       next: (response) => {
         if (response.success) {
           this.alertasEstoque = response.data;
@@ -332,7 +333,7 @@ export class ProdutosPage implements OnInit {
 
     this.produtoSelecionadoEstoque = { ...produto };
 
-    this.http.get<any>(`http://localhost:8000/estoque/produto/${produto.id}`).subscribe({
+    this.http.get<any>(`${environment.apiUrl}/estoque/produto/${produto.id}`).subscribe({
       next: (response) => {
         if (response.success) {
           this.produtoSelecionadoEstoque.estoque = response.data;
@@ -357,7 +358,7 @@ export class ProdutosPage implements OnInit {
     const quantidade_minima = this.produtoSelecionadoEstoque.estoque?.quantidade_minima || 0;
 
     this.http.put<any>(
-      `http://localhost:8000/estoque/produto/${this.produtoSelecionadoEstoque.id}/estoque-minimo`,
+      `${environment.apiUrl}/estoque/produto/${this.produtoSelecionadoEstoque.id}/estoque-minimo`,
       { quantidade_minima }
     ).subscribe({
       next: async (response) => {
@@ -413,7 +414,7 @@ export class ProdutosPage implements OnInit {
       usuario: 'admin'
     };
 
-    this.http.post<any>('http://localhost:8000/estoque/movimentacoes', dados).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/estoque/movimentacoes`, dados).subscribe({
       next: async (response) => {
         if (response.success) {
           this.mostrarNotificacao('Movimentação registrada!', 'success');

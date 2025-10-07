@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico do Servidor - N.D Connect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #0C2B59 0%, #E8622D 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .success {
+            background: rgba(16, 185, 129, 0.3);
+            border: 1px solid #10b981;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.3);
+            border: 1px solid #ef4444;
+        }
+        .warning {
+            background: rgba(247, 166, 76, 0.3);
+            border: 1px solid #F7A64C;
+        }
+        .info {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid #3b82f6;
+        }
+        button {
+            background: #E8622D;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #cc5627;
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .links a {
+            color: #F7A64C;
+            text-decoration: none;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Diagnóstico do Servidor - N.D Connect</h1>
+
+        <div class="test-section">
+            <h2>📊 Status do Sistema</h2>
+            <div id="status-container">
+                <div class="status warning">
+                    <strong>⏳ Carregando...</strong> Verificando configurações do servidor hospedado...
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔗 URLs de Teste</h2>
+            <div class="links">
+                <a href="https://ndconnect.torquatoit.com/" target="_blank">🏠 Site Principal</a>
+                <a href="https://ndconnect.torquatoit.com/api/" target="_blank">⚙️ API Principal</a>
+                <a href="https://ndconnect.torquatoit.com/api/test-minimal.php" target="_blank">⚡ Teste Minimal</a>
+                <a href="https://ndconnect.torquatoit.com/api/test-auth.php" target="_blank">🔐 Teste Auth</a>
+                <a href="https://ndconnect.torquatoit.com/api/test-login.php" target="_blank">🔑 Teste Login</a>
+                <a href="https://ndconnect.torquatoit.com/api/test-auth-direct.php" target="_blank">🎯 Teste Auth Direto</a>
+                <a href="https://ndconnect.torquatoit.com/api/" target="_blank">🏠 API Principal</a>
+                <a href="https://ndconnect.torquatoit.com/api/auth" target="_blank">🔐 Endpoint Auth</a>
+                <a href="https://ndconnect.torquatoit.com/api/auth" target="_blank">🔐 Endpoint de Autenticação</a>
+                <a href="https://ndconnect.torquatoit.com/api/produtos" target="_blank">📦 Endpoint de Produtos</a>
+                <a href="https://ndconnect.torquatoit.com/api/orcamentos" target="_blank">💰 Endpoint de Orçamentos</a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Testes Automáticos</h2>
+            <button onclick="testMainSite()">Testar Site Principal</button>
+            <button onclick="testAPI()">Testar API</button>
+            <button onclick="testSimple()">Teste Simples</button>
+            <button onclick="testRoutes()">Teste de Rotas</button>
+            <button onclick="testServer()">Testar Servidor</button>
+            <button onclick="testCORS()">Testar CORS</button>
+            <button onclick="runAllTests()">Executar Todos os Testes</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Resultados dos Testes</h2>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Informações do Servidor</h2>
+            <div id="server-info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🛠️ Comandos de Diagnóstico</h2>
+            <div class="code">
+# Testar API diretamente
+curl -X GET "https://ndconnect.torquatoit.com/api/test-server.php"
+
+# Testar endpoint de autenticação
+curl -X GET "https://ndconnect.torquatoit.com/api/auth"
+
+# Testar endpoint de produtos
+curl -X GET "https://ndconnect.torquatoit.com/api/produtos"
+
+# Verificar logs de erro (se tiver acesso SSH)
+tail -f /var/log/apache2/error.log
+tail -f /var/log/nginx/error.log
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://ndconnect.torquatoit.com/api';
+
+        // Função para atualizar status
+        function updateStatus(message, type = 'warning') {
+            const container = document.getElementById('status-container');
+            container.innerHTML = `<div class="status ${type}"><strong>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⏳'}</strong> ${message}</div>`;
+        }
+
+        // Função para adicionar resultado de teste
+        function addTestResult(test, result, details = '') {
+            const container = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `status ${result}`;
+            div.innerHTML = `<strong>${result === 'success' ? '✅' : '❌'}</strong> <strong>${test}:</strong> ${details}`;
+            container.appendChild(div);
+        }
+
+        // Função para testar site principal
+        async function testMainSite() {
+            try {
+                const response = await fetch('https://ndconnect.torquatoit.com/');
+                if (response.ok) {
+                    addTestResult('Site Principal', 'success', 'Site carregando corretamente');
+                } else {
+                    addTestResult('Site Principal', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('Site Principal', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para testar API
+        async function testAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                if (response.ok) {
+                    addTestResult('API Principal', 'success', 'API respondendo corretamente');
+                } else {
+                    addTestResult('API Principal', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('API Principal', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para teste simples
+        async function testSimple() {
+            try {
+                const response = await fetch(`${API_BASE}/test-simple.php`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addTestResult('Teste Simples', 'success', data.message);
+                } else {
+                    addTestResult('Teste Simples', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('Teste Simples', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para teste de rotas
+        async function testRoutes() {
+            try {
+                const response = await fetch(`${API_BASE}/test-routes.php`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addTestResult('Teste de Rotas', 'success', data.message);
+
+                    // Mostrar detalhes dos arquivos
+                    if (data.files_status) {
+                        const details = `Arquivos: ${data.files_status.existing}/${data.files_status.total_required} encontrados`;
+                        addTestResult('Arquivos da API', data.files_status.missing === 0 ? 'success' : 'warning', details);
+                    }
+
+                    // Mostrar status do banco
+                    if (data.database_status) {
+                        addTestResult('Banco de Dados', data.database_status.status.includes('Conectado') ? 'success' : 'error', data.database_status.status);
+                    }
+                } else {
+                    addTestResult('Teste de Rotas', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('Teste de Rotas', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para testar servidor
+        async function testServer() {
+            try {
+                const response = await fetch(`${API_BASE}/test-server.php`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addTestResult('Teste do Servidor', 'success', `Servidor funcionando - ${data.message}`);
+
+                    // Mostrar informações detalhadas
+                    if (data.server_info) {
+                        const info = document.getElementById('server-info');
+                        info.innerHTML = `
+                            <div class="status info">
+                                <strong>🌐 Domínio:</strong> ${data.server_info.domain}<br>
+                                <strong>🔧 Servidor:</strong> ${data.server_info.server_software}<br>
+                                <strong>🐘 PHP:</strong> ${data.server_info.php_version}<br>
+                                <strong>📁 Document Root:</strong> ${data.server_info.document_root}<br>
+                                <strong>🗄️ Banco de Dados:</strong> ${data.database.status}<br>
+                                <strong>📊 Tabelas:</strong> ${data.database.tables_count} encontradas<br>
+                                <strong>⏰ Timestamp:</strong> ${data.timestamp}
+                            </div>
+                        `;
+                    }
+                } else {
+                    addTestResult('Teste do Servidor', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('Teste do Servidor', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para testar CORS
+        async function testCORS() {
+            try {
+                const response = await fetch(`${API_BASE}/auth`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                if (response.ok) {
+                    addTestResult('CORS', 'success', 'CORS configurado corretamente');
+                } else {
+                    addTestResult('CORS', 'error', `CORS não configurado: ${response.status}`);
+                }
+            } catch (error) {
+                addTestResult('CORS', 'error', `Erro de CORS: ${error.message}`);
+            }
+        }
+
+        // Função para executar todos os testes
+        async function runAllTests() {
+            document.getElementById('test-results').innerHTML = '';
+            updateStatus('Executando todos os testes...', 'warning');
+
+            await testMainSite();
+            await testAPI();
+            await testSimple();
+            await testRoutes();
+            await testServer();
+            await testCORS();
+
+            updateStatus('Todos os testes concluídos!', 'success');
+        }
+
+        // Executar quando a página carregar
+        window.onload = function() {
+            updateStatus('Diagnóstico carregado! Clique nos botões para testar.', 'info');
+        };
+    </script>
+</body>
+</html>

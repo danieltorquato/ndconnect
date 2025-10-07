@@ -12,6 +12,65 @@
         <a (click)="irPara('/produtos-catalogo')" class="nav-link" [class.active]="router.url === '/produtos-catalogo'">Produtos</a>
         <a (click)="irPara('/portfolio')" class="nav-link" [class.active]="router.url === '/portfolio'">Portfólio</a>
         <a (click)="irPara('/contato')" class="nav-link" [class.active]="router.url === '/contato'">Contato</a>
+
+        <!-- Menu do usuário logado -->
+        <div class="user-menu" *ngIf="isLoggedIn">
+          <ion-button fill="clear" class="user-btn" (click)="toggleUserMenu()">
+            <ion-icon name="person-circle" slot="start"></ion-icon>
+            {{ usuario?.nome }}
+            <ion-icon name="chevron-down" slot="end"></ion-icon>
+          </ion-button>
+
+          <!-- Dropdown do usuário -->
+          <div class="user-dropdown" [class.active]="userMenuOpen">
+            <div class="user-info">
+              <p class="user-name">{{ usuario?.nome }}</p>
+              <p class="user-email">{{ usuario?.email }}</p>
+              <p class="user-level">{{ getNivelDisplay(usuario?.nivel_acesso) }}</p>
+            </div>
+            <div class="user-actions">
+              <a (click)="irPara('/painel')" class="dropdown-item">
+                <ion-icon name="home" slot="start"></ion-icon>
+                Painel
+              </a>
+              <a (click)="irPara('/orcamento')" class="dropdown-item" *ngIf="canAccess('orcamento')">
+                <ion-icon name="document-text" slot="start"></ion-icon>
+                Orçamentos
+              </a>
+              <a (click)="irPara('/produtos')" class="dropdown-item" *ngIf="canAccess('produtos')">
+                <ion-icon name="cube" slot="start"></ion-icon>
+                Produtos
+              </a>
+              <a (click)="irPara('/admin/gestao-leads')" class="dropdown-item" *ngIf="canAccess('admin/gestao-leads')">
+                <ion-icon name="people" slot="start"></ion-icon>
+                Gestão de Leads
+              </a>
+              <a (click)="irPara('/admin/gestao-orcamentos')" class="dropdown-item" *ngIf="canAccess('admin/gestao-orcamentos')">
+                <ion-icon name="document" slot="start"></ion-icon>
+                Gestão de Orçamentos
+              </a>
+              <a (click)="irPara('/admin/gestao-clientes')" class="dropdown-item" *ngIf="canAccess('admin/gestao-clientes')">
+                <ion-icon name="business" slot="start"></ion-icon>
+                Gestão de Clientes
+              </a>
+              <a (click)="irPara('/admin/financeiro')" class="dropdown-item" *ngIf="canAccess('admin/financeiro')">
+                <ion-icon name="cash" slot="start"></ion-icon>
+                Financeiro
+              </a>
+              <a (click)="irPara('/admin/agenda')" class="dropdown-item" *ngIf="canAccess('admin/agenda')">
+                <ion-icon name="calendar" slot="start"></ion-icon>
+                Agenda
+              </a>
+              <a (click)="irPara('/admin/relatorios')" class="dropdown-item" *ngIf="canAccess('admin/relatorios')">
+                <ion-icon name="bar-chart" slot="start"></ion-icon>
+                Relatórios
+              </a>
+              <hr class="dropdown-divider">
+
+            </div>
+          </div>
+        </div>
+
         <ion-button (click)="irPara('/solicitar-orcamento')" class="cta-header">
           Solicitar Orçamento
         </ion-button>
@@ -38,7 +97,56 @@
     <a (click)="irPara('/produtos-catalogo')">Produtos</a>
     <a (click)="irPara('/portfolio')">Portfólio</a>
     <a (click)="irPara('/contato')">Contato</a>
-    <ion-button expand="block" (click)="irPara('/contato')">
+
+    <!-- Menu do usuário mobile -->
+    <div class="mobile-user" *ngIf="isLoggedIn">
+      <div class="mobile-user-info">
+        <p class="mobile-user-name">{{ usuario?.nome }}</p>
+        <p class="mobile-user-level">{{ getNivelDisplay(usuario?.nivel_acesso) }}</p>
+      </div>
+      <a (click)="irPara('/painel')" class="mobile-nav-item">
+        <ion-icon name="home" slot="start"></ion-icon>
+        Painel
+      </a>
+      <a (click)="irPara('/orcamento')" class="mobile-nav-item" *ngIf="canAccess('orcamento')">
+        <ion-icon name="document-text" slot="start"></ion-icon>
+        Orçamentos
+      </a>
+      <a (click)="irPara('/produtos')" class="mobile-nav-item" *ngIf="canAccess('produtos')">
+        <ion-icon name="cube" slot="start"></ion-icon>
+        Produtos
+      </a>
+      <a (click)="irPara('/admin/gestao-leads')" class="mobile-nav-item" *ngIf="canAccess('admin/gestao-leads')">
+        <ion-icon name="people" slot="start"></ion-icon>
+        Gestão de Leads
+      </a>
+      <a (click)="irPara('/admin/gestao-orcamentos')" class="mobile-nav-item" *ngIf="canAccess('admin/gestao-orcamentos')">
+        <ion-icon name="document" slot="start"></ion-icon>
+        Gestão de Orçamentos
+      </a>
+      <a (click)="irPara('/admin/gestao-clientes')" class="mobile-nav-item" *ngIf="canAccess('admin/gestao-clientes')">
+        <ion-icon name="business" slot="start"></ion-icon>
+        Gestão de Clientes
+      </a>
+      <a (click)="irPara('/admin/financeiro')" class="mobile-nav-item" *ngIf="canAccess('admin/financeiro')">
+        <ion-icon name="cash" slot="start"></ion-icon>
+        Financeiro
+      </a>
+      <a (click)="irPara('/admin/agenda')" class="mobile-nav-item" *ngIf="canAccess('admin/agenda')">
+        <ion-icon name="calendar" slot="start"></ion-icon>
+        Agenda
+      </a>
+      <a (click)="irPara('/admin/relatorios')" class="mobile-nav-item" *ngIf="canAccess('admin/relatorios')">
+        <ion-icon name="bar-chart" slot="start"></ion-icon>
+        Relatórios
+      </a>
+      <a (click)="logout()" class="mobile-nav-item logout">
+        <ion-icon name="log-out" slot="start"></ion-icon>
+        Sair
+      </a>
+    </div>
+
+    <ion-button expand="block" (click)="irPara('/solicitar-orcamento')">
       Solicitar Orçamento
     </ion-button>
   </nav>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import {
   arrowBack, cart, person, calendar, cube, cash,
@@ -62,7 +63,7 @@ export class GestaoPedidosPage implements OnInit {
     entregues: 0
   };
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

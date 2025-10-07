@@ -39,10 +39,47 @@ $request_uri = $_SERVER['REQUEST_URI'];
 $uri = parse_url($request_uri, PHP_URL_PATH);
 $uri = ltrim($uri, '/');
 
-$response = ['success' => false, 'message' => 'Endpoint não encontrado'];
+// Remove 'api' from the beginning of URI if present
+if (strpos($uri, 'api/') === 0) {
+    $uri = substr($uri, 4);
+}
+
+// Debug information
+$debug_info = [
+    'original_uri' => $request_uri,
+    'parsed_uri' => $uri,
+    'request_method' => $request_method,
+    'timestamp' => date('Y-m-d H:i:s')
+];
+
+$response = ['success' => false, 'message' => 'Endpoint não encontrado', 'debug' => $debug_info];
 
 try {
     switch ($uri) {
+        case '':
+        case 'api':
+            // Rota raiz da API - mostrar informações
+            $response = [
+                'success' => true,
+                'message' => 'API N.D Connect funcionando!',
+                'version' => '1.0.0',
+                'available_endpoints' => [
+                    'produtos' => 'GET, POST, PUT, DELETE',
+                    'categorias' => 'GET, POST, PUT, DELETE',
+                    'orcamentos' => 'GET, POST, PUT, DELETE',
+                    'leads' => 'GET, POST, PUT, DELETE',
+                    'dashboard' => 'GET',
+                    'clientes' => 'GET, POST, PUT, DELETE',
+                    'pedidos' => 'GET, POST, PUT, DELETE',
+                    'financeiro' => 'GET, POST, PUT, DELETE',
+                    'estoque' => 'GET, POST, PUT, DELETE',
+                    'agenda' => 'GET, POST, PUT, DELETE',
+                    'relatorios' => 'GET, POST, PUT, DELETE',
+                    'auth' => 'GET, POST, PUT, DELETE'
+                ],
+                'debug' => $debug_info
+            ];
+            break;
         case 'produtos':
             $controller = new ProdutoController();
             if ($request_method == 'GET') {
@@ -577,6 +614,58 @@ try {
                 $response = $controller->getDashboardExecutivo($mes, $ano);
             }
             break;
+
+        // AUTH ENDPOINTS
+        case 'auth':
+            // Incluir e executar o arquivo auth.php diretamente
+            try {
+                ob_start();
+                require_once 'auth.php';
+                $auth_output = ob_get_clean();
+
+                // Se auth.php retornou algo, usar isso
+                if (!empty($auth_output)) {
+                    $auth_response = json_decode($auth_output, true);
+                    if ($auth_response) {
+                        $response = $auth_response;
+                    } else {
+                        $response = [
+                            'success' => false,
+                            'message' => 'Resposta inválida do endpoint de autenticação',
+                            'debug' => $debug_info
+                        ];
+                    }
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Endpoint de autenticação não retornou resposta',
+                        'debug' => $debug_info
+                    ];
+                }
+            } catch (Exception $e) {
+                $response = [
+                    'success' => false,
+                    'message' => 'Erro no endpoint de autenticação: ' . $e->getMessage(),
+                    'debug' => $debug_info
+                ];
+            }
+            break;
+
+        // PDF ENDPOINTS
+        case 'pdf_real.php':
+            // Incluir e executar o arquivo pdf_real.php diretamente
+            require_once 'pdf_real.php';
+            exit; // Parar a execução aqui para não processar como JSON
+
+        case 'simple_pdf.php':
+            // Incluir e executar o arquivo simple_pdf.php diretamente
+            require_once 'simple_pdf.php';
+            exit; // Parar a execução aqui para não processar como JSON
+
+        case 'download_pdf.php':
+            // Incluir e executar o arquivo download_pdf.php diretamente
+            require_once 'download_pdf.php';
+            exit; // Parar a execução aqui para não processar como JSON
 
         default:
             $response = ['success' => false, 'message' => 'Endpoint não encontrado'];

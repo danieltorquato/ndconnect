@@ -47,10 +47,10 @@ function gerarPDFSimples($orcamento) {
 
             body {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                line-height: 1.6;
+                line-height: 1.4;
                 color: #333;
-                background: #f8fafc;
-                padding: 20px;
+                background: white;
+                padding: 0;
             }
 
             /* Container principal */
@@ -58,83 +58,86 @@ function gerarPDFSimples($orcamento) {
                 max-width: 800px;
                 margin: 0 auto;
                 background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
             }
 
-            /* Header */
+            /* Header com logo circular */
             .header {
-                background: linear-gradient(135deg,rgba(255, 106, 0, 0.7) 0%, #0C2B59 100%);
-                color: white;
-                padding: 30px;
                 text-align: center;
+                padding: 20px 0;
+                background: white;
+            }
+
+            .logo-container {
+                display: inline-block;
+                width: 80px;
+                height: 80px;
+                background: #0C2B59;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 15px;
                 position: relative;
             }
 
+            .logo-container::after {
+                content: "";
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                width: 20px;
+                height: 20px;
+                background: #E8622D;
+                border-radius: 50%;
+            }
+
+            .logo-text {
+                color: white;
+                font-weight: bold;
+                font-size: 12px;
+                text-align: center;
+                line-height: 1.2;
+            }
+
             .logo {
-                max-width: 120px;
+                max-width: 60px;
                 height: auto;
-                margin-bottom: 20px;
-                border-radius: 8px;
+                border-radius: 50%;
             }
 
-            .company-name {
-                font-size: 28px;
-                font-weight: 700;
-                margin-bottom: 8px;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            }
-
-            .company-tagline {
+            /* Faixas azuis */
+            .blue-bar {
+                background: #0C2B59;
+                color: white;
+                padding: 12px 20px;
+                text-align: center;
+                font-weight: bold;
                 font-size: 16px;
-                opacity: 0.9;
-                margin-bottom: 20px;
+                text-transform: uppercase;
             }
 
-            .orcamento-number {
-                background: rgba(255, 255, 255, 0.2);
-                padding: 12px 24px;
-                border-radius: 25px;
-                font-size: 18px;
-                font-weight: 600;
-                display: inline-block;
-                backdrop-filter: blur(10px);
+            .blue-bar.left {
+                text-align: left;
+                font-size: 14px;
             }
 
-            /* Conteúdo principal */
-            .content {
-                padding: 40px;
+            .blue-bar.small {
+                font-size: 12px;
+                padding: 8px 20px;
             }
 
-            /* Informações do cliente */
+            /* Seção de dados do cliente */
             .cliente-section {
-                background: #f8f9fa;
-                padding: 25px;
-                border-radius: 12px;
-                margin-bottom: 30px;
-                border-left: 4px solid #3498db;
-            }
-
-            .section-title {
-                font-size: 20px;
-                font-weight: 600;
-                color: #2c3e50;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
-            }
-
-            .section-title::before {
-                content: "👤";
-                margin-right: 10px;
-                font-size: 24px;
+                background: white;
+                padding: 20px;
             }
 
             .cliente-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: 1fr 1fr;
                 gap: 15px;
+                margin-top: 10px;
             }
 
             .cliente-item {
@@ -143,185 +146,182 @@ function gerarPDFSimples($orcamento) {
             }
 
             .cliente-label {
-                font-size: 12px;
-                color: #6c757d;
+                font-size: 11px;
+                color: #666;
+                font-weight: 500;
+                margin-bottom: 3px;
                 text-transform: uppercase;
-                font-weight: 600;
-                margin-bottom: 5px;
-                letter-spacing: 0.5px;
             }
 
             .cliente-value {
-                font-size: 16px;
-                color: #2c3e50;
-                font-weight: 500;
+                font-size: 13px;
+                color: #333;
+                font-weight: 400;
             }
 
-            /* Datas */
+            /* Seção de datas */
             .datas-section {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
-                margin-bottom: 30px;
+                background: #F8FAFC;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
             }
 
             .data-item {
                 text-align: center;
-                padding: 20px;
-                background: #f8f9fa;
-                border-radius: 12px;
-                border: 2px solid #e9ecef;
+                flex: 1;
             }
 
             .data-label {
-                font-size: 14px;
-                color: #6c757d;
-                font-weight: 600;
-                margin-bottom: 8px;
+                font-size: 11px;
+                color: #666;
+                font-weight: 500;
+                margin-bottom: 5px;
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
             }
 
             .data-value {
-                font-size: 18px;
-                color: #2c3e50;
-                font-weight: 700;
+                font-size: 14px;
+                color: #333;
+                font-weight: bold;
+            }
+
+            /* Seção de itens */
+            .itens-section {
+                background: white;
+            }
+
+            .orange-bar {
+                background: #E8622D;
+                color: white;
+                padding: 12px 20px;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
             }
 
             /* Tabela de itens */
-            .itens-section {
-                margin-bottom: 30px;
-            }
-
             .itens-table {
                 width: 100%;
                 border-collapse: collapse;
                 background: white;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             }
 
             .itens-table th {
-                background: #2c3e50;
+                background: #0C2B59;
                 color: white;
-                padding: 15px 12px;
+                padding: 10px 8px;
                 text-align: left;
-                font-weight: 600;
-                font-size: 14px;
+                font-weight: bold;
+                font-size: 11px;
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
+            }
+
+            .itens-table th.center {
+                text-align: center;
             }
 
             .itens-table td {
-                padding: 15px 12px;
-                border-bottom: 1px solid #e9ecef;
-                font-size: 14px;
+                padding: 8px;
+                border-bottom: 1px solid #eee;
+                font-size: 12px;
+                background: white;
             }
 
-            .itens-table tr:nth-child(even) {
-                background: #f8f9fa;
+            .itens-table td.center {
+                text-align: center;
             }
 
-            .itens-table tr:hover {
-                background: #e3f2fd;
+            .itens-table td.right {
+                text-align: right;
             }
 
             .produto-nome {
-                font-weight: 600;
-                color: #2c3e50;
+                font-weight: 500;
+                color: #333;
             }
 
-            .categoria {
-                font-size: 12px;
-                color: #6c757d;
-                background: #e9ecef;
-                padding: 2px 8px;
-                border-radius: 12px;
-                display: inline-block;
-            }
-
-            .quantidade {
-                text-align: center;
-                font-weight: 600;
-            }
-
-            .preco {
-                text-align: right;
-                font-weight: 600;
-                color: #27ae60;
-            }
-
-            .subtotal {
-                text-align: right;
-                font-weight: 700;
-                color: #2c3e50;
-            }
-
-            /* Totais */
+            /* Seção de totais */
             .totais-section {
-                background: #f8f9fa;
-                padding: 25px;
-                border-radius: 12px;
-                margin-bottom: 30px;
+                background: white;
+                padding: 20px;
             }
 
             .total-item {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 10px 0;
-                border-bottom: 1px solid #e9ecef;
-            }
-
-            .total-item:last-child {
-                border-bottom: none;
-                font-size: 18px;
-                font-weight: 700;
-                color: #2c3e50;
-                background: #e3f2fd;
-                padding: 15px;
-                margin: 10px -15px -15px -15px;
-                border-radius: 0 0 12px 12px;
+                padding: 5px 0;
+                font-size: 13px;
             }
 
             .total-label {
-                font-size: 16px;
-                color: #6c757d;
+                color: #666;
+                font-weight: 400;
             }
 
             .total-value {
+                color: #333;
+                font-weight: 500;
+            }
+
+            .total-separator {
+                height: 2px;
+                background: #E8622D;
+                margin: 10px 0;
+            }
+
+            .total-final {
                 font-size: 16px;
-                font-weight: 600;
-                color: #2c3e50;
+                font-weight: bold;
+                color: #E8622D;
             }
 
             /* Observações */
             .observacoes-section {
-                background: #fff3cd;
-                border: 1px solid #ffeaa7;
-                padding: 20px;
-                border-radius: 12px;
-                margin-bottom: 30px;
+                background: #FFF8DC;
+                padding: 15px 20px;
+                margin: 0;
             }
 
             .observacoes-title {
-                font-size: 16px;
-                font-weight: 600;
-                color: #856404;
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-            }
-
-            .observacoes-title::before {
-                content: "📝";
-                margin-right: 8px;
+                font-size: 12px;
+                font-weight: bold;
+                color: #0C2B59;
+                margin-bottom: 8px;
+                text-transform: uppercase;
             }
 
             .observacoes-text {
-                color: #856404;
-                line-height: 1.6;
+                font-size: 12px;
+                color: #333;
+                line-height: 1.4;
+            }
+
+            /* Footer */
+            .footer {
+                background: #0C2B59;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .footer-title {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+            }
+
+            .footer-specialization {
+                font-size: 11px;
+                margin-bottom: 8px;
+                opacity: 0.9;
+            }
+
+            .footer-contact {
+                font-size: 10px;
+                opacity: 0.8;
             }
 
             /* Botões de ação */
@@ -330,13 +330,13 @@ function gerarPDFSimples($orcamento) {
                 gap: 15px;
                 justify-content: center;
                 flex-wrap: wrap;
-                margin-bottom: 30px;
+                margin: 20px;
             }
 
             .btn {
                 padding: 12px 24px;
                 border: none;
-                border-radius: 8px;
+                border-radius: 6px;
                 font-size: 14px;
                 font-weight: 600;
                 cursor: pointer;
@@ -393,76 +393,15 @@ function gerarPDFSimples($orcamento) {
                 box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
             }
 
-            /* Footer */
-            .footer {
-                background: #2c3e50;
-                color: white;
-                padding: 30px;
-                text-align: center;
-            }
-
-            .footer-title {
-                font-size: 20px;
-                font-weight: 700;
-                margin-bottom: 15px;
-            }
-
-            .footer-info {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
-                margin-bottom: 20px;
-            }
-
-            .footer-item {
-                text-align: center;
-            }
-
-            .footer-label {
-                font-size: 12px;
-                opacity: 0.8;
-                margin-bottom: 5px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .footer-value {
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            .footer-note {
-                font-size: 14px;
-                opacity: 0.9;
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
             /* Responsividade */
             @media (max-width: 768px) {
-                body {
-                    padding: 10px;
-                }
-
-                .content {
-                    padding: 20px;
-                }
-
-                .header {
-                    padding: 20px;
-                }
-
-                .company-name {
-                    font-size: 24px;
-                }
-
                 .cliente-grid {
                     grid-template-columns: 1fr;
                 }
 
                 .datas-section {
-                    grid-template-columns: 1fr;
+                    flex-direction: column;
+                    gap: 10px;
                 }
 
                 .action-buttons {
@@ -476,39 +415,35 @@ function gerarPDFSimples($orcamento) {
                 }
 
                 .itens-table {
-                    font-size: 12px;
+                    font-size: 10px;
                 }
 
                 .itens-table th,
                 .itens-table td {
-                    padding: 10px 8px;
+                    padding: 6px 4px;
                 }
             }
 
             /* Print styles */
             @media print {
-                body {
-                    background: white;
-                    padding: 0;
-                }
-
-                .container {
-                    box-shadow: none;
-                    border-radius: 0;
-                }
-
                 .action-buttons {
                     display: none;
                 }
 
-                .header {
-                    background: #2c3e50 !important;
+                .blue-bar {
+                    background: #0C2B59 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+
+                .orange-bar {
+                    background: #E8622D !important;
                     -webkit-print-color-adjust: exact;
                     color-adjust: exact;
                 }
 
                 .footer {
-                    background: #2c3e50 !important;
+                    background: #0C2B59 !important;
                     -webkit-print-color-adjust: exact;
                     color-adjust: exact;
                 }
@@ -517,167 +452,152 @@ function gerarPDFSimples($orcamento) {
     </head>
     <body>
         <div class="container">
-            <!-- Header -->
+            <!-- Header com logo -->
             <div class="header">
-                ' . ($logoBase64 ? '<img src="' . $logoBase64 . '" alt="N.D Connect Logo" class="logo">' : '') . '
-                <div class="company-name">N.D CONNECT</div>
-                <div class="company-tagline">Equipamentos para Eventos</div>
-                <div class="orcamento-number">ORÇAMENTO Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '</div>
+                ' . ($logoBase64 ? '<img src="' . $logoBase64 . '" alt="N.D Connect Logo" class="logo">' : '
+                <div class="logo-container">
+                    <div class="logo-text">N.D<br>CONNECT</div>
+                </div>
+                ') . '
             </div>
 
-            <!-- Conteúdo principal -->
-            <div class="content">
-                <!-- Informações do cliente -->
-                <div class="cliente-section">
-                    <div class="section-title">Dados do Cliente</div>
-                    <div class="cliente-grid">
-                        <div class="cliente-item">
-                            <div class="cliente-label">Nome</div>
-                            <div class="cliente-value">' . htmlspecialchars($cliente_nome) . '</div>
-                        </div>
-                        ' . (!empty($cliente_email) ? '
-                        <div class="cliente-item">
-                            <div class="cliente-label">E-mail</div>
-                            <div class="cliente-value">' . htmlspecialchars($cliente_email) . '</div>
-                        </div>
-                        ' : '') . '
-                        ' . (!empty($cliente_telefone) ? '
-                        <div class="cliente-item">
-                            <div class="cliente-label">Telefone</div>
-                            <div class="cliente-value">' . htmlspecialchars($cliente_telefone) . '</div>
-                        </div>
-                        ' : '') . '
-                        ' . (!empty($cliente_endereco) ? '
-                        <div class="cliente-item">
-                            <div class="cliente-label">Endereço</div>
-                            <div class="cliente-value">' . htmlspecialchars($cliente_endereco) . '</div>
-                        </div>
-                        ' : '') . '
-                        ' . (!empty($cliente_cpf_cnpj) ? '
-                        <div class="cliente-item">
-                            <div class="cliente-label">CPF/CNPJ</div>
-                            <div class="cliente-value">' . htmlspecialchars($cliente_cpf_cnpj) . '</div>
-                        </div>
-                        ' : '') . '
+            <!-- Faixa principal -->
+            <div class="blue-bar">
+                EQUIPAMENTOS PARA EVENTOS
+            </div>
+
+            <!-- Número do orçamento -->
+            <div class="blue-bar small">
+                ORÇAMENTO N° ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '
+            </div>
+
+            <!-- Dados do cliente -->
+            <div class="blue-bar left">
+                DADOS DO CLIENTE
+            </div>
+            <div class="cliente-section">
+                <div class="cliente-grid">
+                    <div class="cliente-item">
+                        <div class="cliente-label">NOME</div>
+                        <div class="cliente-value">' . htmlspecialchars($cliente_nome) . '</div>
+                    </div>
+                    <div class="cliente-item">
+                        <div class="cliente-label">E-MAIL</div>
+                        <div class="cliente-value">' . htmlspecialchars($cliente_email) . '</div>
+                    </div>
+                    <div class="cliente-item">
+                        <div class="cliente-label">TELEFONE</div>
+                        <div class="cliente-value">' . htmlspecialchars($cliente_telefone) . '</div>
+                    </div>
+                    <div class="cliente-item">
+                        <div class="cliente-label">CPF/CNPJ</div>
+                        <div class="cliente-value">' . htmlspecialchars($cliente_cpf_cnpj) . '</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Datas -->
-                <div class="datas-section">
-                    <div class="data-item">
-                        <div class="data-label">Data do Orçamento</div>
-                        <div class="data-value">' . date('d/m/Y', strtotime($data_orcamento)) . '</div>
-                    </div>
-                    <div class="data-item">
-                        <div class="data-label">Válido até</div>
-                        <div class="data-value">' . date('d/m/Y', strtotime($data_validade)) . '</div>
-                    </div>
+            <!-- Datas -->
+            <div class="datas-section">
+                <div class="data-item">
+                    <div class="data-label">DATA DO ORÇAMENTO</div>
+                    <div class="data-value">' . date('d/m/Y', strtotime($data_orcamento)) . '</div>
                 </div>
+                <div class="data-item">
+                    <div class="data-label">VÁLIDO ATÉ</div>
+                    <div class="data-value">' . date('d/m/Y', strtotime($data_validade)) . '</div>
+                </div>
+            </div>
 
-                <!-- Itens do orçamento -->
-                <div class="itens-section">
-                    <div class="section-title">Itens do Orçamento</div>
-                    <table class="itens-table">
-                        <thead>
-                            <tr>
-                                <th>Produto</th>
-                                <th>Quantidade</th>
-                                <th>Preço Unit.</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ';
+            <!-- Itens do orçamento -->
+            <div class="orange-bar">
+                ITENS DO ORÇAMENTO
+            </div>
+            <div class="itens-section">
+                <table class="itens-table">
+                    <thead>
+                        <tr>
+                            <th>PRODUTO</th>
+                            <th class="center">QTD</th>
+                            <th class="center">PREÇO UNIT.</th>
+                            <th class="center">SUBTOTAL</th>
+                            <th class="center">UNID.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ';
 
     foreach ($itens as $item) {
         $produto_nome = isset($item['produto_nome']) ? $item['produto_nome'] : 'Produto não informado';
-        $categoria_nome = isset($item['categoria_nome']) ? $item['categoria_nome'] : '';
         $quantidade = isset($item['quantidade']) ? $item['quantidade'] : 0;
         $preco_unitario = isset($item['preco_unitario']) ? $item['preco_unitario'] : 0;
         $subtotal_item = isset($item['subtotal']) ? $item['subtotal'] : 0;
         $unidade = isset($item['unidade']) ? $item['unidade'] : 'un';
 
         $html .= '
-                            <tr>
-                                <td>
-                                    <div class="produto-nome">' . htmlspecialchars($produto_nome) . '</div>
-                                    ' . (!empty($categoria_nome) ? '<div class="categoria">' . htmlspecialchars($categoria_nome) . '</div>' : '') . '
-                                </td>
-                                <td class="quantidade">' . $quantidade . ' ' . htmlspecialchars($unidade) . '</td>
-                                <td class="preco">R$ ' . number_format($preco_unitario, 2, ',', '.') . '</td>
-                                <td class="subtotal">R$ ' . number_format($subtotal_item, 2, ',', '.') . '</td>
-                            </tr>';
+                        <tr>
+                            <td>
+                                <div class="produto-nome">' . htmlspecialchars($produto_nome) . '</div>
+                            </td>
+                            <td class="center">' . $quantidade . '</td>
+                            <td class="right">R$ ' . number_format($preco_unitario, 2, ',', '.') . '</td>
+                            <td class="right">R$ ' . number_format($subtotal_item, 2, ',', '.') . '</td>
+                            <td class="center">' . htmlspecialchars($unidade) . '</td>
+                        </tr>';
     }
 
     $html .= '
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Totais -->
-                <div class="totais-section">
-                    <div class="total-item">
-                        <span class="total-label">Subtotal</span>
-                        <span class="total-value">R$ ' . number_format($subtotal, 2, ',', '.') . '</span>
-                    </div>
-                    ' . ($desconto > 0 ? '
-                    <div class="total-item">
-                        <span class="total-label">Desconto</span>
-                        <span class="total-value">- R$ ' . number_format($desconto, 2, ',', '.') . '</span>
-                    </div>
-                    ' : '') . '
-                    <div class="total-item">
-                        <span class="total-label">Total</span>
-                        <span class="total-value">R$ ' . number_format($total, 2, ',', '.') . '</span>
-                    </div>
+            <!-- Totais -->
+            <div class="totais-section">
+                <div class="total-item">
+                    <span class="total-label">SUBTOTAL:</span>
+                    <span class="total-value">R$ ' . number_format($subtotal, 2, ',', '.') . '</span>
                 </div>
-
-                ' . (!empty($observacoes) ? '
-                <!-- Observações -->
-                <div class="observacoes-section">
-                    <div class="observacoes-title">Observações</div>
-                    <div class="observacoes-text">' . nl2br(htmlspecialchars($observacoes)) . '</div>
+                ' . ($desconto > 0 ? '
+                <div class="total-item">
+                    <span class="total-label">DESCONTO:</span>
+                    <span class="total-value">- R$ ' . number_format($desconto, 2, ',', '.') . '</span>
                 </div>
                 ' : '') . '
-
-                <!-- Botões de ação -->
-                <div class="action-buttons">
-                    <button class="btn btn-whatsapp" onclick="shareWhatsApp()">
-                        📱 WhatsApp
-                    </button>
-                    <button class="btn btn-email" onclick="shareEmail()">
-                        📧 E-mail
-                    </button>
-                    <button class="btn btn-print" onclick="printPDF()">
-                        🖨️ Imprimir
-                    </button>
-                    <button class="btn btn-download" onclick="downloadPDF()">
-                        💾 Baixar PDF
-                    </button>
+                <div class="total-separator"></div>
+                <div class="total-item total-final">
+                    <span class="total-label">TOTAL:</span>
+                    <span class="total-value">R$ ' . number_format($total, 2, ',', '.') . '</span>
                 </div>
+            </div>
+
+            ' . (!empty($observacoes) ? '
+            <!-- Observações -->
+            <div class="observacoes-section">
+                <div class="observacoes-title">OBSERVAÇÕES</div>
+                <div class="observacoes-text">' . nl2br(htmlspecialchars($observacoes)) . '</div>
+            </div>
+            ' : '') . '
+
+            <!-- Botões de ação -->
+            <div class="action-buttons">
+                <button class="btn btn-whatsapp" onclick="shareWhatsApp()">
+                    📱 WhatsApp
+                </button>
+                <button class="btn btn-email" onclick="shareEmail()">
+                    📧 E-mail
+                </button>
+                <button class="btn btn-print" onclick="printPDF()">
+                    🖨️ Imprimir
+                </button>
+                <button class="btn btn-download" onclick="downloadPDF()">
+                    💾 Baixar PDF
+                </button>
             </div>
 
             <!-- Footer -->
             <div class="footer">
-                <div class="footer-title">N.D CONNECT</div>
-                <div class="footer-info">
-                    <div class="footer-item">
-                        <div class="footer-label">Telefone</div>
-                        <div class="footer-value">(11) 99999-9999</div>
-                    </div>
-                    <div class="footer-item">
-                        <div class="footer-label">E-mail</div>
-                        <div class="footer-value">contato@ndconnect.com.br</div>
-                    </div>
-                    <div class="footer-item">
-                        <div class="footer-label">Site</div>
-                        <div class="footer-value">www.ndconnect.com.br</div>
-                    </div>
-                </div>
-                <div class="footer-note">
-                    Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED<br>
-                    Sua parceira em eventos inesquecíveis
-                </div>
+                <div class="footer-title">N.D CONNECT - EQUIPAMENTOS PARA EVENTOS</div>
+                <div class="footer-specialization">Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED</div>
+                <div class="footer-contact">Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br</div>
             </div>
         </div>
 

@@ -1,0 +1,150 @@
+<ion-content class="login-content" [scrollY]="false">
+  <!-- Background animado -->
+  <div class="animated-background">
+    <div class="gradient-bg"></div>
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+  </div>
+
+  <!-- Container principal -->
+  <div class="login-container">
+    <div class="login-card" [@slideInUp]>
+      <!-- Header -->
+      <div class="login-header">
+        <h1 class="login-title">Login</h1>
+        <div class="logo-section">
+          <div class="logo-container">
+            <img src="assets/img/logo.jpeg" alt="N.D Connect" class="logo">
+          </div>
+          <div class="brand-info">
+            <h2 class="brand-name">N.D CONNECT</h2>
+            <p class="brand-subtitle">Equipamentos para Eventos</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário -->
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+        <!-- Campo Email -->
+        <div class="input-group" [@fadeInUp]>
+          <div class="input-container">
+            <ion-icon name="person" class="input-icon"></ion-icon>
+            <div class="input-content">
+              <label class="input-label">E-mail</label>
+              <ion-input
+                type="email"
+                formControlName="email"
+                placeholder="Digite seu e-mail"
+                class="form-input"
+                (focus)="onInputFocus($event)"
+                (blur)="onInputBlur($event)"
+                [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+              </ion-input>
+            </div>
+            <div class="input-line" [class.active]="isEmailFocused"></div>
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" [@fadeIn]>
+            <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">E-mail é obrigatório</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">E-mail inválido</span>
+          </div>
+        </div>
+
+        <!-- Campo Senha -->
+        <div class="input-group" [@fadeInUp]>
+          <div class="input-container">
+            <ion-icon name="lock-closed" class="input-icon"></ion-icon>
+            <div class="input-content">
+              <label class="input-label">Senha</label>
+                      <ion-input
+                        [type]="showPassword ? 'text' : 'password'"
+                        formControlName="senha"
+                        placeholder="Digite sua senha"
+                        class="form-input"
+                        (focus)="onInputFocus($event)"
+                        (blur)="onInputBlur($event)"
+                        [class.error]="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched">
+                      </ion-input>
+            </div>
+            <div class="input-line" [class.active]="isPasswordFocused"></div>
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="password-toggle"
+              [@bounceIn]>
+              <ion-icon [name]="showPassword ? 'eye-off' : 'eye'"></ion-icon>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched" [@fadeIn]>
+            <ion-icon name="alert-circle" class="error-icon"></ion-icon>
+            <span *ngIf="loginForm.get('senha')?.errors?.['required']">Senha é obrigatória</span>
+            <span *ngIf="loginForm.get('senha')?.errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</span>
+          </div>
+        </div>
+
+        <!-- Esqueci minha senha -->
+        <div class="forgot-password" [@fadeInUp]>
+          <a href="#" class="forgot-link">Esqueci minha senha?</a>
+        </div>
+
+        <!-- Mensagem de erro geral -->
+        <div class="error-alert" *ngIf="errorMessage" [@shake]>
+          <ion-icon name="alert-circle" class="alert-icon"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Botão de Login -->
+        <button
+          type="submit"
+          [disabled]="loginForm.invalid || isLoading"
+          class="login-btn"
+          [@pulse]="loginForm.valid && !isLoading"
+          (mouseenter)="onButtonHover($event)"
+          (mouseleave)="onButtonLeave($event)">
+          <ion-spinner *ngIf="isLoading" name="crescent" class="btn-spinner"></ion-spinner>
+          <span *ngIf="!isLoading" class="btn-content">
+            <ion-icon name="log-in" class="btn-icon"></ion-icon>
+            ENTRAR
+          </span>
+          <div class="btn-ripple" [class.active]="buttonRipple"></div>
+        </button>
+      </form>
+
+      <!-- Divisor -->
+      <div class="divider" [@fadeInUp]>
+        <div class="divider-line"></div>
+        <span class="divider-text">Ou entre usando</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Botões sociais -->
+      <div class="social-buttons" [@fadeInUp]>
+        <button class="social-btn facebook" (click)="loginWithFacebook()" [@bounceIn]>
+          <ion-icon name="logo-facebook"></ion-icon>
+        </button>
+        <button class="social-btn twitter" (click)="loginWithTwitter()" [@bounceIn]>
+          <ion-icon name="logo-twitter"></ion-icon>
+        </button>
+        <button class="social-btn google" (click)="loginWithGoogle()" [@bounceIn]>
+          <ion-icon name="logo-google"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="login-footer" [@fadeInUp]>
+        <p class="register-text">
+          Não tem uma conta?
+          <a (click)="goToRegister()" class="register-link">Cadastre-se</a>
+        </p>
+        <a (click)="goToHome()" class="home-link">
+          <ion-icon name="arrow-back" class="link-icon"></ion-icon>
+          Voltar ao site
+        </a>
+      </div>
+    </div>
+  </div>
+</ion-content>

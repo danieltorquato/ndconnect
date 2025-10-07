@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import {
   arrowBack, statsChart, trendingUp, trendingDown,
@@ -64,7 +65,7 @@ export class RelatoriosPage implements OnInit {
   mesRelatorio: number = new Date().getMonth() + 1;
   anoRelatorio: number = new Date().getFullYear();
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 import { addIcons } from 'ionicons';
 import { send, person, mail, call, business, chatbubbles, checkmarkCircle } from 'ionicons/icons';
 import {
@@ -73,7 +74,7 @@ export class SolicitarOrcamentoPage implements OnInit {
   enviando: boolean = false;
   enviado: boolean = false;
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

@@ -1,9 +1,22 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./register/register.page').then((m) => m.RegisterPage),
+  },
+  {
+    path: 'unauthorized',
+    loadComponent: () => import('./unauthorized/unauthorized.page').then((m) => m.UnauthorizedPage),
   },
   {
     path: 'sobre',
@@ -28,14 +41,17 @@ export const routes: Routes = [
   {
     path: 'painel',
     loadComponent: () => import('./painel/painel.page').then((m) => m.PainelPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'orcamento',
     loadComponent: () => import('./orcamento/orcamento.page').then((m) => m.OrcamentoPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'produtos',
     loadComponent: () => import('./produtos/produtos.page').then((m) => m.ProdutosPage),
+    canActivate: [AuthGuard],
   },
   {
     path: '',
@@ -48,36 +64,44 @@ export const routes: Routes = [
   },
   {
     path: 'gestao-leads',
-    loadComponent: () => import('./admin/gestao-leads/gestao-leads.page').then( m => m.GestaoLeadsPage)
+    loadComponent: () => import('./admin/gestao-leads/gestao-leads.page').then( m => m.GestaoLeadsPage),
+    canActivate: [AuthGuard],
   },
 
   {
     path: 'gestao-orcamentos',
-    loadComponent: () => import('./admin/gestao-orcamentos/gestao-orcamentos.page').then( m => m.GestaoOrcamentosPage)
+    loadComponent: () => import('./admin/gestao-orcamentos/gestao-orcamentos.page').then( m => m.GestaoOrcamentosPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'painel-orcamento',
-    loadComponent: () => import('./painel-orcamento/painel-orcamento.page').then( m => m.PainelOrcamentoPage)
+    loadComponent: () => import('./painel-orcamento/painel-orcamento.page').then( m => m.PainelOrcamentoPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'admin/gestao-clientes',
-    loadComponent: () => import('./admin/gestao-clientes/gestao-clientes.page').then( m => m.GestaoClientesPage)
+    loadComponent: () => import('./admin/gestao-clientes/gestao-clientes.page').then( m => m.GestaoClientesPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'admin/gestao-pedidos',
-    loadComponent: () => import('./admin/gestao-pedidos/gestao-pedidos.page').then( m => m.GestaoPedidosPage)
+    loadComponent: () => import('./admin/gestao-pedidos/gestao-pedidos.page').then( m => m.GestaoPedidosPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'admin/financeiro',
-    loadComponent: () => import('./admin/financeiro/financeiro.page').then( m => m.FinanceiroPage)
+    loadComponent: () => import('./admin/financeiro/financeiro.page').then( m => m.FinanceiroPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'admin/agenda',
-    loadComponent: () => import('./admin/agenda/agenda.page').then( m => m.AgendaPage)
+    loadComponent: () => import('./admin/agenda/agenda.page').then( m => m.AgendaPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'admin/relatorios',
-    loadComponent: () => import('./admin/relatorios/relatorios.page').then( m => m.RelatoriosPage)
+    loadComponent: () => import('./admin/relatorios/relatorios.page').then( m => m.RelatoriosPage),
+    canActivate: [AuthGuard],
   },
 
 ];

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste do Servidor - N.D Connect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #0C2B59 0%, #E8622D 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: rgba(16, 185, 129, 0.3);
+            border: 1px solid #10b981;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.3);
+            border: 1px solid #ef4444;
+        }
+        .warning {
+            background: rgba(247, 166, 76, 0.3);
+            border: 1px solid #F7A64C;
+        }
+        button {
+            background: #E8622D;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #cc5627;
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .links a {
+            color: #F7A64C;
+            text-decoration: none;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Teste do Servidor - N.D Connect</h1>
+
+        <div class="test-section">
+            <h2>📋 Status do Sistema</h2>
+            <div id="status-container">
+                <div class="status warning">
+                    <strong>⏳ Carregando...</strong> Verificando configurações do servidor...
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔗 Links de Teste</h2>
+            <div class="links">
+                <a href="/www/" target="_blank">🏠 Aplicação Angular</a>
+                <a href="/api/" target="_blank">⚙️ API PHP</a>
+                <a href="/api/auth" target="_blank">🔐 Endpoint de Autenticação</a>
+                <a href="/api/produtos" target="_blank">📦 Endpoint de Produtos</a>
+                <a href="/api/orcamentos" target="_blank">💰 Endpoint de Orçamentos</a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Testes Automáticos</h2>
+            <button onclick="testAPI()">Testar API</button>
+            <button onclick="testAngular()">Testar Angular</button>
+            <button onclick="testCORS()">Testar CORS</button>
+            <button onclick="runAllTests()">Executar Todos os Testes</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Resultados dos Testes</h2>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Informações do Servidor</h2>
+            <div id="server-info"></div>
+        </div>
+    </div>
+
+    <script>
+        // Função para atualizar status
+        function updateStatus(message, type = 'warning') {
+            const container = document.getElementById('status-container');
+            container.innerHTML = `<div class="status ${type}"><strong>${type === 'success' ? '✅' : type === 'error' ? '❌' : '⏳'}</strong> ${message}</div>`;
+        }
+
+        // Função para adicionar resultado de teste
+        function addTestResult(test, result, details = '') {
+            const container = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `status ${result}`;
+            div.innerHTML = `<strong>${result === 'success' ? '✅' : '❌'}</strong> <strong>${test}:</strong> ${details}`;
+            container.appendChild(div);
+        }
+
+        // Função para testar API
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/');
+                if (response.ok) {
+                    addTestResult('API PHP', 'success', 'API respondendo corretamente');
+                } else {
+                    addTestResult('API PHP', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('API PHP', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para testar Angular
+        async function testAngular() {
+            try {
+                const response = await fetch('/www/');
+                if (response.ok) {
+                    addTestResult('Aplicação Angular', 'success', 'Aplicação Angular carregando corretamente');
+                } else {
+                    addTestResult('Aplicação Angular', 'error', `Erro ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addTestResult('Aplicação Angular', 'error', `Erro de conexão: ${error.message}`);
+            }
+        }
+
+        // Função para testar CORS
+        async function testCORS() {
+            try {
+                const response = await fetch('/api/auth', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                if (response.ok) {
+                    addTestResult('CORS', 'success', 'CORS configurado corretamente');
+                } else {
+                    addTestResult('CORS', 'error', `CORS não configurado: ${response.status}`);
+                }
+            } catch (error) {
+                addTestResult('CORS', 'error', `Erro de CORS: ${error.message}`);
+            }
+        }
+
+        // Função para executar todos os testes
+        async function runAllTests() {
+            document.getElementById('test-results').innerHTML = '';
+            updateStatus('Executando todos os testes...', 'warning');
+
+            await testAPI();
+            await testAngular();
+            await testCORS();
+
+            updateStatus('Todos os testes concluídos!', 'success');
+        }
+
+        // Função para mostrar informações do servidor
+        function showServerInfo() {
+            const info = document.getElementById('server-info');
+            info.innerHTML = `
+                <div class="status success">
+                    <strong>🌐 URL Atual:</strong> ${window.location.href}<br>
+                    <strong>🔗 Host:</strong> ${window.location.host}<br>
+                    <strong>📁 Pathname:</strong> ${window.location.pathname}<br>
+                    <strong>🔒 Protocol:</strong> ${window.location.protocol}<br>
+                    <strong>⏰ Timestamp:</strong> ${new Date().toLocaleString('pt-BR')}
+                </div>
+            `;
+        }
+
+        // Executar quando a página carregar
+        window.onload = function() {
+            updateStatus('Servidor funcionando! Configurações carregadas com sucesso.', 'success');
+            showServerInfo();
+        };
+    </script>
+</body>
+</html>

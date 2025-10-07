@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import {
   arrowBack, cash, card, trendingUp, trendingDown, wallet,
@@ -100,7 +101,7 @@ export class FinanceiroPage implements OnInit {
     observacoes: ''
   };
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

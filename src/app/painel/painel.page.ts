@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 import { addIcons } from 'ionicons';
 import {
   home, people, document, cart, cash, statsChart,
   calendar, cube, settings, notifications, search,
   personAdd, documentText, checkmarkCircle, closeCircle,
-  timeOutline, trendingUp
-} from 'ionicons/icons';
+  timeOutline, trendingUp, logOut } from 'ionicons/icons';
 import {
   IonHeader,
   IonToolbar,
@@ -18,6 +18,7 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
+  IonButtons,
   IonIcon,
   IonGrid,
   IonRow,
@@ -53,6 +54,7 @@ interface DashboardData {
     IonCardTitle,
     IonCardContent,
     IonButton,
+    IonButtons,
     IonIcon,
     IonGrid,
     IonRow,
@@ -74,18 +76,13 @@ export class PainelPage implements OnInit {
     ticket_medio: 0
   };
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
-    addIcons({
-      home, people, document, cart, cash, statsChart,
-      calendar, cube, settings, notifications, search,
-      personAdd, documentText, checkmarkCircle, closeCircle,
-      timeOutline, trendingUp
-    });
+    addIcons({home,logOut,personAdd,documentText,cart,timeOutline,trendingUp,statsChart,people,cube,cash,document,calendar,settings,notifications,search,checkmarkCircle,closeCircle});
   }
 
   ngOnInit() {
@@ -107,5 +104,14 @@ export class PainelPage implements OnInit {
 
   navegarPara(rota: string) {
     this.router.navigate([rota]);
+  }
+
+  logout() {
+    // Limpar dados de autenticação
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+
+    // Redirecionar para login
+    this.router.navigate(['/login']);
   }
 }

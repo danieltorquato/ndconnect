@@ -367,4 +367,5 @@ printStyles.textContent = `
 `;
 document.head.appendChild(printStyles);
 </script>';
+}
 ?>
