@@ -1,7 +1,15 @@
 <app-navbar></app-navbar>
 <ion-content class="catalogo-content">
-  <!-- Hero Section -->
-  <section class="hero-catalogo">
+  <!-- Loading State -->
+  <div *ngIf="carregando" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Carregando produtos...</p>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div *ngIf="!carregando">
+    <!-- Hero Section -->
+    <section class="hero-catalogo">
     <div class="container">
       <div class="hero-content">
         <h1>Nossos Produtos</h1>
@@ -71,4 +79,5 @@
       </div>
     </div>
   </section>
+  </div>
 </ion-content>

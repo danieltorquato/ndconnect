@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar class="header-toolbar">
     <ion-title>
       <div class="header-logo">
         <img src="assets/img/logo.jpeg" alt="N.D Connect" />
@@ -11,6 +11,12 @@
 
 <ion-content class="ion-padding">
   <div class="container">
+
+    <!-- Banner de Boas-vindas -->
+    <div class="welcome-banner">
+      <h1>Solicite Seu Orçamento</h1>
+      <p>Transforme seu evento em uma experiência extraordinária com nossos equipamentos profissionais</p>
+    </div>
 
     <!-- Mensagem de Sucesso -->
     <ion-card *ngIf="enviado" class="success-card">

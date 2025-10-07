@@ -29,6 +29,7 @@
   ion-toolbar {
     --background: rgba(255, 255, 255, 0.95);
     --color: var(--nd-primary);
+    --ion-color-base: #ffffff; /* cor dos ícones padrão */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(232, 98, 45, 0.1);
@@ -72,7 +73,7 @@
   .brand-name {
     font-size: 1.25rem;
     font-weight: 800;
-    color: var(--nd-primary);
+    color: #fff;
     letter-spacing: -0.5px;
   }
 }
@@ -132,7 +133,7 @@
 // Menu Toggle (Mobile)
 .menu-toggle {
   display: none;
-  --color: var(--nd-primary);
+  --color: #ffffff;
   --padding-start: 12px;
   --padding-end: 12px;
 }

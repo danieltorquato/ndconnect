@@ -37,6 +37,7 @@ interface Produto {
 })
 export class ProdutosCatalogoPage implements OnInit {
   produtos: { id: number; nome: string; descricao: string; icone: string; disponivel: boolean; }[] = [];
+  carregando: boolean = true;
 
   constructor(
     private router: Router,
@@ -49,7 +50,11 @@ export class ProdutosCatalogoPage implements OnInit {
   }
 
   ngOnInit() {
-    this.carregarProdutos();
+    // Simular carregamento para evitar flash da página anterior
+    setTimeout(() => {
+      this.carregarProdutos();
+      this.carregando = false;
+    }, 100);
   }
 
   carregarProdutos() {

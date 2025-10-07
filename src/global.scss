@@ -34,27 +34,37 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
 
 /* Cores oficiais da N.D Connect - Aplicação global */
 :root {
-  // Cores principais
-  --nd-primary: #0C2B59;
-  --nd-secondary: #E8622D;
-  --nd-accent: #F7A64C;
-  --nd-light: #FFFFFF;
-  --nd-dark: #0C2B59;
-  --nd-medium: #64748b;
+  // Cores principais - FORÇADAS para não mudar com modo escuro
+  --nd-primary: #0C2B59 !important;
+  --nd-secondary: #E8622D !important;
+  --nd-accent: #F7A64C !important;
+  --nd-light: #FFFFFF !important;
+  --nd-dark: #0C2B59 !important;
+  --nd-medium: #64748b !important;
 
   // Gradientes
-  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
-  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%);
+  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%) !important;
+  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%) !important;
+}
+
+/* Forçar cores específicas para evitar mudanças do modo escuro */
+* {
+  color-scheme: light only !important;
+}
+
+html, body {
+  background-color: #F8FAFC !important;
+  color: #0C2B59 !important;
 }
 
 /* Aplicação global das cores nos componentes Ionic */
 ion-toolbar {
-  --background: var(--nd-primary);
-  --color: var(--nd-light);
+  --background: var(--nd-primary) !important;
+  --color: var(--nd-light) !important;
 }
 
 ion-button {

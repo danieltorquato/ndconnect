@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <meta name="theme-color" content="#0C2B59">
+    <title>Teste Modo Escuro - N.D Connect</title>
+    <style>
+        :root {
+            --nd-primary: #0C2B59 !important;
+            --nd-secondary: #E8622D !important;
+            --nd-accent: #F7A64C !important;
+            --nd-light: #FFFFFF !important;
+        }
+
+        * {
+            color-scheme: light only !important;
+        }
+
+        body {
+            background-color: #F8FAFC !important;
+            color: #0C2B59 !important;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .test-section {
+            background: linear-gradient(135deg, #0A1F3F 0%, #0C2B59 50%);
+            color: white !important;
+            padding: 40px;
+            margin: 20px 0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #E8622D 0%, #F7A64C 50%) !important;
+            color: #0A1F3F !important;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .test-button-secondary {
+            background: #0A1F3F !important;
+            color: white !important;
+            border: 2px solid #E8622D;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #E8622D 0%, #F7A64C 50%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+            color: #E8622D !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Proteção contra Modo Escuro</h1>
+    <p>Este é um teste para verificar se as cores estão sendo forçadas corretamente, independente do modo escuro do iPhone.</p>
+
+    <div class="test-section">
+        <h2>Pronto Para Criar um Evento Memorável?</h2>
+        <p>Fale com nossos especialistas e receba um orçamento personalizado em minutos</p>
+        <button class="test-button">WhatsApp: (11) 95389-8557</button>
+        <button class="test-button-secondary">Solicitar Orçamento</button>
+    </div>
+
+    <div style="background: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
+        <h2>Transforme Cada Evento em uma <span class="gradient-text">Experiência Extraordinária</span></h2>
+        <p>Soluções completas em equipamentos profissionais. Som, luz, palcos, geradores e tecnologia de ponta para eventos que impressionam e ficam na memória.</p>
+    </div>
+
+    <p><strong>Instruções para teste:</strong></p>
+    <ol>
+        <li>Abra este arquivo no iPhone</li>
+        <li>Ative o modo escuro nas configurações</li>
+        <li>Verifique se as cores permanecem as mesmas</li>
+        <li>O fundo deve permanecer claro (#F8FAFC)</li>
+        <li>Os textos devem permanecer escuros (#0C2B59)</li>
+        <li>Os botões devem manter suas cores originais</li>
+    </ol>
+</body>
+</html>

@@ -8,8 +8,70 @@
   --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Garantir que a página carregue imediatamente */
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--nd-gradient-primary);
+  position: relative;
+  z-index: 1;
+  animation: pageLoad 0.3s ease-out;
+}
+
+@keyframes pageLoad {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--nd-gradient-primary);
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    opacity: 0.9;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .catalogo-content {
   --background: var(--nd-gradient-primary);
+  background: var(--nd-gradient-primary);
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  width: 100%;
 }
 
 .container {

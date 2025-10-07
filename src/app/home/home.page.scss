@@ -3,23 +3,23 @@
 // ========================================
 
 :root {
-  --nd-primary: #0C2B59;
-  --nd-secondary: #E8622D;
-  --nd-accent: #F7A64C;
-  --nd-light: #FFFFFF;
-  --nd-dark: #0A1F3F;
-  --nd-gray-50: #F8FAFC;
-  --nd-gray-100: #F1F5F9;
-  --nd-gray-200: #E2E8F0;
-  --nd-gray-300: #CBD5E1;
-  --nd-gray-400: #94A3B8;
-  --nd-gray-500: #64748B;
-  --nd-gray-600: #475569;
-  --nd-gray-700: #334155;
-  --nd-gray-800: #1E293B;
-  --nd-gray-900: #0F172A;
-  --nd-gradient-primary: linear-gradient(135deg, #E8622D 0%, #F7A64C 50%,);
-  --nd-gradient-dark: linear-gradient(135deg, #0A1F3F 0%, #0C2B59 50%,  );
+  --nd-primary: #0C2B59 !important;
+  --nd-secondary: #E8622D !important;
+  --nd-accent: #F7A64C !important;
+  --nd-light: #FFFFFF !important;
+  --nd-dark: #0A1F3F !important;
+  --nd-gray-50: #F8FAFC !important;
+  --nd-gray-100: #F1F5F9 !important;
+  --nd-gray-200: #E2E8F0 !important;
+  --nd-gray-300: #CBD5E1 !important;
+  --nd-gray-400: #94A3B8 !important;
+  --nd-gray-500: #64748B !important;
+  --nd-gray-600: #475569 !important;
+  --nd-gray-700: #334155 !important;
+  --nd-gray-800: #1E293B !important;
+  --nd-gray-900: #0F172A !important;
+  --nd-gradient-primary: linear-gradient(135deg, #E8622D 0%, #F7A64C 50%) !important;
+  --nd-gradient-dark: linear-gradient(135deg, #0A1F3F 0%, #0C2B59 50%) !important;
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -34,16 +34,69 @@
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light only !important;
 }
 
 .premium-content {
-  --background: var(--nd-gray-50);
+  --background: var(--nd-gray-50) !important;
+  background-color: var(--nd-gray-50) !important;
+  color: var(--nd-primary) !important;
+}
+
+/* Forçar cores específicas para evitar mudanças do modo escuro */
+ion-content {
+  --background: var(--nd-gray-50) !important;
+  background-color: var(--nd-gray-50) !important;
+  color: var(--nd-primary) !important;
+}
+
+/* Proteção contra modo escuro - forçar cores específicas */
+.hero-title-premium,
+.hero-description,
+.section-title-premium,
+.section-description,
+.cta-content h2,
+.cta-content p {
+  color: var(--nd-primary) !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  /* Fallback caso o browser não suporte background-clip */
+  color: #E8622D !important;
+}
+
+/* Gradiente azul para títulos (igual ao efeito laranja) */
+.blue-gradient-text {
+  background: linear-gradient(135deg, #0A1F3F 0%, #0C2B59 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  /* Fallback */
+  color: #0A1F3F !important;
 }
 
 .container-premium {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* Melhorias de responsividade */
+@media (max-width: 768px) {
+  .container-premium {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container-premium {
+    padding: 0 12px;
+  }
 }
 
 // ========================================
@@ -239,11 +292,78 @@
 
 .hero-premium {
   position: relative;
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  /* Efeito de luzes de palco animadas - Azul predominante */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(12, 43, 89, 0.9) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(10, 31, 63, 0.75) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(12, 43, 89, 0.85) 0%, transparent 50%),
+      radial-gradient(circle at 90% 70%, rgba(10, 31, 63, 0.7) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(5, 15, 32, 0.6) 0%, transparent 60%);
+    animation: stageLights 8s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%),
+      linear-gradient(-45deg, transparent 30%, rgba(12, 43, 89, 0.2) 50%, transparent 70%);
+    animation: lightSweep 6s linear infinite;
+    z-index: 2;
+  }
+
+  /* Feixes de luz verticais (estilo palco) */
+  .stage-beams {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    overflow: hidden;
+  }
+
+  .beam {
+    position: absolute;
+    top: -20%;
+    bottom: -20%;
+    width: 180px;
+    filter: blur(6px);
+    opacity: 0.18;
+    transform: rotate(8deg);
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0) 70%);
+    mix-blend-mode: screen;
+    animation: beamSweep 8s linear infinite;
+  }
+
+  .beam.b1 { left: 5%; animation-delay: 0s; }
+  .beam.b2 { left: 25%; animation-delay: 1.2s; }
+  .beam.b3 { left: 50%; animation-delay: 2.4s; }
+  .beam.b4 { left: 75%; animation-delay: 3.6s; }
+
+  @keyframes beamSweep {
+    0%   { transform: translateY(0) rotate(8deg); opacity: 0.12; }
+    25%  { transform: translateY(10%) rotate(6deg); opacity: 0.2; }
+    50%  { transform: translateY(0) rotate(8deg); opacity: 0.14; }
+    75%  { transform: translateY(-10%) rotate(10deg); opacity: 0.22; }
+    100% { transform: translateY(0) rotate(8deg); opacity: 0.12; }
+  }
 }
 
 .hero-background {
@@ -254,6 +374,32 @@
   bottom: 0;
   background: var(--nd-gradient-dark);
   z-index: 1;
+
+  /* Efeito de palco com linhas de luz */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.03) 2px,
+        rgba(255, 255, 255, 0.03) 4px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(232, 98, 45, 0.05) 2px,
+        rgba(232, 98, 45, 0.05) 4px
+      );
+    animation: stageGrid 10s linear infinite;
+  }
 }
 
 .gradient-overlay {
@@ -263,11 +409,12 @@
   right: 0;
   bottom: 0;
 
+  /* Overlay mais escuro e profundo em azul */
   background:
-  radial-gradient(ellipse at top right, rgba(33, 37, 241, 0.1), transparent 80%),
-  radial-gradient(ellipse at bottom left, rgba(12, 53, 238, 0.1), transparent 50%),
-  radial-gradient(ellipse at top right, rgba(232, 98, 45, 0.15), transparent 50%),
-              radial-gradient(ellipse at bottom left, rgba(247, 166, 76, 0.1), transparent 50%);
+    linear-gradient(180deg, rgba(5, 15, 32, 0.85) 0%, rgba(8, 24, 50, 0.85) 40%, rgba(10, 31, 63, 0.85) 100%),
+    radial-gradient(ellipse at top right, rgba(12, 43, 89, 0.6), transparent 70%),
+    radial-gradient(ellipse at bottom left, rgba(10, 31, 63, 0.5), transparent 60%),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0.15), transparent 50%);
 }
 
 .animated-shapes {
@@ -288,28 +435,56 @@
 .shape-1 {
   width: 600px;
   height: 600px;
-  background: var(--nd-secondary);
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.6), rgba(10, 31, 63, 0.4));
   top: -300px;
   right: -200px;
   animation-delay: 0s;
+  box-shadow: 0 0 50px rgba(12, 43, 89, 0.3);
 }
 
 .shape-2 {
   width: 400px;
   height: 400px;
-  background: var(--nd-accent);
+  background: linear-gradient(135deg, rgba(10, 31, 63, 0.5), rgba(12, 43, 89, 0.3));
   bottom: -100px;
   left: -100px;
   animation-delay: 7s;
+  box-shadow: 0 0 40px rgba(10, 31, 63, 0.2);
 }
 
 .shape-3 {
   width: 300px;
   height: 300px;
-  background: var(--nd-secondary);
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.7), rgba(10, 31, 63, 0.5));
   top: 50%;
   left: 50%;
   animation-delay: 14s;
+  box-shadow: 0 0 35px rgba(12, 43, 89, 0.4);
+}
+
+/* Formas adicionais de luz para efeito de palco - Azul predominante */
+.shape-4 {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(12, 43, 89, 0.4));
+  top: 40%;
+  right: 30%;
+  border-radius: 50%;
+  animation: lightPulse 4s ease-in-out infinite;
+  filter: blur(2px);
+  box-shadow: 0 0 20px rgba(12, 43, 89, 0.4);
+}
+
+.shape-5 {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.5), rgba(10, 31, 63, 0.3));
+  bottom: 40%;
+  right: 10%;
+  border-radius: 50%;
+  animation: lightMove 7s ease-in-out infinite;
+  filter: blur(3px);
+  box-shadow: 0 0 25px rgba(12, 43, 89, 0.3);
 }
 
 @keyframes float {
@@ -318,18 +493,98 @@
   66% { transform: translate(-30px, 30px) rotate(240deg); }
 }
 
+/* Animações para efeitos de luzes de palco */
+@keyframes stageLights {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  75% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes lightSweep {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes stageGrid {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(20px) translateY(20px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes lightPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
+}
+
+@keyframes lightMove {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -20px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 30px) scale(0.9);
+  }
+  75% {
+    transform: translate(40px, 10px) scale(1.05);
+  }
+}
+
 .hero-container {
   position: relative;
   z-index: 10;
   max-width: 1280px;
   width: 100%;
-  padding: 80px 24px;
+  padding: 60px 24px;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .hero-content-premium {
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
+  position: relative;
+  z-index: 15;
+  color: white !important;
 }
 
 .hero-badge {
@@ -341,27 +596,27 @@
   backdrop-filter: blur(10px);
   border: 2px solid var(--nd-secondary);
   border-radius: 50px;
-  color: var(--nd-primary);
+  color: var(--nd-primary) !important;
   font-size: 0.9rem;
   font-weight: 700;
   margin-bottom: 32px;
   animation: fadeInUp 0.6s ease-out;
 
   ion-icon {
-    color: var(--nd-secondary);
+    color: var(--nd-secondary) !important;
     font-size: 1.2rem;
   }
 }
 
 .hero-title-premium {
-  font-size: 3.5rem;
+  font-size: 3.2rem;
   font-weight: 900;
-  line-height: 1.15;
-  color: #0A1F3F !important;
-  margin: 0 0 24px 0;
+  line-height: 1.1;
+  color: white !important;
+  margin: 0 0 20px 0;
   letter-spacing: -1px;
   animation: fadeInUp 0.6s ease-out 0.1s backwards;
-  text-shadow: none;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .gradient-text {
@@ -372,12 +627,12 @@
 }
 
 .hero-description {
-  font-size: 1.25rem;
-  line-height: 1.7;
-  color: #334155 !important;
-  margin: 0 0 40px 0;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: white !important;
+  margin: 0 0 32px 0;
   animation: fadeInUp 0.6s ease-out 0.2s backwards;
-  text-shadow: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .hero-actions {
@@ -385,7 +640,7 @@
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
   animation: fadeInUp 0.6s ease-out 0.3s backwards;
 }
 
@@ -399,11 +654,15 @@
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  min-width: 200px;
+  border-radius: 12px;
 
   &.primary {
-    --color: #0A1F3F;
-    --background: var(--nd-gradient-primary);
-    box-shadow: 0 8px 24px rgba(232, 98, 45, 0.35);
+    --color: #0A1F3F !important;
+    --background: var(--nd-gradient-primary) !important;
+    background: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%) !important;
+    color: #0A1F3F !important;
+    // box-shadow: 0 8px 24px rgba(232, 98, 45, 0.35);
 
     &:hover {
       transform: translateY(-2px);
@@ -412,15 +671,38 @@
   }
 
   &.secondary {
-    --color: #0A1F3F;
-    --background: #25D366;
-    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+    --color: white !important;
+    --background: linear-gradient(135deg, #075E54    0%, #128C7E 100%) !important;
+    background: linear-gradient(135deg, #075E54    0%, #128C7E 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 24px rgba(10, 31, 63, 0.35);
+    border: 2px solid linear-gradient(135deg, #128C7E    0%, #075E54 100%);
 
     &:hover {
-      --background: #20C55A;
+      --background:  #25D366      !important;
+      background: #25D366      !important;
       transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(37, 211, 102, 0.45);
+      box-shadow: 0 12px 32px #128c7e84;
     }
+  }
+}
+
+/* Melhorias de responsividade para botões */
+@media (max-width: 768px) {
+  .btn-premium {
+    min-width: 180px;
+    height: 50px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-premium {
+    min-width: 160px;
+    height: 48px;
+    font-size: 0.9rem;
+    --padding-start: 24px;
+    --padding-end: 24px;
   }
 }
 
@@ -438,15 +720,16 @@
 .stat-number {
   font-size: 2.5rem;
   font-weight: 900;
-  color: #0A1F3F !important;
+  color: white !important;
   margin-bottom: 4px;
-  text-shadow: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
   font-size: 0.9rem;
-  color: #475569 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .stat-divider {
@@ -573,13 +856,14 @@
 }
 
 .service-card-premium {
-  background: white;
-  border: 2px solid var(--nd-gray-200);
-  border-radius: 20px;
-  padding: 40px 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(12, 43, 89, 0.08);
+  border-radius: 16px;
+  padding: 32px 28px;
   transition: var(--transition-smooth);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(10, 31, 63, 0.06);
 
   &::before {
     content: '';
@@ -587,16 +871,16 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: var(--nd-gradient-primary);
     transform: scaleX(0);
     transition: var(--transition-smooth);
   }
 
   &:hover {
-    border-color: var(--nd-secondary);
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-8px);
+    border-color: rgba(232, 98, 45, 0.3);
+    box-shadow: 0 16px 40px rgba(10, 31, 63, 0.12);
+    transform: translateY(-6px);
 
     &::before {
       transform: scaleX(1);
@@ -618,14 +902,14 @@
   }
 
   h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: #0A1F3F;
     margin: 20px 0 12px 0;
   }
 
   p {
-    font-size: 1rem;
+    font-size: 0.98rem;
     line-height: 1.7;
     color: #475569;
     margin: 0 0 24px 0;
@@ -635,30 +919,30 @@
 
 .featured-badge {
   position: absolute;
-  top: 20px;
-  right: -30px;
-  background: var(--nd-gradient-primary);
+  top: 30px;
+  right: -20px;
+  background: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%);
   color: white;
   padding: 6px 40px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  transform: rotate(45deg);
+  transform: rotate(35deg);
   box-shadow: var(--shadow-md);
 }
 
 .service-icon {
-  width: 80px;
-  height: 80px;
+  width: 68px;
+  height: 68px;
   background: var(--nd-gradient-primary);
-  border-radius: 20px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: var(--transition-smooth);
 
   ion-icon {
-    font-size: 40px;
+    font-size: 32px;
     color: white;
   }
 }
@@ -689,6 +973,10 @@
   --color: #0A1F3F;
   font-weight: 700;
   margin-top: auto;
+  --padding-start: 0;
+  --padding-end: 0;
+  text-transform: none;
+  letter-spacing: 0.2px;
 }
 
 // ========================================
@@ -696,11 +984,13 @@
 // ========================================
 
 .why-choose-premium {
-  padding: 120px 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 120px 0 200px 0;
+  background: var(--nd-gradient-dark);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 10;
 
+  /* Aplicar o mesmo conceito de palco/luzes do banner */
   &::before {
     content: '';
     position: absolute;
@@ -708,8 +998,26 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(232,98,45,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
-    opacity: 0.5;
+    background:
+      linear-gradient(180deg, rgba(5, 15, 32, 0.85) 0%, rgba(8, 24, 50, 0.85) 40%, rgba(10, 31, 63, 0.85) 100%),
+      radial-gradient(circle at 20% 30%, rgba(12, 43, 89, 0.8) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(10, 31, 63, 0.7) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(12, 43, 89, 0.8) 0%, transparent 50%);
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+      linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%),
+      linear-gradient(-45deg, transparent 30%, rgba(12, 43, 89, 0.18) 50%, transparent 70%);
+    animation: lightSweep 8s linear infinite;
+    z-index: 2;
   }
 }
 
@@ -719,18 +1027,23 @@
   gap: 100px;
   align-items: start;
   position: relative;
-  z-index: 2;
+  z-index: 3; /* acima dos overlays */
 }
 
 .why-choose-content {
+  position: relative;
+  z-index: 15;
+
   .section-title-premium {
     text-align: left;
     margin-bottom: 24px;
+    color: white !important;
   }
 
   .section-description {
     text-align: left;
     margin-bottom: 48px;
+    color: rgba(255, 255, 255, 0.9) !important;
   }
 }
 
@@ -741,8 +1054,27 @@
   margin-bottom: 48px;
 }
 
+/* Garantir que o botão da seção why-choose seja visível */
+.why-choose-content .btn-premium {
+  position: relative;
+  z-index: 20;
+  margin-top: 24px;
+}
+
+/* No mobile, ajustar o botão */
+@media (max-width: 768px) {
+  .why-choose-content .btn-premium {
+    margin-top: 0;
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    order: 3;
+  }
+}
+
 .benefit-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.98);
   padding: 28px;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(10, 31, 63, 0.08);
@@ -821,7 +1153,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.98);
   padding: 40px 32px;
   border-radius: 20px;
   text-align: center;
@@ -911,9 +1243,13 @@
 
 .cta-premium {
   padding: 100px 0;
-  background: var(--nd-gradient-dark);
+  background: var(--nd-gradient-dark) !important;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 5;
+  margin-top: -50px;
 
   &::before {
     content: '';
@@ -928,36 +1264,100 @@
   }
 }
 
+/* Melhorias de responsividade para CTA */
+@media (max-width: 768px) {
+  .cta-premium {
+    padding: 60px 0;
+
+    &::before {
+      width: 400px;
+      height: 400px;
+      top: -30%;
+      right: -30%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-premium {
+    padding: 40px 0;
+
+    &::before {
+      width: 300px;
+      height: 300px;
+      top: -20%;
+      right: -40%;
+    }
+  }
+}
+
 .cta-content {
   position: relative;
   z-index: 1;
   text-align: center;
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
 
   h2 {
-    font-size: 3rem;
-    font-weight: 900;
-    color: #0A1F3F !important;
-    margin: 0 0 20px 0;
+    color: linear-gradient(135deg, #E8622D 0%, #F7A64C 50%) !important;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
     line-height: 1.2;
-    text-shadow: none;
   }
 
   p {
-    font-size: 1.25rem;
-    color: #475569 !important;
-    margin: 0 0 40px 0;
-    font-weight: 600;
-    text-shadow: none;
+    color: #0A1F3F !important;
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    line-height: 1.6;
   }
 }
 
 .cta-actions {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Melhorias de responsividade para CTA content */
+@media (max-width: 768px) {
+  .cta-content {
+    padding: 0 16px;
+
+    h2 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+    }
+  }
+
+  .cta-actions {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-content {
+    padding: 0 12px;
+
+    h2 {
+      font-size: 1.75rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
 }
 
 // ========================================
@@ -1151,16 +1551,23 @@
   }
 
   .hero-title-premium {
-    font-size: 2.25rem;
+    font-size: 2rem;
+    margin-bottom: 16px;
   }
 
   .hero-description {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+
+  .hero-actions {
+    margin-bottom: 32px;
   }
 
   .hero-actions {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
 
   .hero-stats {
@@ -1178,6 +1585,19 @@
 
   .services-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .service-card-premium {
+    padding: 24px 18px;
+  }
+
+  .featured-badge {
+    top: 20px;
+    right: -18px;
+    padding: 4px 30px;
+    font-size: 0.7rem;
+    transform: rotate(32deg);
   }
 
   .trust-badges {
@@ -1217,17 +1637,39 @@
   }
 
   .hero-title-premium {
-    font-size: 1.85rem;
+    font-size: 1.75rem;
+    margin-bottom: 12px;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .hero-actions {
+    margin-bottom: 28px;
+  }
+
+  .hero-container {
+    padding: 40px 16px;
   }
 
   .services-premium,
   .why-choose-premium {
-    padding: 80px 0;
+    padding: 80px 0 160px 0;
   }
 
   .why-choose-grid {
     grid-template-columns: 1fr;
-    gap: 60px;
+    gap: 50px;
+  }
+
+  .why-choose-visual {
+    order: 2;
+  }
+
+  .why-choose-content {
+    order: 1;
   }
 
   .benefits-grid {
