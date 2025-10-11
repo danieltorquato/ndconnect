@@ -10,10 +10,18 @@
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
         <div class="shape shape-3"></div>
+        <div class="shape-4"></div>
+        <div class="shape-5"></div>
       </div>
                 </div>
 
     <div class="hero-container">
+      <div class="stage-beams">
+        <div class="beam b1"></div>
+        <div class="beam b2"></div>
+        <div class="beam b3"></div>
+        <div class="beam b4"></div>
+      </div>
       <div class="hero-content-premium">
         <div class="hero-badge">
           <ion-icon name="star"></ion-icon>
@@ -307,14 +315,14 @@
   <section class="cta-premium">
     <div class="container-premium">
       <div class="cta-content" data-aos="zoom-in">
-        <h2>Pronto Para Criar um Evento Memorável?</h2>
-        <p>Fale com nossos especialistas e receba um orçamento personalizado em minutos</p>
+        <h2 class="gradient-text">Pronto Para Criar um Evento Memorável?</h2>
+        <p class="text-dark">Fale com nossos especialistas e receba um orçamento personalizado em minutos</p>
         <div class="cta-actions">
-          <ion-button size="large" class="btn-premium secondary" (click)="abrirWhatsApp()">
+          <ion-button size="large" class="btn-premium primary" (click)="abrirWhatsApp()">
             <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
             WhatsApp: (11) 95389-8557
           </ion-button>
-          <ion-button size="large" class="btn-premium primary" (click)="irPara('/orcamento-cliente')">
+          <ion-button size="large" class="btn-premium secondary" (click)="irPara('/orcamento-cliente')">
             <ion-icon name="mail-outline" slot="start"></ion-icon>
             Solicitar Orçamento
       </ion-button>
