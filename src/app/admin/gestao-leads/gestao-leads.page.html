@@ -53,16 +53,22 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-card *ngFor="let lead of leadsFiltrados" class="lead-card">
+    <ion-card *ngFor="let lead of leadsFiltrados" class="lead-card" [class.lead-nao-lido]="lead.status === 'novo' && !lead.lido">
       <ion-card-header>
         <div class="card-header-content">
           <div>
             <ion-card-title>{{ lead.nome }}</ion-card-title>
             <p class="empresa" *ngIf="lead.empresa">{{ lead.empresa }}</p>
           </div>
-          <ion-badge [color]="getStatusColor(lead.status)">
-            {{ getStatusLabel(lead.status) }}
-          </ion-badge>
+          <div class="badges-container">
+            <ion-badge [color]="getStatusColor(lead.status)">
+              {{ getStatusLabel(lead.status) }}
+            </ion-badge>
+            <ion-badge *ngIf="lead.status === 'novo' && !lead.lido" color="warning" class="novo-badge">
+              <ion-icon name="add-circle" size="small"></ion-icon>
+              Novo
+            </ion-badge>
+          </div>
         </div>
       </ion-card-header>
 
@@ -128,6 +134,16 @@
             (click)="converterEmCliente(lead)">
             <ion-icon name="swap-horizontal" slot="start"></ion-icon>
             Converter
+          </ion-button>
+
+          <ion-button
+            *ngIf="lead.status === 'novo' && !lead.lido"
+            fill="clear"
+            size="small"
+            color="success"
+            (click)="marcarComoLido(lead)">
+            <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+            Marcar como Lido
           </ion-button>
 
           <ion-button fill="clear" size="small" color="danger" (click)="excluirLead(lead, $event)">

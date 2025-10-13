@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonContent,
   IonHeader,
@@ -131,6 +132,8 @@ export class NiveisAcessoPage implements OnInit {
       role: 'confirm'
     }
   ];
+
+  private router = inject(Router);
 
   constructor(
     private nivelAcessoService: NivelAcessoService,
@@ -289,5 +292,9 @@ export class NiveisAcessoPage implements OnInit {
 
   canDelete(): boolean {
     return this.authService.isDev() || this.authService.temNivel('admin');
+  }
+
+  editarPermissoes(nivel: NivelAcesso) {
+    this.router.navigate(['/admin/niveis-acesso', nivel.id, 'permissoes']);
   }
 }

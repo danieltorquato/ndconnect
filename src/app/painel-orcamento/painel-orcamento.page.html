@@ -3,8 +3,15 @@
     <ion-title>
       <ion-icon name="calculator" slot="start"></ion-icon>
       Painel de Orçamentos
+
     </ion-title>
     <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="navegarPara('/admin/gestao-leads')">
+        <ion-icon name="people"></ion-icon>
+        <ion-badge *ngIf="notificacoes > 0" color="danger" class="notification-badge-small">
+          {{ notificacoes }}
+        </ion-badge>
+      </ion-button>
       <ion-button fill="clear" (click)="navegarPara('/painel-orcamento')">
         <ion-icon name="home"></ion-icon>
       </ion-button>
@@ -22,6 +29,18 @@
     </ion-toolbar>
   </ion-header>
 
+  <!-- Refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-skeleton-text animated style="width: 100%; height: 100px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 80%; height: 100px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 90%; height: 100px;"></ion-skeleton-text>
+  </div>
+
   <!-- Seção Principal - Sistema de Orçamentos -->
   <div class="main-section">
     <ion-card class="feature-card primary-card" (click)="irParaOrcamentos()">
@@ -38,9 +57,163 @@
     </ion-card>
   </div>
 
+  <!-- Seção de Estatísticas de Leads -->
+  <div class="stats-section" *ngIf="!loading">
+    <h2 class="section-title">
+      <ion-icon name="people"></ion-icon>
+      Estatísticas de Leads
+    </h2>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-content">
+                <ion-icon name="add-circle" class="stat-icon" color="primary"></ion-icon>
+                <div class="stat-text">
+                  <h3>{{ stats.novos }}</h3>
+                  <p>Novos</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-content">
+                <ion-icon name="call" class="stat-icon" color="warning"></ion-icon>
+                <div class="stat-text">
+                  <h3>{{ stats.contatados }}</h3>
+                  <p>Contatados</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-content">
+                <ion-icon name="checkmark-circle" class="stat-icon" color="success"></ion-icon>
+                <div class="stat-text">
+                  <h3>{{ stats.qualificados }}</h3>
+                  <p>Qualificados</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="6" size-md="3">
+          <ion-card class="stat-card">
+            <ion-card-content>
+              <div class="stat-content">
+                <ion-icon name="trophy" class="stat-icon" color="tertiary"></ion-icon>
+                <div class="stat-text">
+                  <h3>{{ stats.convertidos }}</h3>
+                  <p>Convertidos</p>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Seção de Leads Recentes -->
+  <div class="leads-section" *ngIf="!loading && showLeads">
+    <div class="section-header">
+      <h2 class="section-title">
+        <ion-icon name="time"></ion-icon>
+        Leads Recentes
+        <ion-badge *ngIf="notificacoes > 0" color="primary" class="section-badge">
+          {{ notificacoes }} {{ notificacoes === 1 ? 'novo' : 'novos' }}
+        </ion-badge>
+      </h2>
+      <div class="section-actions">
+        <ion-button *ngIf="notificacoes > 0" fill="clear" size="small" color="success" (click)="marcarTodosComoLidos()">
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          Marcar como Lido
+        </ion-button>
+        <ion-button fill="clear" size="small" (click)="irParaGestaoLeads()">
+          <ion-icon name="eye" slot="start"></ion-icon>
+          Ver Todos
+        </ion-button>
+      </div>
+    </div>
+
+    <ion-list *ngIf="leadsRecentes.length > 0">
+      <ion-item *ngFor="let lead of leadsRecentes" class="lead-item" [class.lead-nao-lido]="!lead.lido && lead.status === 'novo'">
+        <ion-icon [name]="getStatusIcon(lead.status)"
+                  [color]="getStatusColor(lead.status)"
+                  slot="start"></ion-icon>
+
+        <ion-label>
+          <h3>{{ lead.nome }}</h3>
+          <p>{{ lead.email }}</p>
+          <p>{{ lead.telefone }}</p>
+          <div class="lead-meta">
+            <ion-chip [color]="getStatusColor(lead.status)" size="small">
+              {{ lead.status | titlecase }}
+            </ion-chip>
+            <ion-chip *ngIf="!lead.lido && lead.status === 'novo'" color="warning" size="small" class="novo-chip">
+              <ion-icon name="add-circle" size="small"></ion-icon>
+              Novo
+            </ion-chip>
+          </div>
+          <ion-note>{{ formatarData(lead.created_at) }}</ion-note>
+        </ion-label>
+
+        <div slot="end" class="lead-actions">
+          <ion-button fill="clear" size="small" (click)="ligarPara(lead.telefone)">
+            <ion-icon name="call"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="enviarEmail(lead.email)">
+            <ion-icon name="mail"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="criarOrcamento(lead)">
+            <ion-icon name="document-text"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="verDetalhesLead(lead)">
+            <ion-icon name="eye"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="leadsRecentes.length === 0" class="empty-state">
+      <ion-icon name="people-outline" size="large" color="medium"></ion-icon>
+      <h3>Nenhum lead encontrado</h3>
+      <p>Novos leads aparecerão aqui quando forem criados</p>
+    </div>
+  </div>
+
   <!-- Grid de Funcionalidades -->
   <ion-grid>
     <ion-row>
+      <!-- Gestão de Leads -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="feature-card leads-card" (click)="irParaGestaoLeads()">
+          <ion-card-content>
+            <div class="card-content">
+              <ion-icon name="people" class="card-icon"></ion-icon>
+              <div class="card-text">
+                <h3>Gestão de Leads</h3>
+                <p>Gerencie leads e prospects</p>
+                      <ion-badge *ngIf="notificacoes > 0" color="danger" class="card-badge">
+                        {{ notificacoes }} {{ notificacoes === 1 ? 'novo' : 'novos' }}
+                      </ion-badge>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
       <!-- Produtos -->
       <ion-col size="12" size-md="6">
         <ion-card class="feature-card" (click)="irParaProdutos()">
@@ -95,6 +268,21 @@
               <div class="card-text">
                 <h3>Relatórios e Análises</h3>
                 <p>Dashboards e relatórios detalhados</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Configurações -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="feature-card" (click)="irParaConfiguracoes()">
+          <ion-card-content>
+            <div class="card-content">
+              <ion-icon name="cog" class="card-icon"></ion-icon>
+              <div class="card-text">
+                <h3>Configurações</h3>
+                <p>Configure o sistema e preferências</p>
               </div>
             </div>
           </ion-card-content>

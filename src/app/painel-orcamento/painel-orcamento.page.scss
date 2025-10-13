@@ -17,11 +17,27 @@ ion-toolbar {
   ion-title {
     font-weight: 600;
     font-size: 1.2rem;
+    display: flex;
+    align-items: center;
 
     ion-icon {
       margin-right: 8px;
       font-size: 1.3rem;
     }
+
+    .notification-badge {
+      margin-left: 8px;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+    }
+  }
+
+  .notification-badge-small {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 0.7rem;
+    padding: 2px 6px;
   }
 }
 
@@ -140,33 +156,63 @@ ion-toolbar {
   }
 }
 
+// Loading
+.loading-container {
+  margin: 20px 0;
+}
+
+// Seções
+.section-title {
+  color: var(--nd-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+
+  ion-icon {
+    margin-right: 8px;
+    font-size: 1.4rem;
+  }
+}
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .section-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
 // Estatísticas
 .stats-section {
-  margin-top: 32px;
-
-  h2 {
-    color: var(--nd-primary);
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    text-align: center;
-  }
+  margin: 32px 0;
 
   .stat-card {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 16px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
 
     .stat-content {
       display: flex;
       align-items: center;
-      padding: 8px 0;
+      padding: 12px 0;
 
       .stat-icon {
-        font-size: 2rem;
-        color: var(--nd-secondary);
-        margin-right: 12px;
-        min-width: 32px;
+        font-size: 2.5rem;
+        margin-right: 16px;
+        min-width: 40px;
       }
 
       .stat-text {
@@ -174,7 +220,7 @@ ion-toolbar {
 
         h3 {
           margin: 0 0 4px 0;
-          font-size: 1.4rem;
+          font-size: 1.8rem;
           font-weight: 700;
           color: var(--nd-primary);
         }
@@ -182,11 +228,152 @@ ion-toolbar {
         p {
           margin: 0;
           color: var(--nd-dark);
-          font-size: 0.85rem;
+          font-size: 0.9rem;
           font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
       }
     }
+  }
+}
+
+// Seção de Leads
+.leads-section {
+  margin: 32px 0;
+
+  .section-badge {
+    margin-left: 8px;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+  .lead-item {
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    &.lead-nao-lido {
+      border-left: 4px solid var(--nd-warning);
+      background: linear-gradient(90deg, rgba(243, 156, 18, 0.05) 0%, transparent 100%);
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 8px;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background: var(--nd-warning);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+    }
+
+    ion-label {
+      h3 {
+        font-weight: 600;
+        color: var(--nd-primary);
+        margin-bottom: 4px;
+      }
+
+      p {
+        color: var(--nd-dark);
+        font-size: 0.9rem;
+        margin: 2px 0;
+      }
+
+      .lead-meta {
+        display: flex;
+        gap: 8px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+
+        .novo-chip {
+          animation: pulse 2s infinite;
+
+          ion-icon {
+            margin-right: 4px;
+          }
+        }
+      }
+
+      ion-note {
+        font-size: 0.8rem;
+        color: var(--nd-dark);
+        opacity: 0.7;
+      }
+    }
+
+    .lead-actions {
+      display: flex;
+      gap: 4px;
+
+      ion-button {
+        --padding-start: 8px;
+        --padding-end: 8px;
+        --padding-top: 8px;
+        --padding-bottom: 8px;
+        height: 32px;
+        width: 32px;
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--nd-dark);
+
+    ion-icon {
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      color: var(--nd-primary);
+      margin-bottom: 8px;
+    }
+
+    p {
+      opacity: 0.7;
+    }
+  }
+}
+
+// Cards especiais
+.leads-card {
+  position: relative;
+  border: 2px solid var(--nd-secondary);
+
+  .card-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 
@@ -219,22 +406,34 @@ ion-toolbar {
     }
   }
 
-  .quick-actions {
-    ion-button {
-      font-size: 0.9rem;
+  .section-title {
+    font-size: 1.1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    ion-icon {
+      font-size: 1.2rem;
     }
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .stats-section {
     .stat-card {
       .stat-content {
         .stat-icon {
-          font-size: 1.8rem;
+          font-size: 2rem;
+          margin-right: 12px;
         }
 
         .stat-text {
           h3 {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
           }
 
           p {
@@ -242,6 +441,28 @@ ion-toolbar {
           }
         }
       }
+    }
+  }
+
+  .leads-section {
+    .lead-item {
+      .lead-actions {
+        flex-wrap: wrap;
+        gap: 2px;
+
+        ion-button {
+          height: 28px;
+          width: 28px;
+          --padding-start: 6px;
+          --padding-end: 6px;
+        }
+      }
+    }
+  }
+
+  .quick-actions {
+    ion-button {
+      font-size: 0.9rem;
     }
   }
 }

@@ -1,79 +1,51 @@
-# Configuração para Angular SPA - N.D Connect
+# Configuração para aplicação Angular/Ionic
 RewriteEngine On
 
-# Permitir acesso direto aos arquivos da API
-RewriteCond %{REQUEST_URI} ^/api/.*$
-RewriteRule ^api/(.*)$ api/$1 [L,QSA]
+# Configurações de segurança
+<Files "*.log">
+    Order Allow,Deny
+    Deny from all
+</Files>
 
-# Permitir acesso direto aos arquivos PDF e PHP da API
-RewriteCond %{REQUEST_URI} ^/api/.*\.(pdf|php)$
-RewriteRule ^.*$ - [L]
+<Files "*.sql">
+    Order Allow,Deny
+    Deny from all
+</Files>
 
-# Permitir acesso direto aos assets
-RewriteCond %{REQUEST_URI} ^/(assets|www)/.*$
-RewriteRule ^.*$ - [L]
+# Headers de segurança
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
 
-# Permitir acesso direto ao arquivo de teste
-RewriteCond %{REQUEST_URI} ^/test\.php$
-RewriteRule ^.*$ - [L]
-
-# Redirecionar todas as outras requisições para www/index.html
+# Configuração para SPA (Single Page Application)
+# Redirecionar todas as requisições para index.html, exceto arquivos existentes
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^.*$ /www/index.html [L]
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule . /index.html [L]
 
-# Configurações de CORS para API
-<IfModule mod_headers.c>
-    Header always set Access-Control-Allow-Origin "*"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-    Header always set Access-Control-Max-Age "3600"
-</IfModule>
+# Configuração para API
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ /api/index.php [QSA,L]
 
-# Configurações de segurança
-<IfModule mod_headers.c>
-    Header always append X-Frame-Options SAMEORIGIN
-    Header set X-Content-Type-Options nosniff
-    Header set X-XSS-Protection "1; mode=block"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# Configurações de MIME types
-<IfModule mod_mime.c>
-    AddType application/javascript .js
-    AddType text/css .css
-    AddType application/json .json
-    AddType font/woff .woff
-    AddType font/woff2 .woff2
-    AddType application/pdf .pdf
-</IfModule>
-
-# Configurações de cache para assets estáticos
+# Configuração de cache para assets estáticos
 <IfModule mod_expires.c>
     ExpiresActive On
-
-    # Cache para arquivos CSS e JS
     ExpiresByType text/css "access plus 1 year"
     ExpiresByType application/javascript "access plus 1 year"
-    ExpiresByType text/javascript "access plus 1 year"
-
-    # Cache para imagens
     ExpiresByType image/png "access plus 1 year"
     ExpiresByType image/jpg "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-
-    # Cache para fontes
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-
-    # Cache para HTML (menor tempo)
-    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
 </IfModule>
 
-# Configurações de compressão
+# Compressão GZIP
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/plain
     AddOutputFilterByType DEFLATE text/html
@@ -84,18 +56,9 @@ RewriteRule ^.*$ /www/index.html [L]
     AddOutputFilterByType DEFLATE application/rss+xml
     AddOutputFilterByType DEFLATE application/javascript
     AddOutputFilterByType DEFLATE application/x-javascript
-    AddOutputFilterByType DEFLATE application/json
 </IfModule>
 
-# Configurações de erro personalizadas
-ErrorDocument 404 /www/index.html
-ErrorDocument 500 /www/index.html
+# Configuração de tipos MIME
+AddType application/javascript .js
+AddType text/css .css
 
-# Desabilitar listagem de diretórios
-Options -Indexes
-
-# Proteger arquivos sensíveis
-<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak|sql)$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>

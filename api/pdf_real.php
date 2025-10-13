@@ -4,8 +4,11 @@ require_once 'Config/Database.php';
 // Incluir TCPDF
 if (file_exists('vendor/autoload.php')) {
     require_once 'vendor/autoload.php';
+    if (!class_exists('TCPDF')) {
+        require_once 'tcpdf_simple.php';
+    }
 } else {
-    die('TCPDF não está instalado. Execute: composer require tecnickcom/tcpdf');
+    require_once 'tcpdf_simple.php';
 }
 
 // Função para obter dados do orçamento

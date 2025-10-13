@@ -6,7 +6,7 @@ import { addIcons } from 'ionicons';
 import {
   arrowBack, personAdd, call, mail, business, chatbubbles,
   checkmarkCircle, closeCircle, time, search, create, trash,
-  swapHorizontal, documentText } from 'ionicons/icons';
+  swapHorizontal, documentText, addCircle } from 'ionicons/icons';
 import {
   IonHeader,
   IonToolbar,
@@ -21,7 +21,6 @@ import {
   IonSegment,
   IonSegmentButton,
   IonLabel,
-  IonList,
   IonItem,
   IonBadge,
   IonSearchbar,
@@ -46,6 +45,8 @@ interface Lead {
   status: string;
   created_at: string;
   observacoes?: string;
+  lido?: boolean;
+  data_leitura?: string;
 }
 
 @Component({
@@ -67,7 +68,6 @@ interface Lead {
     IonSegment,
     IonSegmentButton,
     IonLabel,
-    IonList,
     IonItem,
     IonBadge,
     IonSearchbar,
@@ -83,7 +83,7 @@ interface Lead {
 export class GestaoLeadsPage implements OnInit {
   leads: Lead[] = [];
   leadsFiltrados: Lead[] = [];
-  statusFiltro: string = 'todos';
+  statusFiltro: string = 'novo';
   termoPesquisa: string = '';
 
   // Modal de detalhes
@@ -111,7 +111,7 @@ export class GestaoLeadsPage implements OnInit {
     private router: Router,
     private alertController: AlertController
   ) {
-    addIcons({arrowBack,personAdd,call,mail,time,chatbubbles,create,documentText,swapHorizontal,trash,closeCircle,business,checkmarkCircle,search});
+    addIcons({arrowBack,personAdd,addCircle,call,mail,time,chatbubbles,create,documentText,swapHorizontal,checkmarkCircle,trash,closeCircle,business,search});
   }
 
   ngOnInit() {
@@ -397,5 +397,29 @@ export class GestaoLeadsPage implements OnInit {
 
   voltarPainel() {
     this.router.navigate(['/painel-orcamento']);
+  }
+
+  marcarComoLido(lead: Lead) {
+    this.http.post<any>(`${this.apiUrl}/marcar_lead_lido.php`, {
+      lead_id: lead.id
+    }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // Marcar como lido localmente
+          lead.lido = true;
+          lead.data_leitura = new Date().toISOString();
+
+          // Recarregar contadores para atualizar badges
+          this.calcularContadores();
+
+          console.log('Lead marcado como lido:', response);
+        } else {
+          console.error('Erro ao marcar lead como lido:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao marcar lead como lido:', error);
+      }
+    });
   }
 }

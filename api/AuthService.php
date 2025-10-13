@@ -40,7 +40,7 @@ class AuthService {
     // Fazer login
     public function login($email, $senha) {
         try {
-            $stmt = $this->db->prepare("SELECT id, nome, email, senha, nivel_acesso, ativo FROM usuarios WHERE email = ? AND ativo = 1");
+            $stmt = $this->db->prepare("SELECT id, nome, email, senha, nivel_acesso, nivel_id, ativo FROM usuarios WHERE email = ? AND ativo = 1");
             $stmt->execute([$email]);
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -80,7 +80,7 @@ class AuthService {
     public function verificarToken($token) {
         try {
             $stmt = $this->db->prepare("
-                SELECT u.id, u.nome, u.email, u.nivel_acesso, s.expira_em
+                SELECT u.id, u.nome, u.email, u.nivel_acesso, u.nivel_id, s.expira_em
                 FROM usuarios u
                 JOIN sessoes s ON u.id = s.usuario_id
                 WHERE s.token = ? AND s.ativo = 1 AND s.expira_em > NOW()
@@ -99,14 +99,26 @@ class AuthService {
     }
 
     // Verificar permissão de acesso
-    public function verificarPermissao($nivel_acesso, $pagina) {
+    public function verificarPermissao($nivel_id, $pagina) {
         try {
-            $stmt = $this->db->prepare("SELECT pode_acessar FROM permissoes_nivel WHERE nivel = ? AND pagina = ?");
-            $stmt->execute([$nivel_acesso, $pagina]);
+            // Log para debug
+            error_log("Verificando permissão - Nível ID: $nivel_id, Página: $pagina");
+
+            $stmt = $this->db->prepare("
+                SELECT perm.pode_acessar
+                FROM permissoes_nivel perm
+                JOIN paginas_sistema p ON perm.pagina_id = p.id
+                WHERE perm.nivel_id = ? AND p.rota = ?
+            ");
+            $stmt->execute([$nivel_id, $pagina]);
             $permissao = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return $permissao ? $permissao['pode_acessar'] : false;
+            $resultado = $permissao ? (bool)$permissao['pode_acessar'] : false;
+            error_log("Resultado da verificação: " . ($resultado ? 'PERMITIDO' : 'NEGADO'));
+
+            return $resultado;
         } catch (Exception $e) {
+            error_log("Erro na verificação de permissão: " . $e->getMessage());
             return false;
         }
     }

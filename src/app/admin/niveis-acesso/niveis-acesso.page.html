@@ -85,6 +85,15 @@
               <ion-button
                 fill="clear"
                 size="small"
+                color="primary"
+                (click)="editarPermissoes(nivel)">
+                <ion-icon name="shield-outline"></ion-icon>
+                Permissões
+              </ion-button>
+
+              <ion-button
+                fill="clear"
+                size="small"
                 color="danger"
                 (click)="excluirNivel(nivel)"
                 [disabled]="nivel.total_usuarios > 0">

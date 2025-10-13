@@ -29,6 +29,7 @@ import {
   IonLabel
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 interface DashboardData {
   leads_novos: number;
@@ -80,12 +81,14 @@ export class PainelPage implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     addIcons({home,logOut,personAdd,documentText,cart,timeOutline,trendingUp,statsChart,people,cube,cash,document,calendar,settings,notifications,search,checkmarkCircle,closeCircle});
   }
 
   ngOnInit() {
+    
     this.carregarDashboard();
   }
 

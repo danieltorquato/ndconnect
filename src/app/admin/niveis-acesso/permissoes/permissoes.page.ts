@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,19 +11,20 @@ import {
   eyeOutline,
   createOutline,
   trashOutline,
-  addOutline, folderOutline } from 'ionicons/icons';
+  addOutline, folderOutline, arrowBackOutline, peopleOutline, checkmarkCircleOutline, informationCircleOutline, linkOutline, settingsOutline, addCircleOutline, gridOutline, listOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { NivelAcessoService, NivelAcesso, PermissaoNivel } from '../../../services/nivel-acesso.service';
 import { AuthService } from '../../../services/auth.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { IonHeader, IonSkeletonText, IonSegmentButton, IonContent, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, IonItem, IonLabel, IonToggle, IonChip, IonBadge, IonList, IonListHeader, IonSpinner, IonRefresher, IonRefresherContent, IonSearchbar, IonGrid, IonRow, IonCol, IonNote, IonText, IonCheckbox, IonSegment, IonFab, IonFabButton } from '@ionic/angular/standalone';
+import { IonHeader, IonSkeletonText, IonSegmentButton, IonContent, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, IonItem, IonLabel, IonToggle, IonChip, IonBadge, IonList, IonListHeader, IonSpinner, IonRefresher, IonRefresherContent, IonSearchbar, IonGrid, IonRow, IonCol, IonNote, IonText, IonCheckbox, IonSegment, IonFab, IonFabButton, IonButtons } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-permissoes',
   templateUrl: './permissoes.page.html',
   styleUrls: ['./permissoes.page.scss'],
   standalone: true,
-  imports: [IonFabButton, IonFab,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [
     CommonModule,
     FormsModule,
     IonContent,
@@ -47,30 +48,12 @@ import { IonHeader, IonSkeletonText, IonSegmentButton, IonContent, IonTitle, Ion
     IonRefresher,
     IonRefresherContent,
     IonSearchbar,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonSkeletonText,
-    IonNote,
-    IonText,
-    IonCheckbox,
     IonSegment,
     IonSegmentButton,
-    IonToggle,
-    IonChip,
-    IonBadge,
-    IonList,
-    IonListHeader,
-    IonSpinner,
-    IonRefresher,
-    IonRefresherContent,
-    IonSearchbar,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonNote,
-    IonText,
-    IonCheckbox,
+    IonFab,
+    IonFabButton,
+    IonButtons
   ]
 })
 export class PermissoesPage implements OnInit {
@@ -81,6 +64,8 @@ export class PermissoesPage implements OnInit {
   saving = false;
   searchTerm = '';
   categoriaFiltro = 'todas';
+  viewMode: 'cards' | 'list' = 'cards';
+  editMode = false;
 
   categorias: string[] = [];
   permissoesModificadas: { [key: number]: any } = {};
@@ -88,9 +73,10 @@ export class PermissoesPage implements OnInit {
   constructor(
     private nivelAcessoService: NivelAcessoService,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
-    addIcons({shieldOutline,folderOutline,checkmarkOutline,closeOutline,saveOutline,refreshOutline,eyeOutline,createOutline,trashOutline,addOutline});
+    addIcons({shieldOutline,arrowBackOutline,peopleOutline,checkmarkCircleOutline,informationCircleOutline,gridOutline,listOutline,createOutline,folderOutline,checkmarkOutline,closeOutline,linkOutline,settingsOutline,addCircleOutline,trashOutline,saveOutline,refreshOutline,eyeOutline,addOutline});
   }
 
   ngOnInit() {
@@ -155,6 +141,14 @@ export class PermissoesPage implements OnInit {
   onCategoriaChange(event: any) {
     this.categoriaFiltro = event.detail.value;
     this.filtrarPermissoes();
+  }
+
+  onViewModeChange(event: any) {
+    this.viewMode = event.detail.value;
+  }
+
+  onEditModeChange(event: any) {
+    this.editMode = event.detail.checked;
   }
 
   async doRefresh(event: any) {
@@ -255,5 +249,9 @@ export class PermissoesPage implements OnInit {
 
   canEdit(): boolean {
     return this.authService.isDev() || this.authService.temNivel('admin');
+  }
+
+  voltar() {
+    this.router.navigate(['/admin/niveis-acesso']);
   }
 }

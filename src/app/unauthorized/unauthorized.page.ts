@@ -20,7 +20,9 @@ export class UnauthorizedPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    
     this.usuario = this.authService.getUsuarioAtual();
+
   }
 
   getNivelDisplay(nivel: string): string {
@@ -34,15 +36,19 @@ export class UnauthorizedPage implements OnInit {
   }
 
   goToPainel() {
-    this.router.navigate(['/painel']);
+    this.redirectToPage('/painel');
   }
-
-  goToHome() {
-    this.router.navigate(['/home']);
+goToPainelOrcamento() {
+  this.redirectToPage('/painel-orcamento');
+}
+    goToHome() {
+      this.redirectToPage('/home');
   }
-
+redirectToPage(page: string) {
+  this.router.navigate([page]);
+}
   async logout() {
     await this.authService.logout().toPromise();
-    this.router.navigate(['/login']);
+    this.redirectToPage('/login');
   }
 }

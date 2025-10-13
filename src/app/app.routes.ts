@@ -63,13 +63,13 @@ export const routes: Routes = [
     loadComponent: () => import('./solicitar-orcamento/solicitar-orcamento.page').then( m => m.SolicitarOrcamentoPage)
   },
   {
-    path: 'gestao-leads',
+    path: 'admin/gestao-leads',
     loadComponent: () => import('./admin/gestao-leads/gestao-leads.page').then( m => m.GestaoLeadsPage),
     canActivate: [AuthGuard],
   },
 
   {
-    path: 'gestao-orcamentos',
+    path: 'admin/gestao-orcamentos',
     loadComponent: () => import('./admin/gestao-orcamentos/gestao-orcamentos.page').then( m => m.GestaoOrcamentosPage),
     canActivate: [AuthGuard],
   },

@@ -97,7 +97,7 @@ switch ($method) {
                 }
 
                 // Verificar permissão
-                $permissao = $authService->verificarPermissao($tokenResult['usuario']['nivel_acesso'], $pagina);
+                $permissao = $authService->verificarPermissao($tokenResult['usuario']['nivel_id'], $pagina);
                 echo json_encode(['success' => true, 'pode_acessar' => $permissao]);
                 break;
 

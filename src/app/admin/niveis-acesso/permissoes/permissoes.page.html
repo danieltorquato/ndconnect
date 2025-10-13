@@ -4,6 +4,11 @@
       <ion-icon name="shield-outline"></ion-icon>
       Permissões - {{ nivel?.nome }}
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="voltar()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -14,12 +19,80 @@
     </ion-toolbar>
   </ion-header>
 
+  <!-- Informações do Nível -->
+  <div class="nivel-info-card" *ngIf="nivel">
+    <ion-card>
+      <ion-card-content>
+        <div class="nivel-header">
+          <div class="nivel-details">
+            <h2>{{ nivel.nome }}</h2>
+            <p>{{ nivel.descricao || 'Sem descrição' }}</p>
+          </div>
+          <div class="nivel-stats">
+            <ion-chip color="primary">
+              <ion-icon name="people-outline"></ion-icon>
+              <ion-label>{{ nivel.total_usuarios }} usuários</ion-label>
+            </ion-chip>
+            <ion-chip [color]="nivel.ativo ? 'success' : 'danger'">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <ion-label>{{ nivel.ativo ? 'Ativo' : 'Inativo' }}</ion-label>
+            </ion-chip>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Legenda de Permissões -->
+  <div class="legenda-section">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Legenda de Permissões
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="legenda-grid">
+          <div class="legenda-item">
+            <ion-toggle disabled checked color="primary"></ion-toggle>
+            <div class="legenda-content">
+              <h4>Acessar</h4>
+              <p>Permite visualizar a página e seus conteúdos</p>
+            </div>
+          </div>
+          <div class="legenda-item">
+            <ion-toggle disabled checked color="success"></ion-toggle>
+            <div class="legenda-content">
+              <h4>Criar</h4>
+              <p>Permite adicionar novos registros/items</p>
+            </div>
+          </div>
+          <div class="legenda-item">
+            <ion-toggle disabled checked color="warning"></ion-toggle>
+            <div class="legenda-content">
+              <h4>Editar</h4>
+              <p>Permite modificar registros existentes</p>
+            </div>
+          </div>
+          <div class="legenda-item">
+            <ion-toggle disabled checked color="danger"></ion-toggle>
+            <div class="legenda-content">
+              <h4>Deletar</h4>
+              <p>Permite remover registros permanentemente</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
   <!-- Barra de Pesquisa e Filtros -->
   <div class="filters-section">
     <ion-searchbar
       [(ngModel)]="searchTerm"
       (ionInput)="onSearchChange($event)"
-      placeholder="Pesquisar páginas..."
+      placeholder="Pesquisar páginas e funções..."
       show-clear-button="focus">
     </ion-searchbar>
 
@@ -31,6 +104,34 @@
         <ion-label>{{ categoria }}</ion-label>
       </ion-segment-button>
     </ion-segment>
+  </div>
+
+  <!-- Controles de Visualização e Edição -->
+  <div class="controls-section">
+    <div class="view-controls">
+      <ion-segment [(ngModel)]="viewMode" (ionChange)="onViewModeChange($event)">
+        <ion-segment-button value="cards">
+          <ion-icon name="grid-outline"></ion-icon>
+          <ion-label>Cards</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="list">
+          <ion-icon name="list-outline"></ion-icon>
+          <ion-label>Lista</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <div class="edit-controls" *ngIf="canEdit()">
+      <ion-toggle
+        [(ngModel)]="editMode"
+        (ionChange)="onEditModeChange($event)"
+        color="primary">
+        <ion-label slot="start">
+          <ion-icon name="create-outline"></ion-icon>
+          Modo Edição
+        </ion-label>
+      </ion-toggle>
+    </div>
   </div>
 
   <!-- Refresh -->
@@ -47,82 +148,216 @@
 
   <!-- Lista de Permissões por Categoria -->
   <div *ngIf="!loading">
-    <div *ngFor="let categoria of getCategoriasFiltradas()" class="categoria-section">
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>
-            <div class="categoria-header">
-              <div>
-                <ion-icon name="folder-outline"></ion-icon>
-                {{ categoria }}
-                <ion-badge color="primary">
-                  {{ getPermissoesAtivasCategoria(categoria) }}/{{ getTotalPermissoesCategoria(categoria) }}
-                </ion-badge>
+    <!-- Modo Cards -->
+    <div *ngIf="viewMode === 'cards'">
+      <div *ngFor="let categoria of getCategoriasFiltradas()" class="categoria-section">
+        <ion-card class="categoria-card">
+          <ion-card-header>
+            <ion-card-title>
+              <div class="categoria-header">
+                <div class="categoria-info">
+                  <ion-icon name="folder-outline"></ion-icon>
+                  <span class="categoria-nome">{{ categoria }}</span>
+                  <ion-badge color="primary" class="categoria-badge">
+                    {{ getPermissoesAtivasCategoria(categoria) }}/{{ getTotalPermissoesCategoria(categoria) }}
+                  </ion-badge>
+                </div>
+                <div class="categoria-actions" *ngIf="canEdit() && editMode">
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    (click)="selecionarTodasPermissoes(categoria)">
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                    Todas
+                  </ion-button>
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    color="danger"
+                    (click)="removerTodasPermissoes(categoria)">
+                    <ion-icon name="close-outline"></ion-icon>
+                    Nenhuma
+                  </ion-button>
+                </div>
               </div>
-              <div class="categoria-actions" *ngIf="canEdit()">
-                <ion-button
-                  fill="clear"
-                  size="small"
-                  (click)="selecionarTodasPermissoes(categoria)">
-                  <ion-icon name="checkmark-outline"></ion-icon>
-                  Todas
-                </ion-button>
-                <ion-button
-                  fill="clear"
-                  size="small"
-                  color="danger"
-                  (click)="removerTodasPermissoes(categoria)">
-                  <ion-icon name="close-outline"></ion-icon>
-                  Nenhuma
-                </ion-button>
+            </ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="paginas-container">
+              <div *ngFor="let permissao of getPermissoesPorCategoria(categoria)"
+                   class="pagina-item"
+                   [class.pagina-acessivel]="getPermissaoAtual(permissao, 'pode_acessar')">
+
+                <div class="pagina-header">
+                  <div class="pagina-info">
+                    <ion-icon [name]="permissao.icone"
+                             [color]="getPermissaoAtual(permissao, 'pode_acessar') ? 'primary' : 'medium'"
+                             class="pagina-icon"></ion-icon>
+                    <div class="pagina-details">
+                      <h3 class="pagina-nome">{{ permissao.nome }}</h3>
+                      <p class="pagina-descricao">{{ permissao.descricao || permissao.rota }}</p>
+                      <div class="pagina-rota">
+                        <ion-chip size="small" color="light">
+                          <ion-icon name="link-outline"></ion-icon>
+                          <ion-label>{{ permissao.rota }}</ion-label>
+                        </ion-chip>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pagina-status">
+                    <ion-chip [color]="getPermissaoAtual(permissao, 'pode_acessar') ? 'success' : 'danger'" size="small">
+                      <ion-icon [name]="getPermissaoAtual(permissao, 'pode_acessar') ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+                      <ion-label>{{ getPermissaoAtual(permissao, 'pode_acessar') ? 'Acessível' : 'Bloqueada' }}</ion-label>
+                    </ion-chip>
+                  </div>
+                </div>
+
+                <!-- Funções Disponíveis -->
+                <div class="funcoes-container">
+                  <h4 class="funcoes-titulo">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    Funções Disponíveis
+                  </h4>
+
+                  <div class="funcoes-grid">
+                    <div class="funcao-item">
+                      <div class="funcao-info">
+                        <ion-icon name="eye-outline" color="primary"></ion-icon>
+                        <span>Acessar</span>
+                      </div>
+                      <ion-toggle
+                        [checked]="getPermissaoAtual(permissao, 'pode_acessar')"
+                        (ionChange)="onPermissaoChange(permissao, 'pode_acessar', $event.detail.checked)"
+                        color="primary">
+                      </ion-toggle>
+                    </div>
+
+                    <div class="funcao-item">
+                      <div class="funcao-info">
+                        <ion-icon name="add-circle-outline" color="success"></ion-icon>
+                        <span>Criar</span>
+                      </div>
+                      <ion-toggle
+                        [checked]="getPermissaoAtual(permissao, 'pode_criar')"
+                        (ionChange)="onPermissaoChange(permissao, 'pode_criar', $event.detail.checked)"
+                        color="success">
+                      </ion-toggle>
+                    </div>
+
+                    <div class="funcao-item">
+                      <div class="funcao-info">
+                        <ion-icon name="create-outline" color="warning"></ion-icon>
+                        <span>Editar</span>
+                      </div>
+                      <ion-toggle
+                        [checked]="getPermissaoAtual(permissao, 'pode_editar')"
+                        (ionChange)="onPermissaoChange(permissao, 'pode_editar', $event.detail.checked)"
+                        color="warning">
+                      </ion-toggle>
+                    </div>
+
+                    <div class="funcao-item">
+                      <div class="funcao-info">
+                        <ion-icon name="trash-outline" color="danger"></ion-icon>
+                        <span>Deletar</span>
+                      </div>
+                      <ion-toggle
+                        [checked]="getPermissaoAtual(permissao, 'pode_deletar')"
+                        (ionChange)="onPermissaoChange(permissao, 'pode_deletar', $event.detail.checked)"
+                        color="danger">
+                      </ion-toggle>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
-          </ion-card-title>
-        </ion-card-header>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
 
-        <ion-card-content>
-          <ion-list>
-            <ion-item *ngFor="let permissao of getPermissoesPorCategoria(categoria)"
-                      lines="inset">
-              <ion-icon [name]="permissao.icone" slot="start" [color]="getPermissaoAtual(permissao, 'pode_acessar') ? 'primary' : 'medium'"></ion-icon>
+    <!-- Modo Lista -->
+    <div *ngIf="viewMode === 'list'">
+      <ion-list>
+        <div *ngFor="let categoria of getCategoriasFiltradas()">
+          <ion-list-header>
+            <ion-label>
+              <h2>{{ categoria }}</h2>
+              <p>{{ getPermissoesAtivasCategoria(categoria) }}/{{ getTotalPermissoesCategoria(categoria) }} permissões ativas</p>
+            </ion-label>
+            <div slot="end" *ngIf="canEdit() && editMode">
+              <ion-button fill="clear" size="small" (click)="selecionarTodasPermissoes(categoria)">
+                <ion-icon name="checkmark-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" color="danger" (click)="removerTodasPermissoes(categoria)">
+                <ion-icon name="close-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-list-header>
 
-              <ion-label>
-                <h3>{{ permissao.nome }}</h3>
-                <p>{{ permissao.descricao || permissao.rota }}</p>
-              </ion-label>
+          <ion-item *ngFor="let permissao of getPermissoesPorCategoria(categoria)"
+                    [class.item-acessivel]="getPermissaoAtual(permissao, 'pode_acessar')"
+                    [class.item-bloqueada]="!getPermissaoAtual(permissao, 'pode_acessar')">
 
-              <div class="permissao-toggles" slot="end" *ngIf="canEdit()">
+          <ion-icon [name]="permissao.icone"
+                   [color]="getPermissaoAtual(permissao, 'pode_acessar') ? 'primary' : 'medium'"
+                   slot="start"></ion-icon>
+
+          <ion-label>
+            <h3>{{ permissao.nome }}</h3>
+            <p>{{ permissao.descricao || permissao.rota }}</p>
+            <ion-chip size="small" color="light">
+              <ion-icon name="link-outline"></ion-icon>
+              <ion-label>{{ permissao.rota }}</ion-label>
+            </ion-chip>
+          </ion-label>
+
+          <div slot="end" class="permissao-controls">
+            <!-- Todas as permissões juntas -->
+            <div class="funcoes-lista">
+              <div class="funcao-lista-item">
                 <ion-toggle
                   [checked]="getPermissaoAtual(permissao, 'pode_acessar')"
                   (ionChange)="onPermissaoChange(permissao, 'pode_acessar', $event.detail.checked)"
                   color="primary">
                 </ion-toggle>
+                <span class="funcao-label">Acessar</span>
+              </div>
 
-                <ion-toggle
-                  [checked]="getPermissaoAtual(permissao, 'pode_editar')"
-                  (ionChange)="onPermissaoChange(permissao, 'pode_editar', $event.detail.checked)"
-                  color="warning"
-                  [disabled]="!getPermissaoAtual(permissao, 'pode_acessar')">
-                </ion-toggle>
-
-                <ion-toggle
-                  [checked]="getPermissaoAtual(permissao, 'pode_deletar')"
-                  (ionChange)="onPermissaoChange(permissao, 'pode_deletar', $event.detail.checked)"
-                  color="danger"
-                  [disabled]="!getPermissaoAtual(permissao, 'pode_acessar')">
-                </ion-toggle>
-
+              <div class="funcao-lista-item">
                 <ion-toggle
                   [checked]="getPermissaoAtual(permissao, 'pode_criar')"
                   (ionChange)="onPermissaoChange(permissao, 'pode_criar', $event.detail.checked)"
-                  color="success"
-                  [disabled]="!getPermissaoAtual(permissao, 'pode_acessar')">
+                  color="success">
                 </ion-toggle>
+                <span class="funcao-label">Criar</span>
               </div>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+
+              <div class="funcao-lista-item">
+                <ion-toggle
+                  [checked]="getPermissaoAtual(permissao, 'pode_editar')"
+                  (ionChange)="onPermissaoChange(permissao, 'pode_editar', $event.detail.checked)"
+                  color="warning">
+                </ion-toggle>
+                <span class="funcao-label">Editar</span>
+              </div>
+
+              <div class="funcao-lista-item">
+                <ion-toggle
+                  [checked]="getPermissaoAtual(permissao, 'pode_deletar')"
+                  (ionChange)="onPermissaoChange(permissao, 'pode_deletar', $event.detail.checked)"
+                  color="danger">
+                </ion-toggle>
+                <span class="funcao-label">Deletar</span>
+              </div>
+            </div>
+          </div>
+          </ion-item>
+        </div>
+      </ion-list>
     </div>
   </div>
 

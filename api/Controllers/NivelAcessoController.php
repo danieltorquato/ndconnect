@@ -13,7 +13,7 @@ class NivelAcessoController {
     public function getAll() {
         try {
             $stmt = $this->db->prepare("
-                SELECT 
+                SELECT
                     n.*,
                     COUNT(u.id) as total_usuarios
                 FROM niveis_acesso n
@@ -43,7 +43,7 @@ class NivelAcessoController {
     public function getById($id) {
         try {
             $stmt = $this->db->prepare("
-                SELECT 
+                SELECT
                     n.*,
                     COUNT(u.id) as total_usuarios
                 FROM niveis_acesso n
@@ -101,7 +101,7 @@ class NivelAcessoController {
 
             // Inserir novo nível
             $stmt = $this->db->prepare("
-                INSERT INTO niveis_acesso (nome, descricao, cor, ordem, ativo) 
+                INSERT INTO niveis_acesso (nome, descricao, cor, ordem, ativo)
                 VALUES (?, ?, ?, ?, ?)
             ");
             $result = $stmt->execute([
@@ -114,7 +114,7 @@ class NivelAcessoController {
 
             if ($result) {
                 $nivel_id = $this->db->lastInsertId();
-                
+
                 // Criar permissões padrão para o novo nível
                 $this->criarPermissoesPadrao($nivel_id, $data['permissoes'] ?? []);
 
@@ -169,7 +169,7 @@ class NivelAcessoController {
             // Atualizar nível
             $campos = [];
             $valores = [];
-            
+
             if (isset($data['nome'])) {
                 $campos[] = 'nome = ?';
                 $valores[] = $data['nome'];
@@ -194,7 +194,7 @@ class NivelAcessoController {
             $valores[] = $id;
 
             $stmt = $this->db->prepare("
-                UPDATE niveis_acesso 
+                UPDATE niveis_acesso
                 SET " . implode(', ', $campos) . ", data_atualizacao = NOW()
                 WHERE id = ?
             ");
@@ -245,7 +245,7 @@ class NivelAcessoController {
             $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM usuarios WHERE nivel_id = ? AND ativo = 1");
             $stmt->execute([$id]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($result['total'] > 0) {
                 return [
                     'success' => false,
@@ -284,7 +284,7 @@ class NivelAcessoController {
     public function getPermissoes($nivel_id) {
         try {
             $stmt = $this->db->prepare("
-                SELECT 
+                SELECT
                     p.id,
                     p.nome,
                     p.rota,
@@ -335,15 +335,16 @@ class NivelAcessoController {
             $this->db->beginTransaction();
 
             try {
-                // Remover permissões existentes
-                $stmt = $this->db->prepare("DELETE FROM permissoes_nivel WHERE nivel_id = ?");
-                $stmt->execute([$nivel_id]);
-
-                // Inserir novas permissões
+                // Atualizar apenas as permissões modificadas
                 if (!empty($permissoes)) {
                     $stmt = $this->db->prepare("
                         INSERT INTO permissoes_nivel (nivel_id, pagina_id, pode_acessar, pode_editar, pode_deletar, pode_criar)
                         VALUES (?, ?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE
+                        pode_acessar = VALUES(pode_acessar),
+                        pode_editar = VALUES(pode_editar),
+                        pode_deletar = VALUES(pode_deletar),
+                        pode_criar = VALUES(pode_criar)
                     ");
 
                     foreach ($permissoes as $permissao) {

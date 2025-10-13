@@ -26,7 +26,6 @@ export class AuthGuard implements CanActivate {
     // Verificar permissão específica da página
     const pagina = this.obterPaginaDaRota(route);
     if (pagina) {
-      // Verificação local para DEV e ADMIN
       const usuario = this.authService.getUsuarioAtual();
       if (!usuario) {
         this.router.navigate(['/login']);
@@ -38,38 +37,26 @@ export class AuthGuard implements CanActivate {
         return of(true);
       }
 
-      // Verificação básica por nível
-      const podeAcessar = this.verificarAcessoLocal(usuario, pagina);
-      if (!podeAcessar) {
-        this.router.navigate(['/unauthorized']);
-        return of(false);
-      }
+      // Verificar permissão no backend
+      return this.authService.verificarPermissao(pagina).pipe(
+        map(podeAcessar => {
+          if (!podeAcessar) {
+            this.router.navigate(['/unauthorized']);
+            return false;
+          }
+          return true;
+        }),
+        catchError(error => {
+          console.error('Erro ao verificar permissão:', error);
+          this.router.navigate(['/unauthorized']);
+          return of(false);
+        })
+      );
     }
 
     return of(true);
   }
 
-  private verificarAcessoLocal(usuario: any, pagina: string): boolean {
-    const niveis = ['cliente', 'vendedor', 'gerente', 'admin', 'dev'];
-    const nivelUsuario = niveis.indexOf(usuario.nivel_acesso);
-
-    // Páginas administrativas
-    if (pagina.startsWith('admin/')) {
-      return nivelUsuario >= 1; // vendedor ou superior
-    }
-
-    // Páginas específicas
-    switch (pagina) {
-      case 'orcamento':
-        return nivelUsuario >= 1; // vendedor ou superior
-      case 'produtos':
-        return nivelUsuario >= 1; // vendedor ou superior
-      case 'painel':
-        return true; // todos podem acessar
-      default:
-        return true;
-    }
-  }
 
   private obterPaginaDaRota(route: ActivatedRouteSnapshot): string | null {
     const url = route.url.map(segment => segment.path).join('/');

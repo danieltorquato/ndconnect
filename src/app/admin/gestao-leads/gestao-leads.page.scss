@@ -43,6 +43,24 @@ ion-segment {
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 
+  &.lead-nao-lido {
+    border-left: 4px solid var(--nd-warning);
+    background: linear-gradient(90deg, rgba(243, 156, 18, 0.05) 0%, transparent 100%);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      background: var(--nd-warning);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+  }
+
   ion-card-header {
     padding-bottom: 8px;
 
@@ -50,6 +68,21 @@ ion-segment {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+
+      .badges-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-end;
+
+        .novo-badge {
+          animation: pulse 2s infinite;
+
+          ion-icon {
+            margin-right: 4px;
+          }
+        }
+      }
 
       ion-card-title {
         color: var(--nd-primary);
@@ -177,6 +210,18 @@ ion-modal {
       flex: 1 1 auto;
       min-width: calc(50% - 4px);
     }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 

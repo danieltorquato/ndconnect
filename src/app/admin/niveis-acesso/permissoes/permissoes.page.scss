@@ -1,3 +1,83 @@
+// Informações do Nível
+.nivel-info-card {
+  margin: 8px;
+
+  .nivel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+
+    .nivel-details {
+      flex: 1;
+
+      h2 {
+        margin: 0 0 8px 0;
+        color: var(--ion-color-primary);
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        color: var(--ion-color-medium);
+        font-size: 14px;
+      }
+    }
+
+    .nivel-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+  }
+}
+
+// Legenda de Permissões
+.legenda-section {
+  margin: 8px;
+
+  .legenda-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--ion-color-light);
+      border-radius: 8px;
+
+      ion-toggle {
+        --handle-width: 20px;
+        --handle-height: 20px;
+        --track-width: 40px;
+        --track-height: 24px;
+      }
+
+      .legenda-content {
+        flex: 1;
+
+        h4 {
+          margin: 0 0 4px 0;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--ion-color-dark);
+        }
+
+        p {
+          margin: 0;
+          font-size: 12px;
+          color: var(--ion-color-medium);
+        }
+      }
+    }
+  }
+}
+
 .filters-section {
   background: var(--ion-color-light);
   padding: 8px;
@@ -24,8 +104,79 @@
   }
 }
 
+// Controles de Visualização e Edição
+.controls-section {
+  margin: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .view-controls {
+    flex: 1;
+    min-width: 200px;
+
+    ion-segment {
+      --background: white;
+      --border-radius: 8px;
+
+      ion-segment-button {
+        --color: var(--ion-color-medium);
+        --color-checked: var(--ion-color-primary);
+        --background-checked: var(--ion-color-primary-tint);
+        font-size: 12px;
+        height: 40px;
+        min-width: 80px;
+
+        ion-icon {
+          font-size: 16px;
+          margin-right: 4px;
+        }
+
+        ion-label {
+          font-size: 12px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  .edit-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    ion-toggle {
+      --handle-width: 20px;
+      --handle-height: 20px;
+      --track-width: 40px;
+      --track-height: 24px;
+    }
+
+    ion-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ion-color-dark);
+
+      ion-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
 .categoria-section {
   margin: 8px;
+}
+
+.categoria-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .categoria-header {
@@ -34,17 +185,25 @@
   align-items: center;
   width: 100%;
 
-  > div:first-child {
+  .categoria-info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 
     ion-icon {
-      font-size: 20px;
+      font-size: 24px;
+      color: var(--ion-color-primary);
     }
 
-    ion-badge {
+    .categoria-nome {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    .categoria-badge {
       font-size: 12px;
+      font-weight: 500;
     }
   }
 }
@@ -58,6 +217,294 @@
     --padding-end: 8px;
     font-size: 12px;
     height: 32px;
+  }
+}
+
+// Layout das Páginas
+.paginas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pagina-item {
+  border: 2px solid var(--ion-color-light);
+  border-radius: 12px;
+  padding: 16px;
+  background: white;
+  transition: all 0.3s ease;
+
+  &.pagina-acessivel {
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary-tint);
+  }
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+}
+
+.pagina-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+
+  .pagina-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+
+    .pagina-icon {
+      font-size: 24px;
+      margin-top: 4px;
+    }
+
+    .pagina-details {
+      flex: 1;
+
+      .pagina-nome {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--ion-color-dark);
+      }
+
+      .pagina-descricao {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: var(--ion-color-medium);
+        line-height: 1.4;
+      }
+
+      .pagina-rota {
+        ion-chip {
+          font-size: 11px;
+          height: 24px;
+        }
+      }
+    }
+  }
+
+  .pagina-status {
+    ion-chip {
+      font-size: 12px;
+      height: 28px;
+    }
+  }
+}
+
+// Funções Disponíveis
+.funcoes-container {
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+
+  .funcoes-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+
+    ion-icon {
+      font-size: 18px;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .funcoes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    .funcao-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--ion-color-light-shade);
+
+      .funcao-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ion-color-dark);
+
+        ion-icon {
+          font-size: 16px;
+        }
+      }
+
+      ion-toggle {
+        --handle-width: 18px;
+        --handle-height: 18px;
+        --track-width: 36px;
+        --track-height: 22px;
+      }
+    }
+  }
+}
+
+// Controles de Acesso
+.acesso-controls {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ion-color-light-shade);
+
+  .acesso-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--ion-color-light);
+    border-radius: 8px;
+
+    ion-toggle {
+      --handle-width: 20px;
+      --handle-height: 20px;
+      --track-width: 40px;
+      --track-height: 24px;
+    }
+
+    .acesso-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ion-color-dark);
+    }
+  }
+}
+
+// Estilos para Modo Lista
+ion-list {
+  margin: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  ion-list-header {
+    --background: var(--ion-color-primary);
+    --color: white;
+    padding: 16px;
+    margin: 0;
+
+    ion-label {
+      h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 0;
+        opacity: 0.9;
+      }
+    }
+
+    div[slot="end"] {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
+  ion-item {
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --min-height: 80px;
+    border-bottom: 1px solid var(--ion-color-light-shade);
+
+    &.item-acessivel {
+      --background: var(--ion-color-primary-tint);
+      border-left: 4px solid var(--ion-color-primary);
+    }
+
+    &.item-bloqueada {
+      --background: var(--ion-color-light);
+      opacity: 0.7;
+    }
+
+    ion-label {
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: var(--ion-color-dark);
+      }
+
+      p {
+        font-size: 14px;
+        color: var(--ion-color-medium);
+        margin: 0 0 8px 0;
+      }
+
+      ion-chip {
+        font-size: 11px;
+        height: 24px;
+      }
+    }
+
+    .permissao-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+
+      .permissao-toggle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        ion-toggle {
+          --handle-width: 18px;
+          --handle-height: 18px;
+          --track-width: 36px;
+          --track-height: 22px;
+        }
+
+        .toggle-label {
+          font-size: 12px;
+          font-weight: 500;
+          color: var(--ion-color-dark);
+        }
+      }
+
+      .funcoes-lista {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .funcao-lista-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+
+          ion-toggle {
+            --handle-width: 16px;
+            --handle-height: 16px;
+            --track-width: 32px;
+            --track-height: 20px;
+          }
+
+          .funcao-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ion-color-medium);
+          }
+        }
+      }
+    }
   }
 }
 
