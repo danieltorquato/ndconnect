@@ -68,8 +68,14 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Proteger arquivos de configuração
-<FilesMatch "^(config|database|auth)\.php$">
+# Proteger apenas arquivos de configuração sensíveis
+<FilesMatch "^(config|database)\.php$">
     Order Allow,Deny
     Deny from all
+</FilesMatch>
+
+# Permitir acesso ao auth.php (endpoint público)
+<FilesMatch "^auth\.php$">
+    Order Allow,Deny
+    Allow from all
 </FilesMatch>

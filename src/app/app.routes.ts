@@ -103,5 +103,16 @@ export const routes: Routes = [
     loadComponent: () => import('./admin/relatorios/relatorios.page').then( m => m.RelatoriosPage),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'admin/niveis-acesso',
+    loadComponent: () => import('./admin/niveis-acesso/niveis-acesso.page').then( m => m.NiveisAcessoPage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/niveis-acesso/:id/permissoes',
+    loadComponent: () => import('./admin/niveis-acesso/permissoes/permissoes.page').then( m => m.PermissoesPage),
+    canActivate: [AuthGuard],
+  },
+
 
 ];

@@ -8,7 +8,8 @@ export interface Usuario {
   id: number;
   nome: string;
   email: string;
-  nivel_acesso: 'admin' | 'gerente' | 'vendedor' | 'cliente';
+  nivel_acesso: 'dev' | 'admin' | 'gerente' | 'vendedor' | 'cliente';
+  nivel_id?: number;
 }
 
 export interface LoginResponse {
@@ -178,7 +179,18 @@ export class AuthService {
     const usuario = this.getUsuarioAtual();
     if (!usuario) return false;
 
-    const niveis = ['cliente', 'vendedor', 'gerente', 'admin'];
+    // Se o usuário tem nivel_id, usar o novo sistema
+    if (usuario.nivel_id) {
+      // Por enquanto, manter compatibilidade com o sistema antigo
+      // TODO: Implementar verificação por nivel_id
+      const niveis = ['cliente', 'vendedor', 'gerente', 'admin', 'dev'];
+      const nivelUsuario = niveis.indexOf(usuario.nivel_acesso);
+      const nivelRequerido = niveis.indexOf(nivel);
+      return nivelUsuario >= nivelRequerido;
+    }
+
+    // Sistema antigo - incluir dev
+    const niveis = ['cliente', 'vendedor', 'gerente', 'admin', 'dev'];
     const nivelUsuario = niveis.indexOf(usuario.nivel_acesso);
     const nivelRequerido = niveis.indexOf(nivel);
 
@@ -188,6 +200,16 @@ export class AuthService {
   // Verificar se é admin
   isAdmin(): boolean {
     return this.temNivel('admin');
+  }
+
+  // Verificar se é dev (acesso total)
+  isDev(): boolean {
+    return this.temNivel('dev');
+  }
+
+  // Verificar se tem acesso total (dev ou admin)
+  hasFullAccess(): boolean {
+    return this.isDev() || this.isAdmin();
   }
 
   // Verificar se é gerente ou superior

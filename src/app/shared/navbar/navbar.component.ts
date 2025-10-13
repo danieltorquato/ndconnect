@@ -77,6 +77,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   canAccess(pagina: string): boolean {
     if (!this.usuario) return false;
 
+    // DEV tem acesso total a tudo
+    if (this.usuario.nivel_acesso === 'dev') {
+      return true;
+    }
+
     // Verificação básica de níveis
     const niveis = ['cliente', 'vendedor', 'gerente', 'admin'];
     const nivelUsuario = niveis.indexOf(this.usuario.nivel_acesso);
@@ -101,6 +106,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   getNivelDisplay(nivel?: string): string {
     const niveis: { [key: string]: string } = {
+      'dev': 'Desenvolvedor',
       'admin': 'Administrador',
       'gerente': 'Gerente',
       'vendedor': 'Vendedor',

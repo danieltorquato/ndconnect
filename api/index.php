@@ -73,18 +73,10 @@ try {
         // Verificar se o arquivo Routes/api.php existe antes de tentar incluí-lo
         if (file_exists('Routes/api.php')) {
             try {
-                // Incluir o arquivo de rotas
-                ob_start();
+                // Incluir o arquivo de rotas diretamente
                 include 'Routes/api.php';
-                $routes_output = ob_get_clean();
-
-                // Se o Routes/api.php retornou algo, usar isso
-                if (!empty($routes_output)) {
-                    $routes_response = json_decode($routes_output, true);
-                    if ($routes_response) {
-                        $response = $routes_response;
-                    }
-                }
+                // O Routes/api.php já faz echo da resposta, então não precisamos processar aqui
+                exit; // Parar a execução aqui para não duplicar a resposta
             } catch (Exception $e) {
                 $response = [
                     'success' => false,

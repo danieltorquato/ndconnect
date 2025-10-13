@@ -31,6 +31,8 @@ require_once 'Controllers/FinanceiroController.php';
 require_once 'Controllers/EstoqueController.php';
 require_once 'Controllers/AgendaController.php';
 require_once 'Controllers/RelatorioController.php';
+require_once 'Controllers/NivelAcessoController.php';
+require_once 'Controllers/PaginaSistemaController.php';
 
 $request_method = $_SERVER['REQUEST_METHOD'];
 $request_uri = $_SERVER['REQUEST_URI'];
@@ -52,7 +54,7 @@ $debug_info = [
     'timestamp' => date('Y-m-d H:i:s')
 ];
 
-$response = ['success' => false, 'message' => 'Endpoint não encontrado', 'debug' => $debug_info];
+$response = ['success' => false, 'message' => 'Endpoint não encontrado', 'debug' => $debug_info, 'uri' => $uri, 'method' => $request_method];
 
 try {
     switch ($uri) {
@@ -618,36 +620,78 @@ try {
         // AUTH ENDPOINTS
         case 'auth':
             // Incluir e executar o arquivo auth.php diretamente
-            try {
-                ob_start();
-                require_once 'auth.php';
-                $auth_output = ob_get_clean();
+            require_once 'auth.php';
+            exit; // O auth.php já faz echo e não precisa processar mais nada
+            break;
 
-                // Se auth.php retornou algo, usar isso
-                if (!empty($auth_output)) {
-                    $auth_response = json_decode($auth_output, true);
-                    if ($auth_response) {
-                        $response = $auth_response;
-                    } else {
-                        $response = [
-                            'success' => false,
-                            'message' => 'Resposta inválida do endpoint de autenticação',
-                            'debug' => $debug_info
-                        ];
-                    }
+        // NÍVEIS DE ACESSO
+        case 'niveis-acesso':
+            $controller = new NivelAcessoController();
+            if ($request_method == 'GET') {
+                $response = $controller->getAll();
+            } elseif ($request_method == 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->create($input);
+            }
+            break;
+
+        case (preg_match('/^niveis-acesso\/(\d+)$/', $uri, $matches) ? true : false):
+            $controller = new NivelAcessoController();
+            $id = $matches[1];
+            if ($request_method == 'GET') {
+                $response = $controller->getById($id);
+            } elseif ($request_method == 'PUT') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->update($id, $input);
+            } elseif ($request_method == 'DELETE') {
+                $response = $controller->delete($id);
+            }
+            break;
+
+        case (preg_match('/^niveis-acesso\/(\d+)\/permissoes$/', $uri, $matches) ? true : false):
+            $controller = new NivelAcessoController();
+            $id = $matches[1];
+            if ($request_method == 'GET') {
+                $response = $controller->getPermissoes($id);
+            } elseif ($request_method == 'PUT') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->updatePermissoes($id, $input);
+            }
+            break;
+
+        // PÁGINAS DO SISTEMA
+        case 'paginas-sistema':
+            $controller = new PaginaSistemaController();
+            if ($request_method == 'GET') {
+                $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : null;
+                if ($categoria) {
+                    $response = $controller->getByCategoria($categoria);
                 } else {
-                    $response = [
-                        'success' => false,
-                        'message' => 'Endpoint de autenticação não retornou resposta',
-                        'debug' => $debug_info
-                    ];
+                    $response = $controller->getAll();
                 }
-            } catch (Exception $e) {
-                $response = [
-                    'success' => false,
-                    'message' => 'Erro no endpoint de autenticação: ' . $e->getMessage(),
-                    'debug' => $debug_info
-                ];
+            } elseif ($request_method == 'POST') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->create($input);
+            }
+            break;
+
+        case (preg_match('/^paginas-sistema\/(\d+)$/', $uri, $matches) ? true : false):
+            $controller = new PaginaSistemaController();
+            $id = $matches[1];
+            if ($request_method == 'GET') {
+                $response = $controller->getById($id);
+            } elseif ($request_method == 'PUT') {
+                $input = json_decode(file_get_contents('php://input'), true);
+                $response = $controller->update($id, $input);
+            } elseif ($request_method == 'DELETE') {
+                $response = $controller->delete($id);
+            }
+            break;
+
+        case 'paginas-sistema/categorias':
+            $controller = new PaginaSistemaController();
+            if ($request_method == 'GET') {
+                $response = $controller->getCategorias();
             }
             break;
 

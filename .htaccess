@@ -3,10 +3,10 @@ RewriteEngine On
 
 # Permitir acesso direto aos arquivos da API
 RewriteCond %{REQUEST_URI} ^/api/.*$
-RewriteRule ^api/(.*)$ api/$1 [L]
+RewriteRule ^api/(.*)$ api/$1 [L,QSA]
 
-# Permitir acesso direto aos arquivos PDF e PHP
-RewriteCond %{REQUEST_URI} \.(pdf|php)$
+# Permitir acesso direto aos arquivos PDF e PHP da API
+RewriteCond %{REQUEST_URI} ^/api/.*\.(pdf|php)$
 RewriteRule ^.*$ - [L]
 
 # Permitir acesso direto aos assets
