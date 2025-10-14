@@ -1,0 +1,531 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button *ngIf="paginaAtual === 'listagem'" (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="paginaAtual === 'cadastro'" (click)="voltarParaListagem()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      {{ paginaAtual === 'listagem' ? 'Gerenciar Funcionários' : (modoEdicao ? 'Editar Funcionário' : 'Novo Funcionário') }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="paginaAtual === 'listagem'" (click)="carregarFuncionarios()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Página de Listagem -->
+  <div *ngIf="paginaAtual === 'listagem'">
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <!-- Contadores -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Resumo</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="people" color="primary"></ion-icon>
+              <h3>{{ contadores.total }}</h3>
+              <p>Total</p>
+            </div>
+          </ion-col>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="checkmark-circle" color="success"></ion-icon>
+              <h3>{{ contadores.ativos }}</h3>
+              <p>Ativos</p>
+            </div>
+          </ion-col>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="time" color="warning"></ion-icon>
+              <h3>{{ contadores.afastados }}</h3>
+              <p>Afastados</p>
+            </div>
+          </ion-col>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="close-circle" color="danger"></ion-icon>
+              <h3>{{ contadores.demitidos }}</h3>
+              <p>Demitidos</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Filtros e Pesquisa -->
+  <ion-card>
+    <ion-card-content>
+      <ion-searchbar
+        [(ngModel)]="termoPesquisa"
+        (ionInput)="pesquisar()"
+        placeholder="Pesquisar funcionários..."
+        show-clear-button="focus">
+      </ion-searchbar>
+
+      <ion-segment [(ngModel)]="statusFiltro" (ionChange)="mudarFiltro($event)" class="ion-margin-top">
+        <ion-segment-button value="todos">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="ativo">
+          <ion-label>Ativos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="inativo">
+          <ion-label>Inativos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="afastado">
+          <ion-label>Afastados</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="demitido">
+          <ion-label>Demitidos</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de Funcionários -->
+  <ion-card *ngIf="!loading">
+    <ion-card-header>
+      <ion-card-title>
+        Funcionários ({{ funcionariosFiltrados.length }})
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div *ngIf="funcionariosFiltrados.length > 0; else semFuncionarios">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6" size-md="4" size-lg="3" *ngFor="let funcionario of funcionariosFiltrados">
+              <div class="funcionario-card" (click)="abrirModalAcoes(funcionario)">
+                <!-- Cargo no topo -->
+                <div class="cargo-badge">
+                  {{ funcionario.cargo }}
+                </div>
+
+                <!-- Foto do funcionário -->
+                <div class="foto-container">
+                  <img *ngIf="getImagemSrc(funcionario.foto)" [src]="getImagemSrc(funcionario.foto)" [alt]="funcionario.nome_completo" class="foto-funcionario">
+                  <div *ngIf="!getImagemSrc(funcionario.foto)" class="avatar-fallback" [style.background-color]="getStatusColor(funcionario.status)">
+                    {{ funcionario.nome_completo.charAt(0).toUpperCase() }}
+                  </div>
+                </div>
+
+                <!-- Nome do funcionário -->
+                <div class="nome-funcionario">
+                  {{ funcionario.nome_completo }}
+                </div>
+
+                <!-- Status -->
+                <div class="status-badge" [class]="'status-' + funcionario.status">
+                  {{ getStatusLabel(funcionario.status) }}
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+      <ng-template #semFuncionarios>
+        <div class="sem-dados">
+          <ion-icon name="people" size="large" color="medium"></ion-icon>
+          <h3>Nenhum funcionário encontrado</h3>
+          <p>Não há funcionários que correspondam aos filtros aplicados.</p>
+        </div>
+      </ng-template>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Carregando funcionários...</p>
+  </div>
+
+    <!-- FAB para adicionar funcionário -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="abrirPaginaCadastro()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+
+  <!-- Página de Cadastro -->
+  <div *ngIf="paginaAtual === 'cadastro'">
+    <ion-card>
+      <ion-card-content>
+        <form (ngSubmit)="salvarFuncionario()">
+              <!-- Upload de Foto -->
+              <ion-item>
+                <ion-label position="stacked">Foto do Funcionário</ion-label>
+                <div class="foto-upload-container">
+                  <div class="foto-preview" *ngIf="formData.foto || fotoPreview">
+                    <img [src]="fotoPreview || formData.foto" alt="Preview da foto" class="foto-preview-img">
+                    <ion-button (click)="removerFoto()" fill="clear" size="small" color="danger" class="remover-foto">
+                      <ion-icon name="close-circle"></ion-icon>
+                    </ion-button>
+                  </div>
+                  <div class="foto-placeholder" *ngIf="!formData.foto && !fotoPreview">
+                    <ion-icon name="camera" size="large"></ion-icon>
+                    <p>Clique para adicionar foto</p>
+                  </div>
+                  <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+                  <ion-button (click)="fileInput.click()" fill="outline" size="small">
+                    <ion-icon name="camera" slot="start"></ion-icon>
+                    {{ formData.foto || fotoPreview ? 'Alterar Foto' : 'Adicionar Foto' }}
+                  </ion-button>
+                </div>
+              </ion-item>
+
+
+
+              <!-- Nome Completo -->
+              <ion-item>
+                <ion-label position="stacked">Nome Completo *</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.nome_completo"
+                  name="nome_completo"
+                  type="text"
+                  required>
+                </ion-input>
+              </ion-item>
+
+              <!-- Email -->
+              <ion-item>
+                <ion-label position="stacked">E-mail *</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.email"
+                  name="email"
+                  type="email"
+                  required>
+                </ion-input>
+              </ion-item>
+
+              <!-- CPF e RG -->
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">CPF</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.cpf"
+                        name="cpf"
+                        type="text"
+                        placeholder="000.000.000-00"
+                        (ionInput)="formatarCPF($event)"
+                        maxlength="14">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">RG</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.rg"
+                        name="rg"
+                        type="text">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Data de Nascimento -->
+              <ion-item>
+                <ion-label position="stacked">Data de Nascimento</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.data_nascimento"
+                  name="data_nascimento"
+                  type="date">
+                </ion-input>
+              </ion-item>
+
+              <!-- Telefones -->
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Telefone</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.telefone"
+                        name="telefone"
+                        type="tel"
+                        placeholder="(00) 0000-0000"
+                        (ionInput)="formatarTelefone($event)"
+                        maxlength="14">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Celular</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.celular"
+                        name="celular"
+                        type="tel"
+                        placeholder="(00) 00000-0000"
+                        (ionInput)="formatarCelular($event)"
+                        maxlength="15">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- CEP -->
+              <ion-item>
+                <ion-label position="stacked">CEP *</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.cep"
+                  name="cep"
+                  type="text"
+                  placeholder="00000-000"
+                  (ionInput)="formatarCep($event)"
+                  maxlength="9">
+                </ion-input>
+                <ion-spinner *ngIf="buscandoCep" slot="end" name="crescent" size="small"></ion-spinner>
+              </ion-item>
+
+              <!-- Endereço -->
+              <ion-item>
+                <ion-label position="stacked">Rua/Avenida</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.endereco"
+                  name="endereco"
+                  placeholder="Nome da rua ou avenida">
+                </ion-input>
+              </ion-item>
+
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="4">
+                    <ion-item>
+                      <ion-label position="stacked">Número</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.numero_endereco"
+                        name="numero_endereco"
+                        placeholder="Número">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="8">
+                    <ion-item>
+                      <ion-label position="stacked">Complemento</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.complemento"
+                        name="complemento"
+                        placeholder="Apartamento, sala, etc.">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Cidade e Estado -->
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="8">
+                    <ion-item>
+                      <ion-label position="stacked">Cidade</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.cidade"
+                        name="cidade"
+                        type="text">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="4">
+                    <ion-item>
+                      <ion-label position="stacked">Estado</ion-label>
+                      <ion-select
+                        [(ngModel)]="formData.estado"
+                        name="estado">
+                        <ion-select-option *ngFor="let estado of estados" [value]="estado">
+                          {{ estado }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Cargo e Departamento -->
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Cargo *</ion-label>
+                      <ion-select
+                        [(ngModel)]="formData.cargo"
+                        name="cargo"
+                        placeholder="Selecione o cargo"
+                        required>
+                        <ion-select-option *ngFor="let cargo of cargos" [value]="cargo">
+                          {{ cargo }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Departamento</ion-label>
+                      <ion-select
+                        [(ngModel)]="formData.departamento"
+                        name="departamento"
+                        placeholder="Selecione o departamento">
+                        <ion-select-option *ngFor="let departamento of departamentos" [value]="departamento">
+                          {{ departamento }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Datas de Admissão e Demissão -->
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Data de Admissão *</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.data_admissao"
+                        name="data_admissao"
+                        type="date"
+                        required>
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Data de Demissão</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.data_demissao"
+                        name="data_demissao"
+                        type="date">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Salário e Status -->
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Salário</ion-label>
+                      <ion-input
+                        [(ngModel)]="formData.salario"
+                        name="salario"
+                        type="text"
+                        placeholder="R$ 0,00"
+                        (ionInput)="formatarSalario($event)">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="stacked">Status</ion-label>
+                      <ion-select
+                        [(ngModel)]="formData.status"
+                        name="status">
+                        <ion-select-option value="ativo">Ativo</ion-select-option>
+                        <ion-select-option value="inativo">Inativo</ion-select-option>
+                        <ion-select-option value="afastado">Afastado</ion-select-option>
+                        <ion-select-option value="demitido">Demitido</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+
+              <!-- Observações -->
+              <ion-item>
+                <ion-label position="stacked">Observações</ion-label>
+                <ion-textarea
+                  [(ngModel)]="formData.observacoes"
+                  name="observacoes"
+                  rows="3"
+                  placeholder="Observações sobre o funcionário...">
+                </ion-textarea>
+              </ion-item>
+
+          <div class="ion-padding">
+            <ion-button
+              expand="block"
+              type="submit"
+              [disabled]="loading">
+              <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+              <span *ngIf="!loading">{{ modoEdicao ? 'Atualizar' : 'Criar' }} Funcionário</span>
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Modal de Ações do Funcionário -->
+  <ion-modal [isOpen]="isModalAcoesOpen" (didDismiss)="fecharModalAcoes()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Ações do Funcionário</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalAcoes()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div *ngIf="funcionarioSelecionado" class="funcionario-info-modal">
+          <div class="foto-container-modal">
+            <img *ngIf="funcionarioSelecionado.foto"
+                 [src]="getImagemSrc(funcionarioSelecionado.foto)"
+                 alt="Foto do funcionário"
+                 class="foto-funcionario-modal">
+            <div *ngIf="!funcionarioSelecionado.foto" class="avatar-fallback-modal">
+              <ion-icon name="person"></ion-icon>
+            </div>
+          </div>
+
+          <h2>{{ funcionarioSelecionado.nome_completo }}</h2>
+          <p class="cargo-modal">{{ funcionarioSelecionado.cargo }}</p>
+          <p class="status-modal" [class]="'status-' + funcionarioSelecionado.status">
+            {{ getStatusLabel(funcionarioSelecionado.status) }}
+          </p>
+        </div>
+
+        <div class="acoes-modal">
+          <ion-button expand="block" fill="outline" (click)="editarFuncionario()">
+            <ion-icon name="create" slot="start"></ion-icon>
+            Editar Funcionário
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" color="warning" (click)="inativarFuncionario()">
+            <ion-icon name="close-circle" slot="start"></ion-icon>
+            Inativar Funcionário
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" color="danger" (click)="deletarFuncionario()">
+            <ion-icon name="trash" slot="start"></ion-icon>
+            Excluir Funcionário
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

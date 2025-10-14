@@ -38,17 +38,24 @@ class AuthService {
     }
 
     // Fazer login
-    public function login($email, $senha) {
+    public function login($usuario, $senha) {
         try {
-            $stmt = $this->db->prepare("SELECT id, nome, email, senha, nivel_acesso, nivel_id, ativo FROM usuarios WHERE email = ? AND ativo = 1");
-            $stmt->execute([$email]);
-            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $this->db->prepare("
+                SELECT u.id, u.nome, u.usuario, u.senha, u.nivel_acesso, u.nivel_id, u.ativo,
+                       n.id as nivel_info_id, n.nome as nivel_info_nome, n.descricao as nivel_info_descricao,
+                       n.cor as nivel_info_cor, n.ordem as nivel_info_ordem
+                FROM usuarios u
+                LEFT JOIN niveis_acesso n ON u.nivel_id = n.id
+                WHERE u.usuario = ? AND u.ativo = 1
+            ");
+            $stmt->execute([$usuario]);
+            $usuarioData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$usuario) {
+            if (!$usuarioData) {
                 return ['success' => false, 'message' => 'Usuário não encontrado'];
             }
 
-            if (!password_verify($senha, $usuario['senha'])) {
+            if (!password_verify($senha, $usuarioData['senha'])) {
                 return ['success' => false, 'message' => 'Senha incorreta'];
             }
 
@@ -60,10 +67,30 @@ class AuthService {
 
             // Salvar sessão
             $stmt = $this->db->prepare("INSERT INTO sessoes (usuario_id, token, expira_em, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$usuario['id'], $token, $expira_em, $ip_address, $user_agent]);
+            $stmt->execute([$usuarioData['id'], $token, $expira_em, $ip_address, $user_agent]);
 
             // Remover senha da resposta
-            unset($usuario['senha']);
+            unset($usuarioData['senha']);
+
+            // Organizar dados do usuário com informações do nível
+            $usuario = [
+                'id' => $usuarioData['id'],
+                'nome' => $usuarioData['nome'],
+                'email' => $usuarioData['email'],
+                'nivel_acesso' => $usuarioData['nivel_acesso'],
+                'nivel_id' => $usuarioData['nivel_id']
+            ];
+
+            // Adicionar informações do nível se existir
+            if ($usuarioData['nivel_id'] && $usuarioData['nivel_info_id']) {
+                $usuario['nivel_info'] = [
+                    'id' => $usuarioData['nivel_info_id'],
+                    'nome' => $usuarioData['nivel_info_nome'],
+                    'descricao' => $usuarioData['nivel_info_descricao'],
+                    'cor' => $usuarioData['nivel_info_cor'],
+                    'ordem' => $usuarioData['nivel_info_ordem']
+                ];
+            }
 
             return [
                 'success' => true,
@@ -80,16 +107,39 @@ class AuthService {
     public function verificarToken($token) {
         try {
             $stmt = $this->db->prepare("
-                SELECT u.id, u.nome, u.email, u.nivel_acesso, u.nivel_id, s.expira_em
+                SELECT u.id, u.nome, u.usuario, u.nivel_acesso, u.nivel_id, s.expira_em,
+                       n.id as nivel_info_id, n.nome as nivel_info_nome, n.descricao as nivel_info_descricao,
+                       n.cor as nivel_info_cor, n.ordem as nivel_info_ordem
                 FROM usuarios u
                 JOIN sessoes s ON u.id = s.usuario_id
+                LEFT JOIN niveis_acesso n ON u.nivel_id = n.id
                 WHERE s.token = ? AND s.ativo = 1 AND s.expira_em > NOW()
             ");
             $stmt->execute([$token]);
-            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+            $usuarioData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$usuario) {
+            if (!$usuarioData) {
                 return ['success' => false, 'message' => 'Token inválido ou expirado'];
+            }
+
+            // Organizar dados do usuário com informações do nível
+            $usuario = [
+                'id' => $usuarioData['id'],
+                'nome' => $usuarioData['nome'],
+                'email' => $usuarioData['email'],
+                'nivel_acesso' => $usuarioData['nivel_acesso'],
+                'nivel_id' => $usuarioData['nivel_id']
+            ];
+
+            // Adicionar informações do nível se existir
+            if ($usuarioData['nivel_id'] && $usuarioData['nivel_info_id']) {
+                $usuario['nivel_info'] = [
+                    'id' => $usuarioData['nivel_info_id'],
+                    'nome' => $usuarioData['nivel_info_nome'],
+                    'descricao' => $usuarioData['nivel_info_descricao'],
+                    'cor' => $usuarioData['nivel_info_cor'],
+                    'ordem' => $usuarioData['nivel_info_ordem']
+                ];
             }
 
             return ['success' => true, 'usuario' => $usuario];

@@ -29,28 +29,28 @@
 
       <!-- Formulário -->
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
-        <!-- Campo Email -->
+        <!-- Campo Usuário -->
         <div class="input-group" [@fadeInUp]>
           <div class="input-container">
             <ion-icon name="person" class="input-icon"></ion-icon>
             <div class="input-content">
-              <label class="input-label">E-mail</label>
+              <label class="input-label">Usuário</label>
               <ion-input
-                type="email"
-                formControlName="email"
-                placeholder="Digite seu e-mail"
+                type="text"
+                formControlName="usuario"
+                placeholder="Digite seu usuário"
                 class="form-input"
                 (focus)="onInputFocus($event)"
                 (blur)="onInputBlur($event)"
-                [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+                [class.error]="loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched">
               </ion-input>
             </div>
-            <div class="input-line" [class.active]="isEmailFocused"></div>
+            <div class="input-line" [class.active]="isUsuarioFocused"></div>
           </div>
-          <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" [@fadeIn]>
+          <div class="error-message" *ngIf="loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched" [@fadeIn]>
             <ion-icon name="alert-circle" class="error-icon"></ion-icon>
-            <span *ngIf="loginForm.get('email')?.errors?.['required']">E-mail é obrigatório</span>
-            <span *ngIf="loginForm.get('email')?.errors?.['email']">E-mail inválido</span>
+            <span *ngIf="loginForm.get('usuario')?.errors?.['required']">Usuário é obrigatório</span>
+            <span *ngIf="loginForm.get('usuario')?.errors?.['minlength']">Usuário deve ter pelo menos 3 caracteres</span>
           </div>
         </div>
 
@@ -136,10 +136,6 @@
 
       <!-- Footer -->
       <div class="login-footer" [@fadeInUp]>
-        <p class="register-text">
-          Não tem uma conta?
-          <a (click)="goToRegister()" class="register-link">Cadastre-se</a>
-        </p>
         <a (click)="goToHome()" class="home-link">
           <ion-icon name="arrow-back" class="link-icon"></ion-icon>
           Voltar ao site

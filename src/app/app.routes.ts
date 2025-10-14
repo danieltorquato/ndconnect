@@ -11,10 +11,6 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
   },
   {
-    path: 'register',
-    loadComponent: () => import('./register/register.page').then((m) => m.RegisterPage),
-  },
-  {
     path: 'unauthorized',
     loadComponent: () => import('./unauthorized/unauthorized.page').then((m) => m.UnauthorizedPage),
   },
@@ -111,6 +107,16 @@ export const routes: Routes = [
   {
     path: 'admin/niveis-acesso/:id/permissoes',
     loadComponent: () => import('./admin/niveis-acesso/permissoes/permissoes.page').then( m => m.PermissoesPage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/gestao-usuarios',
+    loadComponent: () => import('./admin/gestao-usuarios/gestao-usuarios.page').then( m => m.GestaoUsuariosPage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/gestao-funcionarios',
+    loadComponent: () => import('./admin/gestao-funcionarios/gestao-funcionarios.page').then( m => m.GestaoFuncionariosPage),
     canActivate: [AuthGuard],
   },
 

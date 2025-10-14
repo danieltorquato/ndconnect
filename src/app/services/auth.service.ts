@@ -7,9 +7,33 @@ import { environment } from '../../environments/environment';
 export interface Usuario {
   id: number;
   nome: string;
+  usuario: string;
   email: string;
   nivel_acesso: 'dev' | 'admin' | 'gerente' | 'vendedor' | 'cliente';
   nivel_id?: number;
+  funcionario_id?: number;
+  ativo: boolean;
+  data_criacao: string;
+  data_atualizacao: string;
+  funcionario?: {
+    id: number;
+    nome_completo: string;
+    email?: string;
+    cargo: string;
+    departamento?: string;
+    status: string;
+    endereco?: string;
+    numero_endereco?: string;
+    cidade?: string;
+    estado?: string;
+  };
+  nivel_info?: {
+    id: number;
+    nome: string;
+    descricao: string;
+    cor: string;
+    ordem: number;
+  };
 }
 
 export interface LoginResponse {
@@ -42,9 +66,9 @@ export class AuthService {
   }
 
   // Fazer login
-  login(email: string, senha: string): Observable<LoginResponse> {
+  login(usuario: string, senha: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API_URL}?action=login`, {
-      email,
+      usuario,
       senha
     }).pipe(
       tap(response => {
@@ -180,16 +204,15 @@ export class AuthService {
     if (!usuario) return false;
 
     // Se o usuário tem nivel_id, usar o novo sistema
-    if (usuario.nivel_id) {
-      // Por enquanto, manter compatibilidade com o sistema antigo
-      // TODO: Implementar verificação por nivel_id
+    if (usuario.nivel_id && usuario.nivel_info) {
+      // Usar a informação do nível do banco de dados
       const niveis = ['cliente', 'vendedor', 'gerente', 'admin', 'dev'];
-      const nivelUsuario = niveis.indexOf(usuario.nivel_acesso);
+      const nivelUsuario = niveis.indexOf(usuario.nivel_info.nome);
       const nivelRequerido = niveis.indexOf(nivel);
       return nivelUsuario >= nivelRequerido;
     }
 
-    // Sistema antigo - incluir dev
+    // Fallback para o sistema antigo
     const niveis = ['cliente', 'vendedor', 'gerente', 'admin', 'dev'];
     const nivelUsuario = niveis.indexOf(usuario.nivel_acesso);
     const nivelRequerido = niveis.indexOf(nivel);
@@ -220,5 +243,36 @@ export class AuthService {
   // Verificar se é vendedor ou superior
   isVendedor(): boolean {
     return this.temNivel('vendedor');
+  }
+
+  // Verificar se usuário tem nível específico por ID
+  temNivelPorId(nivelId: number): boolean {
+    const usuario = this.getUsuarioAtual();
+    if (!usuario) return false;
+
+    return usuario.nivel_id === nivelId;
+  }
+
+  // Obter informações do nível do usuário
+  getNivelInfo(): any {
+    const usuario = this.getUsuarioAtual();
+    if (!usuario) return null;
+
+    return usuario.nivel_info || null;
+  }
+
+  // Verificar se usuário tem permissão específica
+  temPermissao(permissao: string): boolean {
+    const usuario = this.getUsuarioAtual();
+    if (!usuario) return false;
+
+    // Se tem nivel_id, usar o sistema de permissões do banco
+    if (usuario.nivel_id) {
+      // Esta verificação será feita no backend
+      return true; // O backend fará a verificação real
+    }
+
+    // Fallback para o sistema antigo
+    return this.temNivel('admin');
   }
 }

@@ -1,0 +1,566 @@
+.contador-item {
+  text-align: center;
+  padding: 20px 12px;
+  background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.05), rgba(var(--ion-color-primary-rgb), 0.02));
+  border-radius: 16px;
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--ion-color-primary), var(--ion-color-secondary));
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(var(--ion-color-primary-rgb), 0.15);
+  }
+
+  ion-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  h3 {
+    margin: 12px 0 6px 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.sem-dados {
+  text-align: center;
+  padding: 40px 20px;
+
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 16px 0 8px 0;
+    color: var(--ion-color-medium);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+
+  ion-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}
+
+ion-segment {
+  --background: var(--ion-color-light);
+  --indicator-color: var(--ion-color-primary);
+}
+
+ion-chip {
+  font-size: 0.8rem;
+  height: 24px;
+}
+
+ion-badge {
+  font-size: 0.7rem;
+  height: 20px;
+}
+
+ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 60px;
+
+  ion-label {
+    h2 {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 0.9rem;
+      margin: 2px 0;
+    }
+  }
+}
+
+ion-fab-button {
+  --background: var(--ion-color-primary);
+  --color: white;
+}
+
+ion-modal {
+  --height: 90%;
+  --width: 95%;
+  --max-width: 600px;
+}
+
+ion-card {
+  margin: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+}
+
+ion-card-header {
+  padding-bottom: 8px;
+}
+
+ion-card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+ion-searchbar {
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+  --box-shadow: none;
+  padding: 0 16px;
+}
+
+ion-button[slot="end"] {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  margin-left: 4px;
+}
+
+ion-datetime-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+ion-textarea {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .contador-item {
+    padding: 12px 4px;
+
+    ion-icon {
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  ion-segment {
+    ion-segment-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+
+      ion-label {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  ion-modal {
+    --height: 95%;
+    --width: 98%;
+  }
+}
+
+// Dark mode
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    opacity: 0.9;
+  }
+
+  ion-card {
+    --background: var(--ion-color-dark);
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Estilos específicos para formulário
+ion-grid {
+  padding: 0;
+
+  ion-row {
+    margin: 0;
+
+    ion-col {
+      padding: 0 4px;
+    }
+  }
+}
+
+ion-datetime-button {
+  --color: var(--ion-color-primary);
+  font-size: 0.9rem;
+}
+
+// Melhorias visuais para chips de status
+ion-chip[color="success"] {
+  --background: var(--ion-color-success);
+  --color: white;
+}
+
+ion-chip[color="warning"] {
+  --background: var(--ion-color-warning);
+  --color: white;
+}
+
+ion-chip[color="primary"] {
+  --background: var(--ion-color-primary);
+  --color: white;
+}
+
+ion-chip[color="danger"] {
+  --background: var(--ion-color-danger);
+  --color: white;
+}
+
+// Cards de funcionários
+.funcionario-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  text-align: center;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .cargo-badge {
+    background: var(--ion-color-primary);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+
+  .foto-container {
+    margin: 12px 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120px;
+
+    .foto-funcionario {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--ion-color-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-fallback {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+      border: 3px solid var(--ion-color-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .nome-funcionario {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    margin: 8px 0;
+    line-height: 1.3;
+    min-height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 8px 0;
+
+    &.status-ativo {
+      background: #e8f5e8;
+      color: #2e7d32;
+    }
+
+    &.status-inativo {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    &.status-afastado {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    &.status-demitido {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+  }
+
+  .acoes-buttons {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    ion-button {
+      --padding-start: 4px;
+      --padding-end: 4px;
+      --padding-top: 4px;
+      --padding-bottom: 4px;
+      height: 28px;
+      width: 28px;
+    }
+  }
+
+  &:hover .acoes-buttons {
+    opacity: 1;
+  }
+}
+
+// Upload de foto
+.foto-upload-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  .foto-preview {
+    position: relative;
+    display: inline-block;
+
+    .foto-preview-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--ion-color-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .remover-foto {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      --padding-start: 4px;
+      --padding-end: 4px;
+      --padding-top: 4px;
+      --padding-bottom: 4px;
+      height: 24px;
+      width: 24px;
+    }
+  }
+
+  .foto-placeholder {
+    width: 120px;
+    height: 120px;
+    border: 2px dashed var(--ion-color-medium);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--ion-color-medium);
+    background: var(--ion-color-light);
+
+    ion-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  }
+}
+
+// Estilos do Modal de Ações
+.funcionario-info-modal {
+  text-align: center;
+  margin-bottom: 24px;
+
+  .foto-container-modal {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--ion-color-light);
+
+    .foto-funcionario-modal {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-fallback-modal {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--ion-color-light);
+      color: var(--ion-color-medium);
+
+      ion-icon {
+        font-size: 2rem;
+      }
+    }
+  }
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .cargo-modal {
+    margin: 0 0 8px 0;
+    color: var(--ion-color-primary);
+    font-weight: 500;
+  }
+
+  .status-modal {
+    margin: 0;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+
+    &.status-ativo {
+      background: var(--ion-color-success-tint);
+      color: var(--ion-color-success-shade);
+    }
+
+    &.status-inativo {
+      background: var(--ion-color-danger-tint);
+      color: var(--ion-color-danger-shade);
+    }
+  }
+}
+
+.acoes-modal {
+  ion-button {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Botão flutuante
+ion-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+
+  ion-fab-button {
+    --background: var(--ion-color-primary);
+    --background-activated: var(--ion-color-primary-shade);
+    --color: white;
+    --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+    }
+  }
+}

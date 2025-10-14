@@ -1,0 +1,368 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gerenciar Usuários</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="carregarUsuarios()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Contadores -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Resumo</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="people" color="primary"></ion-icon>
+              <h3>{{ contadores.total }}</h3>
+              <p>Total</p>
+            </div>
+          </ion-col>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="checkmark-circle" color="success"></ion-icon>
+              <h3>{{ contadores.ativos }}</h3>
+              <p>Ativos</p>
+            </div>
+          </ion-col>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="close-circle" color="danger"></ion-icon>
+              <h3>{{ contadores.inativos }}</h3>
+              <p>Inativos</p>
+            </div>
+          </ion-col>
+          <ion-col size="6" size-md="3">
+            <div class="contador-item">
+              <ion-icon name="shield" color="warning"></ion-icon>
+              <h3>{{ contadores.admins }}</h3>
+              <p>Admins</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Filtros e Pesquisa -->
+  <ion-card>
+    <ion-card-content>
+      <ion-searchbar
+        [(ngModel)]="termoPesquisa"
+        (ionInput)="pesquisar()"
+        placeholder="Pesquisar usuários..."
+        show-clear-button="focus">
+      </ion-searchbar>
+
+      <ion-segment [(ngModel)]="statusFiltro" (ionChange)="mudarFiltro($event)" class="ion-margin-top">
+        <ion-segment-button value="todos">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="ativos">
+          <ion-label>Ativos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="inativos">
+          <ion-label>Inativos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="funcionarios">
+          <ion-label>Funcionários</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="admins">
+          <ion-label>Admins</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de Usuários -->
+  <ion-card *ngIf="!loading">
+    <ion-card-header>
+      <ion-card-title>
+        Usuários ({{ usuariosFiltrados.length }})
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list *ngIf="usuariosFiltrados.length > 0; else semUsuarios">
+        <ion-item *ngFor="let usuario of usuariosFiltrados" button (click)="abrirModalEditar(usuario)">
+          <ion-thumbnail slot="start">
+            <div class="avatar" [style.background-color]="getNivelColor(usuario.nivel_acesso)">
+              {{ usuario.funcionario?.nome_completo?.toUpperCase() || '?' }}
+            </div>
+          </ion-thumbnail>
+
+          <ion-label>
+            <h2>
+              <ng-container *ngIf="usuario.funcionario">
+                {{ usuario.funcionario.nome_completo?.toUpperCase() }}
+                <span class="funcionario-id">
+                (ID: {{ usuario.funcionario.id }})
+                </span>
+              </ng-container>
+              <ng-container *ngIf="!usuario.funcionario">
+                <!-- Exibe algo alternativo caso não haja funcionario -->
+                <span>Usuário sem funcionário</span>
+              </ng-container>
+            </h2>
+            <p><strong>Usuário:</strong> {{ usuario.usuario }}</p>
+            <p><strong>Email:</strong> {{ usuario.funcionario?.email }}</p>
+            <p *ngIf="usuario.funcionario" class="funcionario-info">
+              <ion-icon name="briefcase" size="small"></ion-icon>
+              {{ usuario.funcionario.cargo }} - {{ usuario.funcionario.departamento }}
+            </p>
+            <p *ngIf="usuario.funcionario && (usuario.funcionario.endereco || usuario.funcionario.numero_endereco)" class="endereco-info">
+              <ion-icon name="location" size="small"></ion-icon>
+              {{ usuario.funcionario.endereco }}{{ usuario.funcionario.numero_endereco ? ', ' + usuario.funcionario.numero_endereco : '' }}
+              <span *ngIf="usuario.funcionario.cidade"> - {{ usuario.funcionario.cidade }}/{{ usuario.funcionario.estado }}</span>
+            </p>
+          </ion-label>
+
+          <ion-chip slot="end" [color]="getNivelColor(usuario.nivel_acesso)">
+            {{ getNivelLabel(usuario.nivel_acesso) }}
+          </ion-chip>
+
+          <ion-badge slot="end" [color]="getStatusColor(usuario.ativo)">
+            {{ getStatusLabel(usuario.ativo) }}
+          </ion-badge>
+
+          <ion-buttons slot="end">
+            <ion-button *ngIf="usuario.funcionario" (click)="irParaFuncionarios(); $event.stopPropagation()" fill="clear" size="small" color="primary">
+              <ion-icon name="briefcase"></ion-icon>
+            </ion-button>
+            <ion-button (click)="toggleStatusUsuario(usuario); $event.stopPropagation()" fill="clear" size="small">
+              <ion-icon [name]="usuario.ativo ? 'close-circle' : 'checkmark-circle'"
+                       [color]="usuario.ativo ? 'danger' : 'success'"></ion-icon>
+            </ion-button>
+            <ion-button (click)="excluirUsuario(usuario); $event.stopPropagation()" fill="clear" size="small" color="danger">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+      </ion-list>
+
+      <ng-template #semUsuarios>
+        <div class="sem-dados">
+          <ion-icon name="people" size="large" color="medium"></ion-icon>
+          <h3>Nenhum usuário encontrado</h3>
+          <p>Não há usuários que correspondam aos filtros aplicados.</p>
+        </div>
+      </ng-template>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Carregando usuários...</p>
+  </div>
+
+  <!-- FAB para adicionar usuário -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="abrirModalCriar()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- Modal de Criação/Edição -->
+  <ion-modal [isOpen]="modalAberto" (didDismiss)="fecharModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ modoEdicao ? 'Editar Usuário' : 'Novo Usuário' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <ion-card>
+          <ion-card-content>
+            <form (ngSubmit)="salvarUsuario()">
+              <ion-item>
+                <ion-label position="stacked">Usuário *</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.usuario"
+                  name="usuario"
+                  type="text"
+                  required>
+                </ion-input>
+              </ion-item>
+
+
+
+
+              <ion-item *ngIf="!modoEdicao">
+                <ion-label position="stacked">Senha *</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.senha"
+                  name="senha"
+                  type="password"
+                  required>
+                </ion-input>
+              </ion-item>
+
+              <ion-item *ngIf="modoEdicao">
+                <ion-label position="stacked">Nova Senha (deixe em branco para manter a atual)</ion-label>
+                <ion-input
+                  [(ngModel)]="formData.senha"
+                  name="senha"
+                  type="password">
+                </ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Nível de Acesso *</ion-label>
+                <ion-select
+                  [(ngModel)]="formData.nivel_acesso"
+                  name="nivel_acesso"
+                  placeholder="Selecione o nível"
+                  required>
+                  <ion-select-option *ngFor="let nivel of niveisAcesso" [value]="nivel.nome">
+                    {{ nivel.descricao || nivel.nome }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-label>Usuário Ativo</ion-label>
+                <ion-toggle
+                  [(ngModel)]="formData.ativo"
+                  name="ativo"
+                  slot="end">
+                </ion-toggle>
+              </ion-item>
+
+              <!-- Funcionário Associado -->
+              <ion-item>
+                <ion-label position="stacked">Funcionário Associado</ion-label>
+                <div class="funcionario-associado">
+                  <!-- Card do funcionário selecionado -->
+                  <ion-card *ngIf="funcionarioSelecionado" class="funcionario-card">
+                    <ion-card-content>
+                      <div class="funcionario-card-content">
+                        <div class="funcionario-info">
+                          <h3>{{ funcionarioSelecionado.nome_completo }}</h3>
+                          <p class="cargo-info">{{ funcionarioSelecionado.cargo }}</p>
+                          <p *ngIf="funcionarioSelecionado.departamento" class="departamento-info">
+                            {{ funcionarioSelecionado.departamento }}
+                          </p>
+                          <p *ngIf="funcionarioSelecionado.email" class="email-info">
+                            <ion-icon name="mail" size="small"></ion-icon>
+                            {{ funcionarioSelecionado.email }}
+                          </p>
+                          <p class="id-info">
+                            <strong>ID:</strong> {{ funcionarioSelecionado.id }}
+                          </p>
+                        </div>
+                        <ion-button fill="clear" color="danger" (click)="removerFuncionarioSelecionado()" class="remover-funcionario">
+                          <ion-icon name="close"></ion-icon>
+                        </ion-button>
+                      </div>
+                    </ion-card-content>
+                  </ion-card>
+
+                  <!-- Botão para pesquisar funcionário -->
+                  <ion-button *ngIf="!funcionarioSelecionado" expand="block" fill="outline" (click)="abrirModalFuncionarios()">
+                    <ion-icon name="search" slot="start"></ion-icon>
+                    Pesquisar Funcionário
+                  </ion-button>
+                </div>
+              </ion-item>
+
+              <div class="ion-padding">
+                <ion-button
+                  expand="block"
+                  type="submit"
+                  [disabled]="loading || !formData.usuario || formData.usuario.length < 2">
+                  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+                  <span *ngIf="!loading">{{ modoEdicao ? 'Atualizar' : 'Criar' }} Usuário</span>
+                </ion-button>
+              </div>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal de Pesquisa de Funcionários -->
+  <ion-modal [isOpen]="modalFuncionariosAberto" (didDismiss)="fecharModalFuncionarios()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Pesquisar Funcionário</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalFuncionarios()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <ion-card>
+          <ion-card-content>
+            <!-- Campo de pesquisa -->
+            <ion-searchbar
+              [(ngModel)]="termoPesquisaFuncionario"
+              (ionInput)="pesquisarFuncionarios()"
+              placeholder="Pesquisar funcionários..."
+              show-clear-button="focus">
+            </ion-searchbar>
+
+            <!-- Lista de funcionários -->
+            <ion-list *ngIf="funcionariosDisponiveis.length > 0; else semFuncionarios">
+              <ion-item *ngFor="let funcionario of funcionariosDisponiveis" button (click)="selecionarFuncionario(funcionario)">
+                <ion-thumbnail slot="start">
+                  <div class="avatar-funcionario">
+                    {{ funcionario.nome_completo.charAt(0).toUpperCase() }}
+                  </div>
+                </ion-thumbnail>
+
+                <ion-label>
+                  <h2>{{ funcionario.nome_completo }}</h2>
+                  <p>{{ funcionario.cargo }} - {{ funcionario.departamento }}</p>
+                  <p *ngIf="funcionario.email" class="email-info">
+                    <ion-icon name="mail" size="small"></ion-icon>
+                    {{ funcionario.email }}
+                  </p>
+                  <p *ngIf="funcionario.endereco">{{ funcionario.endereco }}{{ funcionario.numero_endereco ? ', ' + funcionario.numero_endereco : '' }}</p>
+                </ion-label>
+
+                <ion-chip slot="end" [color]="funcionario.status === 'ativo' ? 'success' : 'danger'">
+                  {{ funcionario.status === 'ativo' ? 'Ativo' : 'Inativo' }}
+                </ion-chip>
+              </ion-item>
+            </ion-list>
+
+            <ng-template #semFuncionarios>
+              <div class="sem-dados">
+                <ion-icon name="people" size="large" color="medium"></ion-icon>
+                <h3>Nenhum funcionário encontrado</h3>
+                <p>Não há funcionários disponíveis para associação.</p>
+              </div>
+            </ng-template>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

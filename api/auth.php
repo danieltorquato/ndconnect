@@ -25,12 +25,12 @@ switch ($method) {
             case 'login':
                 $data = json_decode(file_get_contents('php://input'), true);
 
-                if (!isset($data['email']) || !isset($data['senha'])) {
-                    echo json_encode(['success' => false, 'message' => 'Email e senha são obrigatórios']);
+                if (!isset($data['usuario']) || !isset($data['senha'])) {
+                    echo json_encode(['success' => false, 'message' => 'Usuário e senha são obrigatórios']);
                     exit();
                 }
 
-                $result = $authService->login($data['email'], $data['senha']);
+                $result = $authService->login($data['usuario'], $data['senha']);
                 echo json_encode($result);
                 break;
 

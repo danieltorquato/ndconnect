@@ -76,7 +76,7 @@ export class LoginPage implements OnInit {
   showPassword = false;
   isLoading = false;
   errorMessage = '';
-  isEmailFocused = false;
+  isUsuarioFocused = false;
   isPasswordFocused = false;
   buttonRipple = false;
 
@@ -90,7 +90,7 @@ export class LoginPage implements OnInit {
     addIcons({person, alertCircle, lockClosed, logIn, logoFacebook, logoTwitter, logoGoogle, arrowBack, eye, eyeOff});
 
             this.loginForm = this.formBuilder.group({
-              email: ['', [Validators.required, Validators.email]],
+              usuario: ['', [Validators.required, Validators.minLength(3)]],
               senha: ['', [Validators.required, Validators.minLength(6)]]
             });
   }
@@ -111,10 +111,10 @@ export class LoginPage implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { email, senha } = this.loginForm.value;
+    const { usuario, senha } = this.loginForm.value;
 
     try {
-      const response = await this.authService.login(email, senha).toPromise();
+      const response = await this.authService.login(usuario, senha).toPromise();
 
       if (response?.success) {
         await this.showToast('Login realizado com sucesso!', 'success');
@@ -153,9 +153,6 @@ export class LoginPage implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  goToRegister() {
-    this.router.navigate(['/register']);
-  }
 
   goToHome() {
     this.router.navigate(['/home']);
@@ -171,8 +168,8 @@ export class LoginPage implements OnInit {
   // Métodos para animações
   onInputFocus(event: any) {
     const input = event.target;
-    if (input.name === 'email') {
-      this.isEmailFocused = true;
+    if (input.name === 'usuario') {
+      this.isUsuarioFocused = true;
     } else if (input.name === 'senha') {
       this.isPasswordFocused = true;
     }
@@ -180,8 +177,8 @@ export class LoginPage implements OnInit {
 
   onInputBlur(event: any) {
     const input = event.target;
-    if (input.name === 'email') {
-      this.isEmailFocused = false;
+    if (input.name === 'usuario') {
+      this.isUsuarioFocused = false;
     } else if (input.name === 'senha') {
       this.isPasswordFocused = false;
     }

@@ -580,25 +580,6 @@
   gap: 16px;
 }
 
-.register-text {
-  margin: 0;
-  color: var(--gray-600);
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.register-link {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.register-link:hover {
-  color: var(--secondary);
-  text-decoration: underline;
-}
 
 .home-link {
   color: var(--primary);
