@@ -3,13 +3,27 @@ require_once 'Controllers/OrcamentoController.php';
 
 // Função para converter imagem para base64
 function getLogoBase64() {
-    $logoPath = __DIR__ . '/../src/assets/img/logo.jpeg';
-    if (file_exists($logoPath)) {
-        $imageData = file_get_contents($logoPath);
-        $base64 = base64_encode($imageData);
-        return 'data:image/jpeg;base64,' . $base64;
-    }
-    return null;
+  $logoPath = 'https://ndconnect.torquatoit.com/assets/img/logo.jpeg';
+
+  // Tentar carregar a imagem da URL
+  $imageData = @file_get_contents($logoPath);
+
+  if ($imageData !== false && !empty($imageData)) {
+      $base64 = base64_encode($imageData);
+      return 'data:image/jpeg;base64,' . $base64;
+  }
+
+  // Fallback: tentar carregar do caminho local
+  $localPath = __DIR__ . '/../src/assets/img/logo.jpeg';
+  if (file_exists($localPath)) {
+      $imageData = file_get_contents($localPath);
+      if ($imageData !== false) {
+          $base64 = base64_encode($imageData);
+          return 'data:image/jpeg;base64,' . $base64;
+      }
+  }
+
+  return null;
 }
 
 function gerarPDFSimples($orcamento) {
@@ -64,14 +78,14 @@ function gerarPDFSimples($orcamento) {
             /* Header com logo circular */
             .header {
                 text-align: center;
-                padding: 20px 0;
+                padding: 0px 0;
                 background: white;
             }
 
             .logo-container {
                 display: inline-block;
-                width: 80px;
-                height: 80px;
+                width: 100px;
+                height:100px;
                 background: #0C2B59;
                 border-radius: 50%;
                 display: flex;
@@ -101,7 +115,7 @@ function gerarPDFSimples($orcamento) {
             }
 
             .logo {
-                max-width: 60px;
+                max-width:100px;
                 height: auto;
                 border-radius: 50%;
             }
@@ -463,13 +477,10 @@ function gerarPDFSimples($orcamento) {
 
             <!-- Faixa principal -->
             <div class="blue-bar">
-                EQUIPAMENTOS PARA EVENTOS
+                   ORÇAMENTO N° ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '
             </div>
 
-            <!-- Número do orçamento -->
-            <div class="blue-bar small">
-                ORÇAMENTO N° ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '
-            </div>
+
 
             <!-- Dados do cliente -->
             <div class="blue-bar left">
@@ -479,19 +490,19 @@ function gerarPDFSimples($orcamento) {
                 <div class="cliente-grid">
                     <div class="cliente-item">
                         <div class="cliente-label">NOME</div>
-                        <div class="cliente-value">' . htmlspecialchars($cliente_nome) . '</div>
+                        <div class="cliente-value">' . htmlspecialchars(empty($cliente_nome) ? 'Não Informado' : $cliente_nome) . '</div>
                     </div>
                     <div class="cliente-item">
                         <div class="cliente-label">E-MAIL</div>
-                        <div class="cliente-value">' . htmlspecialchars($cliente_email) . '</div>
+                        <div class="cliente-value">' . htmlspecialchars(empty($cliente_email) ? 'Não Informado' : $cliente_email) . '</div>
                     </div>
                     <div class="cliente-item">
                         <div class="cliente-label">TELEFONE</div>
-                        <div class="cliente-value">' . htmlspecialchars($cliente_telefone) . '</div>
+                        <div class="cliente-value">' . htmlspecialchars(empty($cliente_telefone) ? 'Não Informado' : $cliente_telefone) . '</div>
                     </div>
                     <div class="cliente-item">
                         <div class="cliente-label">CPF/CNPJ</div>
-                        <div class="cliente-value">' . htmlspecialchars($cliente_cpf_cnpj) . '</div>
+                        <div class="cliente-value">' . htmlspecialchars(empty($cliente_cpf_cnpj) ? 'Não Informado' : $cliente_cpf_cnpj) . '</div>
                     </div>
                 </div>
             </div>
@@ -604,7 +615,7 @@ function gerarPDFSimples($orcamento) {
         <script>
         async function shareWhatsApp() {
             try {
-                const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $id . '";
+                const pdfUrl = window.location.origin + "/api/pdf_real.php?id=' . $id . '";
                 const message = "🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*\\n\\nOlá ' . htmlspecialchars($cliente_nome) . '! 👋\\n\\nSegue o orçamento solicitado:\\n\\n📋 *Orçamento Nº ' . str_pad($numero_orcamento, 6, '0', STR_PAD_LEFT) . '*\\n💰 *Valor Total: R$ ' . number_format($total, 2, ',', '.') . '*\\n📅 *Válido até: ' . date('d/m/Y', strtotime($data_validade)) . '*\\n\\n📄 *PDF em anexo*\\n\\n✨ *Agradecemos pela preferência!*\\n🎉 *N.D Connect - Sua parceira em eventos inesquecíveis*";
 
                 // Mostrar loading no botão
@@ -687,7 +698,7 @@ function gerarPDFSimples($orcamento) {
 
         function downloadPDF() {
             try {
-                window.open("/pdf_real.php?id=' . $id . '", "_blank");
+                window.open("/api/pdf_real.php?id=' . $id . '", "_blank");
             } catch (error) {
                 console.error("Erro ao baixar PDF:", error);
                 alert("Erro ao baixar PDF. Tente novamente.");
@@ -697,7 +708,7 @@ function gerarPDFSimples($orcamento) {
         async function shareEmail() {
             try {
                 const orcamentoUrl = window.location.href;
-                const pdfUrl = window.location.origin + "/pdf_real.php?id=' . $id . '";
+                const pdfUrl = window.location.origin + "/api/pdf_real.php?id=' . $id . '";
 
                 const email = "' . htmlspecialchars($cliente_email) . '";
                 let emailUrl;
@@ -773,3 +784,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     echo 'ID do orçamento não fornecido';
 }
 ?>
+

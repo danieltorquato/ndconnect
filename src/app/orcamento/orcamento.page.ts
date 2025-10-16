@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, remove, calculator, document as documentIcon, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash } from 'ionicons/icons';
+import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +32,9 @@ interface ItemOrcamento {
   preco_unitario: number;
   subtotal: number;
   unidade: string;
+  desconto_porcentagem?: number;
+  desconto_valor?: number;
+  subtotal_com_desconto?: number;
 }
 
 interface Cliente {
@@ -71,6 +74,7 @@ export class OrcamentoPage implements OnInit {
 
   observacoes: string = '';
   desconto: number = 0;
+  descontoTipo: 'valor' | 'porcentagem' = 'valor';
   subtotal: number = 0;
   total: number = 0;
   dataValidade: string = '';
@@ -85,7 +89,7 @@ export class OrcamentoPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    addIcons({list,search,close,add,remove,person,calendar,warning,documentText,calculator,trash,document:documentIcon,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,informationCircle,star,home});
+    addIcons({list,search,close,add,remove,person,calendar,warning,documentText,calculator,trash,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,informationCircle,star,home});
   }
 
   ngOnInit() {
@@ -267,7 +271,10 @@ export class OrcamentoPage implements OnInit {
         quantidade: 1,
         preco_unitario: Number(produto.preco),
         subtotal: Number(produto.preco),
-        unidade: produto.unidade
+        unidade: produto.unidade,
+        desconto_porcentagem: 0,
+        desconto_valor: 0,
+        subtotal_com_desconto: Number(produto.preco)
       };
       // Criar nova referência do array para forçar atualização
       this.itensOrcamento = [...this.itensOrcamento, novoItem];
@@ -295,6 +302,7 @@ export class OrcamentoPage implements OnInit {
       } else {
         item.quantidade = quantidade;
         item.subtotal = Number(item.quantidade) * Number(item.preco_unitario);
+        this.calcularDescontoItem(item);
         // Criar nova referência do array para forçar atualização
         this.itensOrcamento = [...this.itensOrcamento];
         this.calcularTotal();
@@ -303,9 +311,51 @@ export class OrcamentoPage implements OnInit {
     }
   }
 
+  calcularDescontoItem(item: ItemOrcamento) {
+    const subtotalBase = item.subtotal;
+
+    if (item.desconto_porcentagem && item.desconto_porcentagem > 0) {
+      const valorDesconto = (subtotalBase * item.desconto_porcentagem) / 100;
+      item.desconto_valor = valorDesconto;
+      item.subtotal_com_desconto = subtotalBase - valorDesconto;
+    } else if (item.desconto_valor && item.desconto_valor > 0) {
+      item.desconto_porcentagem = (item.desconto_valor / subtotalBase) * 100;
+      item.subtotal_com_desconto = subtotalBase - item.desconto_valor;
+    } else {
+      item.desconto_valor = 0;
+      item.desconto_porcentagem = 0;
+      item.subtotal_com_desconto = subtotalBase;
+    }
+  }
+
+  aplicarDescontoItem(produtoId: number, tipo: 'porcentagem' | 'valor', valor: number) {
+    const item = this.itensOrcamento.find(item => item.produto_id === produtoId);
+    if (item) {
+      if (tipo === 'porcentagem') {
+        item.desconto_porcentagem = valor;
+        item.desconto_valor = 0;
+      } else {
+        item.desconto_valor = valor;
+        item.desconto_porcentagem = 0;
+      }
+      this.calcularDescontoItem(item);
+      this.calcularTotal();
+    }
+  }
+
   calcularTotal() {
-    this.subtotal = this.itensOrcamento.reduce((total, item) => total + Number(item.subtotal), 0);
-    this.total = Number(this.subtotal) - Number(this.desconto);
+    // Calcular subtotal com descontos dos itens
+    this.subtotal = this.itensOrcamento.reduce((total, item) => {
+      return total + (item.subtotal_com_desconto || item.subtotal);
+    }, 0);
+
+    // Aplicar desconto geral
+    if (this.descontoTipo === 'porcentagem') {
+      const valorDescontoGeral = (this.subtotal * this.desconto) / 100;
+      this.total = this.subtotal - valorDescontoGeral;
+    } else {
+      this.total = this.subtotal - this.desconto;
+    }
   }
 
   gerarOrcamento() {
@@ -329,6 +379,7 @@ export class OrcamentoPage implements OnInit {
       itens: this.itensOrcamento,
       observacoes: this.observacoes,
       desconto: this.desconto,
+      desconto_tipo: this.descontoTipo,
       subtotal: this.subtotal,
       total: this.total,
       data_orcamento: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD

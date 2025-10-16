@@ -1,0 +1,16 @@
+{
+  "name": "ndconnect-pdf-generator",
+  "version": "1.0.0",
+  "description": "Gerador de PDFs para orçamentos N.D Connect usando Browsershot",
+  "main": "pdf-generator.js",
+  "scripts": {
+    "test": "node pdf-generator.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "browsershot": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

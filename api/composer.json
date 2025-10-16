@@ -3,7 +3,7 @@
     "description": "Sistema de Orçamentos N.D Connect",
     "type": "project",
     "require": {
-        "tecnickcom/tcpdf": "^6.7"
+        "mpdf/mpdf": "^8.2"
     },
     "autoload": {
         "psr-4": {

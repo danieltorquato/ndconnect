@@ -143,6 +143,38 @@
               <h4>{{item.produto_nome}}</h4>
               <p class="categoria">{{item.categoria_nome}}</p>
               <p class="preco-unitario">R$ {{item.preco_unitario | number:'1.2-2'}} / {{item.unidade}}</p>
+
+              <!-- Seção de desconto por item -->
+              <div class="desconto-item" style="margin-top: 8px;">
+                <ion-grid>
+                  <ion-row>
+                    <ion-col size="6">
+                      <ion-item lines="none" style="--padding-start: 0; --padding-end: 0;">
+                        <ion-label position="stacked" style="font-size: 12px;">Desconto %</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="item.desconto_porcentagem || 0"
+                          (ionInput)="aplicarDescontoItem(item.produto_id, 'porcentagem', +($event.target.value ?? 0))"
+                          placeholder="0"
+                          style="font-size: 14px;">
+                        </ion-input>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col size="6">
+                      <ion-item lines="none" style="--padding-start: 0; --padding-end: 0;">
+                        <ion-label position="stacked" style="font-size: 12px;">Desconto R$</ion-label>
+                        <ion-input
+                          type="number"
+                          [value]="item.desconto_valor || 0"
+                          (ionInput)="aplicarDescontoItem(item.produto_id, 'valor', +($event.target.value ?? 0))"
+                          placeholder="0.00"
+                          style="font-size: 14px;">
+                        </ion-input>
+                      </ion-item>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </div>
             </div>
             <div class="item-controls">
               <ion-button
@@ -158,7 +190,19 @@
                 (click)="atualizarQuantidade(item.produto_id, item.quantidade + 1)">
                 <ion-icon name="add"></ion-icon>
               </ion-button>
-              <span class="subtotal">R$ {{item.subtotal | number:'1.2-2'}}</span>
+              <div class="valores-item">
+                <span class="subtotal" *ngIf="!item.subtotal_com_desconto || item.subtotal_com_desconto === item.subtotal">
+                  R$ {{item.subtotal | number:'1.2-2'}}
+                </span>
+                <div *ngIf="item.subtotal_com_desconto && item.subtotal_com_desconto !== item.subtotal" class="subtotal-com-desconto">
+                  <span class="subtotal-original" style="text-decoration: line-through; color: #999; font-size: 12px;">
+                    R$ {{item.subtotal | number:'1.2-2'}}
+                  </span>
+                  <span class="subtotal-final" style="color: #2dd36f; font-weight: bold;">
+                    R$ {{item.subtotal_com_desconto | number:'1.2-2'}}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </ion-item>
@@ -171,12 +215,22 @@
         </ion-item>
         <ion-item>
           <ion-label>Desconto:</ion-label>
+          <ion-select
+            [(ngModel)]="descontoTipo"
+            (ionChange)="calcularTotal()"
+            slot="end"
+            interface="popover"
+            style="min-width: 100px;">
+            <ion-select-option value="valor">R$</ion-select-option>
+            <ion-select-option value="porcentagem">%</ion-select-option>
+          </ion-select>
           <ion-input
             type="number"
             [(ngModel)]="desconto"
             (ionInput)="calcularTotal()"
-            placeholder="0.00"
-            slot="end">
+            [placeholder]="descontoTipo === 'valor' ? '0.00' : '0'"
+            slot="end"
+            style="min-width: 80px;">
           </ion-input>
         </ion-item>
         <ion-item class="total-item">

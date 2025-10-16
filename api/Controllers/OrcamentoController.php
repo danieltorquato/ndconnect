@@ -27,9 +27,11 @@ class OrcamentoController {
             $data_validade = isset($dados['data_validade']) ? $dados['data_validade'] : date('Y-m-d', strtotime('+10 days'));
 
             // Inserir orçamento
+            $desconto_tipo = isset($dados['desconto_tipo']) ? $dados['desconto_tipo'] : 'valor';
+
             $query = "INSERT INTO " . $this->table_orcamento . "
-                     (cliente_id, numero_orcamento, data_orcamento, data_validade, subtotal, desconto, total, observacoes)
-                     VALUES (:cliente_id, :numero_orcamento, :data_orcamento, :data_validade, :subtotal, :desconto, :total, :observacoes)";
+                     (cliente_id, numero_orcamento, data_orcamento, data_validade, subtotal, desconto, desconto_tipo, total, observacoes)
+                     VALUES (:cliente_id, :numero_orcamento, :data_orcamento, :data_validade, :subtotal, :desconto, :desconto_tipo, :total, :observacoes)";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':cliente_id', $cliente_id);
@@ -38,6 +40,7 @@ class OrcamentoController {
             $stmt->bindParam(':data_validade', $data_validade);
             $stmt->bindParam(':subtotal', $dados['subtotal']);
             $stmt->bindParam(':desconto', $dados['desconto']);
+            $stmt->bindParam(':desconto_tipo', $desconto_tipo);
             $stmt->bindParam(':total', $dados['total']);
             $stmt->bindParam(':observacoes', $dados['observacoes']);
             $stmt->execute();
@@ -46,9 +49,13 @@ class OrcamentoController {
 
             // Inserir itens do orçamento
             foreach ($dados['itens'] as $item) {
+                $desconto_porcentagem = isset($item['desconto_porcentagem']) ? $item['desconto_porcentagem'] : 0;
+                $desconto_valor = isset($item['desconto_valor']) ? $item['desconto_valor'] : 0;
+                $subtotal_com_desconto = isset($item['subtotal_com_desconto']) ? $item['subtotal_com_desconto'] : $item['subtotal'];
+
                 $query_item = "INSERT INTO " . $this->table_itens . "
-                              (orcamento_id, produto_id, quantidade, preco_unitario, subtotal)
-                              VALUES (:orcamento_id, :produto_id, :quantidade, :preco_unitario, :subtotal)";
+                              (orcamento_id, produto_id, quantidade, preco_unitario, subtotal, desconto_porcentagem, desconto_valor, subtotal_com_desconto)
+                              VALUES (:orcamento_id, :produto_id, :quantidade, :preco_unitario, :subtotal, :desconto_porcentagem, :desconto_valor, :subtotal_com_desconto)";
 
                 $stmt_item = $this->conn->prepare($query_item);
                 $stmt_item->bindParam(':orcamento_id', $orcamento_id);
@@ -56,6 +63,9 @@ class OrcamentoController {
                 $stmt_item->bindParam(':quantidade', $item['quantidade']);
                 $stmt_item->bindParam(':preco_unitario', $item['preco_unitario']);
                 $stmt_item->bindParam(':subtotal', $item['subtotal']);
+                $stmt_item->bindParam(':desconto_porcentagem', $desconto_porcentagem);
+                $stmt_item->bindParam(':desconto_valor', $desconto_valor);
+                $stmt_item->bindParam(':subtotal_com_desconto', $subtotal_com_desconto);
                 $stmt_item->execute();
             }
 
@@ -90,7 +100,7 @@ class OrcamentoController {
         $cpf_cnpj = isset($cliente_data['cpf_cnpj']) ? $cliente_data['cpf_cnpj'] : '';
         $email = isset($cliente_data['email']) ? $cliente_data['email'] : '';
         $telefone = isset($cliente_data['telefone']) ? $cliente_data['telefone'] : '';
-        
+
         $stmt->bindParam(':cpf_cnpj', $cpf_cnpj);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':telefone', $telefone);
@@ -108,14 +118,14 @@ class OrcamentoController {
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nome', $cliente_data['nome']);
-        
+
         $email = isset($cliente_data['email']) ? $cliente_data['email'] : '';
         $telefone = isset($cliente_data['telefone']) ? $cliente_data['telefone'] : '';
         $endereco = isset($cliente_data['endereco']) ? $cliente_data['endereco'] : '';
         $cpf_cnpj = isset($cliente_data['cpf_cnpj']) ? $cliente_data['cpf_cnpj'] : '';
         $tipo = isset($cliente_data['tipo']) ? $cliente_data['tipo'] : 'pessoa_fisica';
         $status = isset($cliente_data['status']) ? $cliente_data['status'] : 'ativo';
-        
+
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':telefone', $telefone);
         $stmt->bindParam(':endereco', $endereco);
@@ -128,13 +138,46 @@ class OrcamentoController {
     }
 
     private function generateNumeroOrcamento() {
-        $query = "SELECT COUNT(*) as total FROM " . $this->table_orcamento;
+        // Primeiro, verificar se há orçamentos com números inconsistentes
+        $this->sincronizarNumerosOrcamento();
+
+        $query = "SELECT MAX(id) as max_id FROM " . $this->table_orcamento;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $numero = $result['total'] + 1;
+        $numero = ($result['max_id'] ?? 0) + 1;
         return str_pad($numero, 6, '0', STR_PAD_LEFT);
+    }
+
+    private function sincronizarNumerosOrcamento() {
+        try {
+            // Buscar orçamentos onde o numero_orcamento não corresponde ao ID
+            $query = "SELECT id, numero_orcamento FROM " . $this->table_orcamento . "
+                     WHERE CAST(numero_orcamento AS UNSIGNED) != id
+                     ORDER BY id";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $orcamentos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Atualizar números inconsistentes
+            foreach ($orcamentos as $orcamento) {
+                $novo_numero = str_pad($orcamento['id'], 6, '0', STR_PAD_LEFT);
+
+                $update_query = "UPDATE " . $this->table_orcamento . "
+                                SET numero_orcamento = :novo_numero
+                                WHERE id = :id";
+
+                $update_stmt = $this->conn->prepare($update_query);
+                $update_stmt->bindParam(':novo_numero', $novo_numero);
+                $update_stmt->bindParam(':id', $orcamento['id']);
+                $update_stmt->execute();
+            }
+        } catch (Exception $e) {
+            // Log do erro, mas não interrompe o processo
+            error_log('Erro ao sincronizar números de orçamento: ' . $e->getMessage());
+        }
     }
 
     public function getAll() {

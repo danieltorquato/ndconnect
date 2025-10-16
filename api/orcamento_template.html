@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento N.D Connect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: white;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+        }
+
+        /* Cores N.D Connect */
+        :root {
+            --azul-marinho: #0C2B59;
+            --laranja: #E8622D;
+            --amarelo: #F7A64C;
+            --cinza-claro: #F8FAFC;
+            --cinza-escuro: #64748B;
+            --verde: #059669;
+        }
+
+        /* Header */
+        .header {
+            background: var(--azul-marinho);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* Número do Orçamento */
+        .orcamento-numero {
+            background: white;
+            color: var(--azul-marinho);
+            text-align: center;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Dados do Cliente */
+        .dados-cliente {
+            background: var(--azul-marinho);
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+        }
+
+        .dados-cliente h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .cliente-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .cliente-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .cliente-label {
+            font-weight: bold;
+            color: var(--cinza-escuro);
+            margin-right: 8px;
+            min-width: 80px;
+        }
+
+        .cliente-value {
+            color: white;
+        }
+
+        /* Seção de Datas */
+        .datas {
+            background: var(--cinza-claro);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .datas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .data-label {
+            font-weight: bold;
+            color: var(--cinza-escuro);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .data-value {
+            color: var(--azul-marinho);
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Título da Seção de Itens */
+        .itens-titulo {
+            background: var(--laranja);
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0 0 0;
+        }
+
+        /* Tabela de Itens */
+        .tabela-itens {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .tabela-itens th {
+            background: var(--laranja);
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .tabela-itens th:nth-child(2),
+        .tabela-itens th:nth-child(3),
+        .tabela-itens th:nth-child(4),
+        .tabela-itens th:nth-child(5) {
+            text-align: center;
+        }
+
+        .tabela-itens td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            font-size: 10px;
+        }
+
+        .tabela-itens tr:nth-child(even) {
+            background: var(--cinza-claro);
+        }
+
+        .produto-nome {
+            font-weight: bold;
+            color: var(--azul-marinho);
+        }
+
+        .quantidade,
+        .unidade {
+            text-align: center;
+        }
+
+        .preco-unitario {
+            color: var(--verde);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .subtotal {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Seção de Totais */
+        .totais {
+            background: var(--cinza-claro);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .total-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .total-label {
+            color: var(--cinza-escuro);
+            font-weight: bold;
+        }
+
+        .total-value {
+            font-weight: bold;
+        }
+
+        .desconto {
+            color: #dc2626;
+        }
+
+        .total-final {
+            border-top: 2px solid var(--laranja);
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .total-final .total-label {
+            color: var(--laranja);
+        }
+
+        .total-final .total-value {
+            color: var(--laranja);
+            font-size: 20px;
+        }
+
+        /* Observações */
+        .observacoes {
+            background: #fef3c7;
+            border: 2px solid var(--amarelo);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .observacoes h3 {
+            color: var(--azul-marinho);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .observacoes p {
+            color: #92400e;
+            font-style: italic;
+            font-size: 11px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--azul-marinho);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .footer p {
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .footer .contato {
+            color: #cbd5e1;
+            font-size: 10px;
+        }
+
+        /* Responsividade para PDF */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Header -->
+        <div class="header">
+            <img src="../src/assets/img/logo.jpeg" alt="N.D Connect" class="logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="logo-text" style="display: none;">N.D CONNECT</div>
+            <div class="subtitle">EQUIPAMENTOS PARA EVENTOS</div>
+        </div>
+
+        <!-- Número do Orçamento -->
+        <div class="orcamento-numero">
+            ORÇAMENTO Nº <span id="numero-orcamento">000000</span>
+        </div>
+
+        <!-- Dados do Cliente -->
+        <div class="dados-cliente">
+            <h2>DADOS DO CLIENTE</h2>
+            <div class="cliente-grid">
+                <div class="cliente-item">
+                    <span class="cliente-label">NOME:</span>
+                    <span class="cliente-value" id="cliente-nome">-</span>
+                </div>
+                <div class="cliente-item">
+                    <span class="cliente-label">E-MAIL:</span>
+                    <span class="cliente-value" id="cliente-email">-</span>
+                </div>
+                <div class="cliente-item">
+                    <span class="cliente-label">TELEFONE:</span>
+                    <span class="cliente-value" id="cliente-telefone">-</span>
+                </div>
+                <div class="cliente-item">
+                    <span class="cliente-label">CPF/CNPJ:</span>
+                    <span class="cliente-value" id="cliente-cpf-cnpj">-</span>
+                </div>
+                <div class="cliente-item" id="endereco-item" style="display: none;">
+                    <span class="cliente-label">ENDEREÇO:</span>
+                    <span class="cliente-value" id="cliente-endereco">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Datas -->
+        <div class="datas">
+            <div class="datas-grid">
+                <div>
+                    <div class="data-label">DATA DO ORÇAMENTO</div>
+                    <div class="data-value" id="data-orcamento">-</div>
+                </div>
+                <div>
+                    <div class="data-label">VÁLIDO ATÉ</div>
+                    <div class="data-value" id="data-validade">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Título da Seção de Itens -->
+        <div class="itens-titulo">ITENS DO ORÇAMENTO</div>
+
+        <!-- Tabela de Itens -->
+        <table class="tabela-itens">
+            <thead>
+                <tr>
+                    <th>PRODUTO</th>
+                    <th>QTD</th>
+                    <th>PREÇO UNIT.</th>
+                    <th>SUBTOTAL</th>
+                    <th>UNID.</th>
+                </tr>
+            </thead>
+            <tbody id="itens-tabela">
+                <!-- Itens serão inseridos via JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Seção de Totais -->
+        <div class="totais">
+            <div class="total-item">
+                <span class="total-label">SUBTOTAL:</span>
+                <span class="total-value" id="subtotal">R$ 0,00</span>
+            </div>
+            <div class="total-item" id="desconto-item" style="display: none;">
+                <span class="total-label">DESCONTO:</span>
+                <span class="total-value desconto" id="desconto">- R$ 0,00</span>
+            </div>
+            <div class="total-item total-final">
+                <span class="total-label">TOTAL:</span>
+                <span class="total-value" id="total">R$ 0,00</span>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="observacoes" id="observacoes-container" style="display: none;">
+            <h3>OBSERVAÇÕES</h3>
+            <p id="observacoes-texto">-</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>N.D CONNECT - EQUIPAMENTOS PARA EVENTOS</h3>
+            <p>Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED</p>
+            <p class="contato">Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br | Site: www.ndconnect.com.br</p>
+        </div>
+    </div>
+
+    <script>
+        // Função para formatar moeda
+        function formatarMoeda(valor) {
+            return 'R$ ' + valor.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Função para formatar data
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        // Função para carregar dados do orçamento
+        function carregarDadosOrcamento(dados) {
+            // Número do orçamento
+            document.getElementById('numero-orcamento').textContent =
+                String(dados.numero_orcamento).padStart(6, '0');
+
+            // Dados do cliente
+            document.getElementById('cliente-nome').textContent = dados.cliente_nome || '-';
+            document.getElementById('cliente-email').textContent = dados.email || '-';
+            document.getElementById('cliente-telefone').textContent = dados.telefone || '-';
+            document.getElementById('cliente-cpf-cnpj').textContent = dados.cpf_cnpj || '-';
+
+            if (dados.endereco) {
+                document.getElementById('cliente-endereco').textContent = dados.endereco;
+                document.getElementById('endereco-item').style.display = 'flex';
+            }
+
+            // Datas
+            document.getElementById('data-orcamento').textContent = formatarData(dados.data_orcamento);
+            document.getElementById('data-validade').textContent = formatarData(dados.data_validade);
+
+            // Itens da tabela
+            const tbody = document.getElementById('itens-tabela');
+            tbody.innerHTML = '';
+
+            dados.itens.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="produto-nome">${item.produto_nome}</td>
+                    <td class="quantidade">${item.quantidade}</td>
+                    <td class="preco-unitario">${formatarMoeda(item.preco_unitario)}</td>
+                    <td class="subtotal">${formatarMoeda(item.subtotal)}</td>
+                    <td class="unidade">${item.unidade}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Totais
+            document.getElementById('subtotal').textContent = formatarMoeda(dados.subtotal);
+
+            if (dados.desconto > 0) {
+                document.getElementById('desconto').textContent = '- ' + formatarMoeda(dados.desconto);
+                document.getElementById('desconto-item').style.display = 'flex';
+            }
+
+            document.getElementById('total').textContent = formatarMoeda(dados.total);
+
+            // Observações
+            if (dados.observacoes) {
+                document.getElementById('observacoes-texto').textContent = dados.observacoes;
+                document.getElementById('observacoes-container').style.display = 'block';
+            }
+        }
+
+        // Carregar dados se fornecidos via URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orcamentoId = urlParams.get('id');
+
+        if (orcamentoId) {
+            // Fazer requisição para obter dados do orçamento
+            fetch(`get_orcamento_data.php?id=${orcamentoId}`)
+                .then(response => response.json())
+                .then(dados => carregarDadosOrcamento(dados))
+                .catch(error => console.error('Erro ao carregar dados:', error));
+        }
+    </script>
+</body>
+</html>

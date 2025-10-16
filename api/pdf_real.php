@@ -1,15 +1,21 @@
 <?php
-require_once 'Config/Database.php';
+// Gerador de PDF usando mPDF
+error_reporting(0);
+ini_set('display_errors', 0);
 
-// Incluir TCPDF
-if (file_exists('vendor/autoload.php')) {
-    require_once 'vendor/autoload.php';
-    if (!class_exists('TCPDF')) {
-        require_once 'tcpdf_simple.php';
+// Verificar se o mPDF está disponível
+if (!class_exists('Mpdf\Mpdf')) {
+    // Tentar carregar via autoload do Composer
+    if (file_exists('vendor/autoload.php')) {
+        require_once 'vendor/autoload.php';
+    } else {
+        die('mPDF não encontrado. Execute: composer install');
     }
-} else {
-    require_once 'tcpdf_simple.php';
 }
+
+use Mpdf\Mpdf;
+
+require_once 'Config/Database.php';
 
 // Função para obter dados do orçamento
 function getOrcamentoData($id) {
@@ -46,305 +52,594 @@ function getOrcamentoData($id) {
     return $orcamento;
 }
 
-// Verificar se o ID foi fornecido
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    die('ID do orçamento não fornecido');
-}
+// Função para converter imagem para base64
+function getLogoBase64() {
+    $logoPath = 'https://ndconnect.torquatoit.com/assets/img/logo.jpeg';
 
-$orcamentoId = (int)$_GET['id'];
-$orcamento = getOrcamentoData($orcamentoId);
+    // Tentar carregar a imagem da URL
+    $imageData = @file_get_contents($logoPath);
 
-if (!$orcamento) {
-    die('Orçamento não encontrado');
-}
-
-// Criar novo documento PDF
-$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-// Configurar informações do documento
-$pdf->SetCreator('N.D Connect');
-$pdf->SetAuthor('N.D Connect');
-$pdf->SetTitle('Orçamento N.D Connect - ' . $orcamentoId);
-$pdf->SetSubject('Orçamento de Equipamentos para Eventos');
-$pdf->SetKeywords('orçamento, eventos, equipamentos, N.D Connect');
-
-// Desabilitar cabeçalho e rodapé
-$pdf->setPrintHeader(false);
-$pdf->setPrintFooter(false);
-
-// Configurar margens
-$pdf->SetMargins(15, 0, 15);
-$pdf->SetHeaderMargin(0);
-$pdf->SetFooterMargin(0);
-
-// Configurar quebras de página automáticas
-$pdf->SetAutoPageBreak(TRUE, 25);
-
-// Adicionar uma página
-$pdf->AddPage();
-
-// Cores personalizadas N.D Connect
-$azulMarinho = array(12, 43, 89);    // #0C2B59
-$laranja = array(232, 98, 45);       // #E8622D
-$amarelo = array(247, 166, 76);      // #F7A64C
-$cinzaClaro = array(248, 250, 252);  // #f8fafc
-$cinzaEscuro = array(100, 116, 139); // #64748b
-
-// Header com logo pequeno no topo - APENAS JPEG
-$logoPath = __DIR__ . '/../src/assets/img/logo.jpeg';
-
-if (file_exists($logoPath)) {
-    // Tentar carregar como JPEG
-    $image = null;
-    if (function_exists('imagecreatefromjpeg')) {
-        $image = @imagecreatefromjpeg($logoPath);
+    if ($imageData !== false && !empty($imageData)) {
+        $base64 = base64_encode($imageData);
+        return 'data:image/jpeg;base64,' . $base64;
     }
 
-    if ($image) {
-        // Se conseguiu carregar com GD, processar
-        $width = imagesx($image);
-        $height = imagesy($image);
-
-        // Salvar como arquivo temporário JPEG
-        $tempJpeg = tempnam(sys_get_temp_dir(), 'logo_') . '.jpg';
-        imagejpeg($image, $tempJpeg, 90);
-
-        // Limpar memória
-        imagedestroy($image);
-
-        // Adicionar logo pequeno (60mm de largura) usando arquivo direto
-        $pdf->Image($tempJpeg, 75, 0, 60, 0, 'JPEG', '', 'C', false, 300, 'C', false, false, 0, false, false, false);
-        $pdf->Ln(40);
-
-        // Limpar arquivo temporário
-        unlink($tempJpeg);
-    } else {
-        // Se GD não funcionar, tentar arquivo direto
-        try {
-            $pdf->Image($logoPath, 75, 0, 60, 0, 'JPEG', '', 'C', false, 300, 'C', false, false, 0, false, false, false);
-            $pdf->Ln(40);
-        } catch (Exception $e) {
-            // Se falhar, usar texto
-            $pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-            $pdf->SetTextColor(255, 255, 255);
-            $pdf->SetFont('helvetica', 'B', 24);
-            $pdf->Cell(0, 20, 'N.D CONNECT', 0, 1, 'C', true);
+    // Fallback: tentar carregar do caminho local
+    $localPath = __DIR__ . '/../src/assets/img/logo.jpeg';
+    if (file_exists($localPath)) {
+        $imageData = file_get_contents($localPath);
+        if ($imageData !== false) {
+            $base64 = base64_encode($imageData);
+            return 'data:image/jpeg;base64,' . $base64;
         }
     }
-} else {
-    // Fallback para texto se logo não encontrada
-    $pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-    $pdf->SetTextColor(255, 255, 255);
-    $pdf->SetFont('helvetica', 'B', 24);
-    $pdf->Cell(0, 20, 'N.D CONNECT', 0, 1, 'C', true);
+
+    return null;
 }
 
-// Adicionar espaço antes da faixa azul
-$pdf->Ln(10);
+try {
+    // Iniciar buffer de output
+    ob_start();
 
-$pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetFont('helvetica', '', 14);
-$pdf->Cell(0, 8, 'EQUIPAMENTOS PARA EVENTOS', 0, 1, 'C', true);
+    // Verificar se o ID foi fornecido
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+        die('ID do orçamento não fornecido');
+    }
 
-// Número do orçamento com destaque
-$pdf->SetFillColor(255, 255, 255);
-$pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-$pdf->SetFont('helvetica', 'B', 16);
-$pdf->Cell(0, 12, 'ORÇAMENTO Nº ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT), 0, 1, 'C', true);
+    $orcamentoId = (int)$_GET['id'];
+    $orcamento = getOrcamentoData($orcamentoId);
 
-$pdf->Ln(0);
+    if (!$orcamento) {
+        die('Orçamento não encontrado');
+    }
 
-// Dados do cliente
-$pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetFont('helvetica', 'B', 14);
-$pdf->Cell(0, 10, 'DADOS DO CLIENTE', 0, 1, 'L', true);
+    // Obter logo em base64
+    $logoBase64 = getLogoBase64();
 
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Ln(8);
+        // Criar instância do mPDF
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'orientation' => 'P',
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 16,
+            'margin_bottom' => 16,
+            'margin_header' => 9,
+            'margin_footer' => 9,
+            'tempDir' => sys_get_temp_dir(),
+            'debug' => false,
+            'allow_charset_conversion' => false,
+            'autoScriptToLang' => false,
+            'autoLangToFont' => false
+        ]);
 
-// Grid de dados do cliente
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(25, 6, 'NOME', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 11);
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Cell(80, 6, $orcamento['cliente_nome'], 0, 0, 'L');
+    // Configurar metadados
+    $mpdf->SetTitle('Orçamento N.D Connect - ' . $orcamentoId);
+    $mpdf->SetAuthor('N.D Connect');
+    $mpdf->SetCreator('N.D Connect');
+    $mpdf->SetSubject('Orçamento de Equipamentos para Eventos');
+    $mpdf->SetKeywords('orçamento, eventos, equipamentos, N.D Connect');
 
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(20, 6, 'E-MAIL', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 11);
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Cell(0, 6, $orcamento['email'] ?? '', 0, 1, 'L');
+    // HTML do orçamento - Layout idêntico ao simple_pdf.php
+    $html = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Orçamento - ' . $orcamento['numero_orcamento'] . '</title>
+        <style>
+            /* Reset e base */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-$pdf->Ln(3);
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                line-height: 1.4;
+                color: #333;
+                background: white;
+                padding: 0;
+            }
 
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(25, 6, 'TELEFONE', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 11);
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Cell(80, 6, $orcamento['telefone'] ?? '', 0, 0, 'L');
+            /* Container principal */
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                overflow: hidden;
+            }
 
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(20, 6, 'CPF/CNPJ', 0, 0, 'L');
-$pdf->SetFont('helvetica', '', 11);
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Cell(0, 6, $orcamento['cpf_cnpj'] ?? '', 0, 1, 'L');
+            /* Header com logo circular */
+            .header {
+                text-align: center;
+                padding: 0px 0;
+                background: white;
+            }
 
-if (!empty($orcamento['endereco'])) {
-    $pdf->Ln(3);
-    $pdf->SetFont('helvetica', 'B', 10);
-    $pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-    $pdf->Cell(25, 6, 'ENDEREÇO', 0, 0, 'L');
-    $pdf->SetFont('helvetica', '', 11);
-    $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(0, 6, $orcamento['endereco'], 0, 1, 'L');
+            .logo-container {
+                display: inline-block;
+                width: 100px;
+                height: 100px;
+                background: #0C2B59;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 15px;
+                position: relative;
+            }
+
+            .logo-container::after {
+                content: "";
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                width: 20px;
+                height: 20px;
+                background: #E8622D;
+                border-radius: 50%;
+            }
+
+            .logo-text {
+                color: white;
+                font-weight: bold;
+                font-size: 12px;
+                text-align: center;
+                line-height: 1.2;
+            }
+
+            .logo {
+                max-width: 100px;
+                height: auto;
+                border-radius: 50%;
+            }
+
+            /* Faixas azuis */
+            .blue-bar {
+                background: #0C2B59;
+                color: white;
+                padding: 12px 20px;
+                text-align: center;
+                font-weight: bold;
+                font-size: 16px;
+                text-transform: uppercase;
+            }
+
+            .blue-bar.left {
+                text-align: left;
+                font-size: 14px;
+            }
+
+            .blue-bar.small {
+                font-size: 12px;
+                padding: 8px 20px;
+            }
+
+            /* Seção de dados do cliente */
+            .cliente-section {
+                background: white;
+                padding: 20px;
+            }
+
+            .cliente-table {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .cliente-label {
+                font-size: 11px;
+                color: #666;
+                font-weight: 500;
+                margin-bottom: 3px;
+                text-transform: uppercase;
+            }
+
+            .cliente-value {
+                font-size: 13px;
+                color: #333;
+                font-weight: 400;
+            }
+
+
+            /* Seção de datas */
+            .datas-section {
+                background: #F8FAFC;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .data-item {
+                text-align: center;
+                flex: 1;
+            }
+
+            .data-label {
+                font-size: 11px;
+                color: #666;
+                font-weight: 500;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+            }
+
+            .data-value {
+                font-size: 14px;
+                color: #333;
+                font-weight: bold;
+            }
+
+            /* Seção de itens */
+            .itens-section {
+                background: white;
+            }
+
+            .orange-bar {
+                background: #E8622D;
+                color: white;
+                padding: 12px 20px;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+            }
+
+            /* Tabela de itens */
+            .itens-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+            }
+
+            .itens-table th {
+                background: #0C2B59;
+                color: white;
+                padding: 12px 8px;
+                text-align: left;
+                font-weight: bold;
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+
+            .itens-table th.center {
+                text-align: center;
+            }
+
+            .itens-table td {
+                padding: 10px 8px;
+                border-bottom: 1px solid #eee;
+                font-size: 14px;
+                background: white;
+            }
+
+            .itens-table td.center {
+                text-align: center;
+            }
+
+            .itens-table td.right {
+                text-align: right;
+            }
+
+            .produto-nome {
+                font-weight: 600;
+                color: #333;
+                font-size: 15px;
+            }
+
+            /* Seção de totais */
+            .totais-section {
+                background: white;
+                padding: 20px;
+            }
+
+            .total-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 5px 0;
+                font-size: 13px;
+            }
+
+            .total-label {
+                color: #666;
+                font-weight: 400;
+            }
+
+            .total-value {
+                color: #333;
+                font-weight: 500;
+                float: right;
+            }
+
+            .total-separator {
+                height: 2px;
+                background: #E8622D;
+                margin: 10px 0;
+            }
+
+            .total-final {
+                font-size: 16px;
+                font-weight: bold;
+                color: #E8622D;
+            }
+
+            /* Observações */
+            .observacoes-section {
+                background: #FFF8DC;
+                padding: 15px 20px;
+                margin: 0;
+            }
+
+            .observacoes-title {
+                font-size: 12px;
+                font-weight: bold;
+                color: #0C2B59;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+            }
+
+            .observacoes-text {
+                font-size: 12px;
+                color: #333;
+                line-height: 1.4;
+            }
+
+            /* Footer */
+            .footer {
+                background: #0C2B59;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .footer-title {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+            }
+
+            .footer-specialization {
+                font-size: 11px;
+                margin-bottom: 8px;
+                opacity: 0.9;
+            }
+
+            .footer-contact {
+                font-size: 10px;
+                opacity: 0.8;
+            }
+
+            /* Print styles */
+            @media print {
+                .blue-bar {
+                    background: #0C2B59 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+
+                .orange-bar {
+                    background: #E8622D !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+
+                .footer {
+                    background: #0C2B59 !important;
+                    -webkit-print-color-adjust: exact;
+                    color-adjust: exact;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Header com logo -->
+            <div class="header">
+                ' . ($logoBase64 ? '<img src="' . $logoBase64 . '" alt="N.D Connect Logo" class="logo">' : '
+                <div class="logo-container">
+                    <div class="logo-text">N.D<br>CONNECT</div>
+                </div>
+                ') . '
+            </div>
+
+            <!-- Faixa principal -->
+            <div class="blue-bar">
+   ORÇAMENTO N° ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT) . '
+            </div>
+
+            <!-- Dados do cliente -->
+            <div class="blue-bar left">
+                DADOS DO CLIENTE
+            </div>
+            <div class="cliente-section">
+                <table class="cliente-table" cellpadding="10" cellspacing="0" border="0">
+                    <tr>
+                        <td width="50%" style="vertical-align: top;">
+                            <div class="cliente-label">NOME</div>
+                            <div class="cliente-value">' . htmlspecialchars((empty($orcamento['cliente_nome']) || trim($orcamento['cliente_nome']) === '') ? 'Não Informado' : $orcamento['cliente_nome']) . '</div>
+                        </td>
+                        <td width="50%" style="vertical-align: top;">
+                            <div class="cliente-label">E-MAIL</div>
+                            <div class="cliente-value">' . htmlspecialchars((empty($orcamento['email']) || trim($orcamento['email']) === '') ? 'Não Informado' : $orcamento['email']) . '</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="50%" style="vertical-align: top;">
+                            <div class="cliente-label">TELEFONE</div>
+                            <div class="cliente-value">' . htmlspecialchars((empty($orcamento['telefone']) || trim($orcamento['telefone']) === '') ? 'Não Informado' : $orcamento['telefone']) . '</div>
+                        </td>
+                        <td width="50%" style="vertical-align: top;">
+                            <div class="cliente-label">CPF/CNPJ</div>
+                            <div class="cliente-value">' . htmlspecialchars((empty($orcamento['cpf_cnpj']) || trim($orcamento['cpf_cnpj']) === '') ? 'Não Informado' : $orcamento['cpf_cnpj']) . '</div>
+                        </td>
+                    </tr>
+                </table>';
+
+    if (!empty($orcamento['endereco'])) {
+        $html .= '
+                </table>
+                <div style="margin-top: 10px;">
+                    <div class="cliente-label">ENDEREÇO</div>
+                    <div class="cliente-value">' . htmlspecialchars($orcamento['endereco']) . '</div>
+                </div>';
+    } else {
+        $html .= '
+                </table>';
+    }
+
+    $html .= '
+            </div>
+
+            <!-- Datas -->
+            <div class="datas-section">
+                <div class="data-item">
+                    <div class="data-label">DATA DO ORÇAMENTO</div>
+                    <div class="data-value">' . date('d/m/Y', strtotime($orcamento['data_orcamento'])) . '</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">VÁLIDO ATÉ</div>
+                    <div class="data-value">' . date('d/m/Y', strtotime($orcamento['data_validade'])) . '</div>
+                </div>
+            </div>
+
+            <!-- Itens do orçamento -->
+            <div class="orange-bar">
+                ITENS DO ORÇAMENTO
+            </div>
+            <div class="itens-section">
+                <table class="itens-table">
+                    <thead>
+                        <tr>
+                            <th>PRODUTO</th>
+                            <th class="center">QTD</th>
+                            <th class="center">PREÇO UNIT.</th>
+                            <th class="center">SUBTOTAL</th>
+                            <th class="center">UNID.</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        foreach ($orcamento['itens'] as $item) {
+            $subtotal_final = isset($item['subtotal_com_desconto']) && $item['subtotal_com_desconto'] > 0 ? $item['subtotal_com_desconto'] : $item['subtotal'];
+            $tem_desconto = isset($item['desconto_porcentagem']) && $item['desconto_porcentagem'] > 0 || isset($item['desconto_valor']) && $item['desconto_valor'] > 0;
+
+            $html .= '
+                            <tr>
+                                <td>
+                                    <div class="produto-nome">' . htmlspecialchars($item['produto_nome']) . '</div>';
+
+            if ($tem_desconto) {
+                $html .= '
+                                    <div style="font-size: 10px; color: #666; margin-top: 2px;">';
+                if (isset($item['desconto_porcentagem']) && $item['desconto_porcentagem'] > 0) {
+                    $html .= 'Desconto: ' . $item['desconto_porcentagem'] . '%';
+                } elseif (isset($item['desconto_valor']) && $item['desconto_valor'] > 0) {
+                    $html .= 'Desconto: R$ ' . number_format($item['desconto_valor'], 2, ',', '.');
+                }
+                $html .= '</div>';
+            }
+
+            $html .= '
+                                </td>
+                                <td class="center">' . $item['quantidade'] . '</td>
+                                <td class="right">R$ ' . number_format($item['preco_unitario'], 2, ',', '.') . '</td>';
+
+            if ($tem_desconto) {
+                $html .= '
+                                <td class="right">
+                                    <div style="text-decoration: line-through; color: #999; font-size: 11px;">R$ ' . number_format($item['subtotal'], 2, ',', '.') . '</div>
+                                    <div style="color: #2dd36f; font-weight: bold;">R$ ' . number_format($subtotal_final, 2, ',', '.') . '</div>
+                                </td>';
+            } else {
+                $html .= '
+                                <td class="right">R$ ' . number_format($subtotal_final, 2, ',', '.') . '</td>';
+            }
+
+            $html .= '
+                                <td class="center">' . htmlspecialchars($item['unidade']) . '</td>
+                            </tr>';
+        }
+
+    $html .= '
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totais -->
+            <div class="totais-section">';
+
+        // Calcular subtotal real considerando descontos dos itens
+        $subtotal_real = 0;
+        foreach ($orcamento['itens'] as $item) {
+            $subtotal_real += isset($item['subtotal_com_desconto']) && $item['subtotal_com_desconto'] > 0 ? $item['subtotal_com_desconto'] : $item['subtotal'];
+        }
+
+        $html .= '
+                <div class="total-item">
+                    <span class="total-label">SUBTOTAL:</span>
+                    <span class="total-value">R$ ' . number_format($subtotal_real, 2, ',', '.') . '</span>
+                </div>';
+
+        if ($orcamento['desconto'] > 0) {
+            $desconto_texto = '';
+            if (isset($orcamento['desconto_tipo']) && $orcamento['desconto_tipo'] === 'porcentagem') {
+                $desconto_texto = $orcamento['desconto'] . '%';
+            } else {
+                $desconto_texto = 'R$ ' . number_format($orcamento['desconto'], 2, ',', '.');
+            }
+
+            $html .= '
+                <div class="total-item">
+                    <span class="total-label">DESCONTO:</span>
+                    <span class="total-value">- ' . $desconto_texto . '</span>
+                </div>';
+        }
+
+    $html .= '
+                <div class="total-separator"></div>
+                <div class="total-item total-final">
+                    <span class="total-label">TOTAL:</span>
+                    <span class="total-value">R$ ' . number_format($orcamento['total'], 2, ',', '.') . '</span>
+                </div>
+            </div>';
+
+    if (!empty($orcamento['observacoes'])) {
+        $html .= '
+            <!-- Observações -->
+            <div class="observacoes-section">
+                <div class="observacoes-title">OBSERVAÇÕES</div>
+                <div class="observacoes-text">' . nl2br(htmlspecialchars($orcamento['observacoes'])) . '</div>
+            </div>';
+    }
+
+    $html .= '
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-title">N.D CONNECT - EQUIPAMENTOS PARA EVENTOS</div>
+                <div class="footer-specialization">Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED</div>
+                <div class="footer-contact">Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br</div>
+            </div>
+        </div>
+    </body>
+    </html>';
+
+        // Limpar buffer de output
+        ob_clean();
+
+        // Adicionar HTML ao mPDF
+        $mpdf->WriteHTML($html);
+
+        // Definir nome do arquivo
+        $filename = 'Orçamento N° ' . str_pad($orcamento['numero_orcamento'], 6, '0', STR_PAD_LEFT) . '.pdf';
+
+        // Gerar PDF
+        $mpdf->Output($filename, 'D');
+
+} catch (Exception $e) {
+    error_log('Erro no PDF mPDF: ' . $e->getMessage());
+    header('Content-Type: text/html');
+    die('Erro ao gerar PDF: ' . $e->getMessage());
 }
 
-$pdf->Ln(10);
-
-// Seção de datas
-$pdf->SetFillColor($cinzaClaro[0], $cinzaClaro[1], $cinzaClaro[2]);
-$pdf->Rect(15, $pdf->GetY(), 180, 15, 'F');
-
-$dataOrcamento = date('d/m/Y', strtotime($orcamento['data_orcamento']));
-$dataValidade = date('d/m/Y', strtotime($orcamento['data_validade']));
-
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(60, 8, 'DATA DO ORÇAMENTO', 0, 0, 'C');
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-$pdf->Cell(60, 8, $dataOrcamento, 0, 0, 'C');
-$pdf->SetFont('helvetica', 'B', 9);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(30, 8, 'VÁLIDO ATÉ', 0, 0, 'C');
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-$pdf->Cell(0, 8, $dataValidade, 0, 1, 'C');
-
-$pdf->Ln(15);
-
-// Título da seção de itens
-$pdf->SetFillColor($laranja[0], $laranja[1], $laranja[2]);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetFont('helvetica', 'B', 14);
-$pdf->Cell(0, 10, 'ITENS DO ORÇAMENTO', 0, 1, 'L', true);
-
-$pdf->Ln(5);
-
-// Cabeçalho da tabela
-$pdf->SetFillColor($laranja[0], $laranja[1], $laranja[2]);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetFont('helvetica', 'B', 10);
-
-$pdf->Cell(80, 8, 'PRODUTO', 1, 0, 'L', true);
-$pdf->Cell(20, 8, 'QTD', 1, 0, 'C', true);
-$pdf->Cell(30, 8, 'PREÇO UNIT.', 1, 0, 'C', true);
-$pdf->Cell(30, 8, 'SUBTOTAL', 1, 0, 'C', true);
-$pdf->Cell(20, 8, 'UNID.', 1, 1, 'C', true);
-
-// Itens da tabela
-$pdf->SetTextColor(0, 0, 0);
-$pdf->SetFont('helvetica', '', 9);
-
-foreach ($orcamento['itens'] as $index => $item) {
-    $bgColor = ($index % 2 == 0) ? array(255, 255, 255) : array(248, 250, 252);
-    $pdf->SetFillColor($bgColor[0], $bgColor[1], $bgColor[2]);
-
-    // Nome do produto
-    $pdf->SetFont('helvetica', 'B', 9);
-    $pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-    $pdf->Cell(80, 8, $item['produto_nome'], 1, 0, 'L', true);
-
-    // Quantidade
-    $pdf->SetFont('helvetica', '', 9);
-    $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(20, 8, $item['quantidade'], 1, 0, 'C', true);
-
-    // Preço unitário
-    $pdf->SetTextColor(5, 150, 105);
-    $pdf->SetFont('helvetica', 'B', 9);
-    $pdf->Cell(30, 8, 'R$ ' . number_format($item['preco_unitario'], 2, ',', '.'), 1, 0, 'C', true);
-
-    // Subtotal
-    $pdf->Cell(30, 8, 'R$ ' . number_format($item['subtotal'], 2, ',', '.'), 1, 0, 'C', true);
-
-    // Unidade
-    $pdf->SetTextColor(0, 0, 0);
-    $pdf->SetFont('helvetica', '', 9);
-    $pdf->Cell(20, 8, $item['unidade'], 1, 1, 'C', true);
-}
-
-$pdf->Ln(10);
-
-// Seção de totais
-$pdf->SetFillColor($cinzaClaro[0], $cinzaClaro[1], $cinzaClaro[2]);
-$pdf->Rect(15, $pdf->GetY(), 180, 40, 'F');
-
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-$pdf->Cell(120, 8, 'SUBTOTAL:', 0, 0, 'R');
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Cell(60, 8, 'R$ ' . number_format($orcamento['subtotal'], 2, ',', '.'), 0, 1, 'R');
-
-if ($orcamento['desconto'] > 0) {
-    $pdf->SetFont('helvetica', 'B', 12);
-    $pdf->SetTextColor($cinzaEscuro[0], $cinzaEscuro[1], $cinzaEscuro[2]);
-    $pdf->Cell(120, 8, 'DESCONTO:', 0, 0, 'R');
-    $pdf->SetTextColor(0, 0, 0);
-    $pdf->Cell(60, 8, '- R$ ' . number_format($orcamento['desconto'], 2, ',', '.'), 0, 1, 'R');
-}
-
-// Linha separadora
-$pdf->SetDrawColor($laranja[0], $laranja[1], $laranja[2]);
-$pdf->Line(15, $pdf->GetY() + 2, 195, $pdf->GetY() + 2);
-
-$pdf->Ln(5);
-
-// Total final
-$pdf->SetFont('helvetica', 'B', 16);
-$pdf->SetTextColor($laranja[0], $laranja[1], $laranja[2]);
-$pdf->Cell(120, 10, 'TOTAL:', 0, 0, 'R');
-$pdf->SetFont('helvetica', 'B', 18);
-$pdf->Cell(60, 10, 'R$ ' . number_format($orcamento['total'], 2, ',', '.'), 0, 1, 'R');
-
-$pdf->Ln(15);
-
-// Observações (se houver)
-if (!empty($orcamento['observacoes'])) {
-    $pdf->SetFillColor(254, 243, 199); // Amarelo claro
-    $pdf->SetDrawColor($amarelo[0], $amarelo[1], $amarelo[2]);
-    $pdf->Rect(15, $pdf->GetY(), 180, 25, 'FD');
-
-    $pdf->SetFont('helvetica', 'B', 12);
-    $pdf->SetTextColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-    $pdf->Cell(0, 6, 'OBSERVAÇÕES', 0, 1, 'L');
-
-    $pdf->SetFont('helvetica', 'I', 10);
-    $pdf->SetTextColor(146, 64, 14); // Marrom escuro
-    $pdf->MultiCell(170, 5, $orcamento['observacoes'], 0, 'L');
-
-    $pdf->Ln(10);
-}
-
-// Footer
-$pdf->SetFillColor($azulMarinho[0], $azulMarinho[1], $azulMarinho[2]);
-$pdf->SetTextColor(255, 255, 255);
-$pdf->SetFont('helvetica', 'B', 12);
-$pdf->Cell(0, 8, 'N.D CONNECT - EQUIPAMENTOS PARA EVENTOS', 0, 1, 'C', true);
-
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 5, 'Especializada em palcos, geradores, efeitos, stands, som, luz e painéis LED', 0, 1, 'C', true);
-
-$pdf->SetFont('helvetica', '', 9);
-$pdf->SetTextColor(200, 200, 200);
-$pdf->Cell(0, 4, 'Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br', 0, 1, 'C', true);
-
-// Gerar PDF
-$pdf->Output('orcamento_' . strtolower(explode(' ', $orcamento['cliente_nome'])[0]) . '_' . $orcamentoId . '.pdf', 'D');
-?>
