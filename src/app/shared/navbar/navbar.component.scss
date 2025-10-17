@@ -1,59 +1,75 @@
-// Variáveis CSS
+// Variáveis CSS - FORÇADAS para evitar mudanças do modo escuro
 :root {
-  --nd-primary: #0A1F3F;
-  --nd-secondary: #E8622D;
-  --nd-accent: #F4A261;
-  --nd-success: #2A9D8F;
-  --nd-warning: #E76F51;
-  --nd-light: #F8F9FA;
-  --nd-dark: #212529;
-  --nd-gray-100: #F8F9FA;
-  --nd-gray-200: #E9ECEF;
-  --nd-gray-300: #DEE2E6;
-  --nd-gray-400: #CED4DA;
-  --nd-gray-500: #ADB5BD;
-  --nd-gray-600: #6C757D;
-  --nd-gray-700: #495057;
-  --nd-gray-800: #343A40;
-  --nd-gray-900: #212529;
-  --nd-gradient: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-secondary) 100%);
-  --nd-gradient-primary: linear-gradient(135deg, #E8622D 0%, #F4A261 100%);
+  --nd-primary: #0C2B59 !important;
+  --nd-secondary: #E8622D !important;
+  --nd-accent: #F7A64C !important;
+  --nd-success: #10b981 !important;
+  --nd-warning: #F7A64C !important;
+  --nd-light: #FFFFFF !important;
+  --nd-dark: #0C2B59 !important;
+  --nd-gray-100: #F8FAFC !important;
+  --nd-gray-200: #E2E8F0 !important;
+  --nd-gray-300: #CBD5E1 !important;
+  --nd-gray-400: #94A3B8 !important;
+  --nd-gray-500: #64748B !important;
+  --nd-gray-600: #475569 !important;
+  --nd-gray-700: #334155 !important;
+  --nd-gray-800: #1E293B !important;
+  --nd-gray-900: #0F172A !important;
+  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%) !important;
+  --nd-gradient-primary: linear-gradient(135deg, #E8622D 0%, #F7A64C 100%) !important;
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-soft: 0 4px 20px rgba(10, 31, 63, 0.1);
-  --shadow-medium: 0 8px 30px rgba(10, 31, 63, 0.15);
-  --shadow-strong: 0 12px 40px rgba(10, 31, 63, 0.2);
+  --shadow-soft: 0 4px 20px rgba(12, 43, 89, 0.1);
+  --shadow-medium: 0 8px 30px rgba(12, 43, 89, 0.15);
+  --shadow-strong: 0 12px 40px rgba(12, 43, 89, 0.2);
 }
 
-// Header Glass Effect
+/* FORÇAR MODO CLARO - Proteção contra modo escuro */
+* {
+  color-scheme: light only !important;
+}
+
+/* Forçar cores específicas em todos os elementos do navbar */
+ion-header, ion-toolbar, .toolbar-container, .brand, .nav-menu, .nav-link, .user-menu, .user-btn, .dropdown-content, .dropdown-item, .mobile-menu, .mobile-nav, .mobile-nav-item {
+  color: var(--nd-light) !important;
+  background-color: transparent !important;
+}
+
+/* Forçar cores dos textos - Brancos no fundo azul */
+h1, h2, h3, h4, h5, h6, p, span, div, ion-label, ion-text, .brand-name, .user-name, .user-email, .user-level {
+  color: var(--nd-light) !important;
+}
+
+// Header Glass Effect - Estilo da imagem com fundo azul escuro
 .header-glass {
   ion-toolbar {
-    --background: rgba(255, 255, 255, 0.95);
-    --color: var(--nd-primary);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(232, 98, 45, 0.1);
-    box-shadow: var(--shadow-soft);
+    --background: var(--nd-primary) !important;
+    --color: var(--nd-light) !important;
+    background-color: var(--nd-primary) !important;
+    color: var(--nd-light) !important;
+    border-bottom: none;
+    box-shadow: 0 2px 10px rgba(12, 43, 89, 0.3);
   }
 }
 
-// Toolbar Premium
+// Toolbar Premium - Layout da imagem
 .toolbar-premium {
   .toolbar-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    max-width: 1200px;
+    padding: 0 30px;
+    max-width: 1400px;
     margin: 0 auto;
     width: 100%;
+    height: 70px;
   }
 }
 
-// Brand
+// Brand - Logo apenas como na imagem
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
   cursor: pointer;
   transition: var(--transition-smooth);
 
@@ -62,70 +78,69 @@
   }
 
   .brand-logo {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(232, 98, 45, 0.2);
-  }
-
-  .brand-name {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--nd-primary);
-    letter-spacing: -0.5px;
+    border-radius: 12px;
+    background-color: white;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
 
-// Navigation Menu
+// Navigation Menu - Centralizado como na imagem
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
+  flex: 1;
+  justify-content: center;
 
   .nav-link {
-    padding: 12px 20px;
-    color: var(--nd-gray-700);
+    padding: 12px 24px;
+    color: var(--nd-light) !important;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
-    border-radius: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
     transition: var(--transition-smooth);
     position: relative;
     cursor: pointer;
+    margin: 0 4px;
+
     &:hover {
-      background: rgba(232, 98, 45, 0.1);
-      color: var(--nd-primary);
-      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--nd-light);
     }
 
     &.active {
-      background: var(--nd-secondary);
-      color: white;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(232, 98, 45, 0.3);
+      background: var(--nd-secondary) !important;
+      color: var(--nd-light) !important;
+      box-shadow: 0 2px 8px rgba(232, 98, 45, 0.3);
     }
   }
 }
 
-// CTA Header Button
+// CTA Header Button - Estilo da imagem
 .cta-header {
-  --color: white;
-  --background: var(--nd-secondary);
-  --border-radius: 10px;
-  --padding-start: 24px;
-  --padding-end: 24px;
-  height: 44px;
+  --color: white !important;
+  --background: var(--nd-secondary) !important;
+  --border-radius: 8px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+  height: 50px;
   font-weight: 700;
   font-size: 0.9rem;
-  margin-left: 16px;
-  box-shadow: 0 4px 16px rgba(232, 98, 45, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 20px;
+  box-shadow: 0 4px 12px rgba(232, 98, 45, 0.3);
   transition: var(--transition-smooth);
 
   &:hover {
-    --background: #d55a2a;
+    --background: #d55a2a !important;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(232, 98, 45, 0.4);
+    box-shadow: 0 6px 16px rgba(232, 98, 45, 0.4);
   }
 }
 

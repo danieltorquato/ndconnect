@@ -195,6 +195,7 @@ try {
                 max-width: 100px;
                 height: auto;
                 border-radius: 50%;
+                margin-bottom: 10px;
             }
 
             /* Faixas azuis */

@@ -3,7 +3,7 @@ import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
-    path: 'home',
+    path: '',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
   {
@@ -48,11 +48,6 @@ export const routes: Routes = [
     path: 'produtos',
     loadComponent: () => import('./produtos/produtos.page').then((m) => m.ProdutosPage),
     canActivate: [AuthGuard],
-  },
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
   },
   {
     path: 'solicitar-orcamento',

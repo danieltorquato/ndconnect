@@ -34,21 +34,24 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
 
 /* Cores oficiais da N.D Connect - Aplicação global */
 :root {
-  // Cores principais
-  --nd-primary: #0C2B59;
-  --nd-secondary: #E8622D;
-  --nd-accent: #F7A64C;
-  --nd-light: #FFFFFF;
-  --nd-dark: #0C2B59;
-  --nd-medium: #64748b;
+  // Cores principais - FORÇADAS para evitar mudanças do modo escuro
+  --nd-primary: #0C2B59 !important;
+  --nd-secondary: #E8622D !important;
+  --nd-accent: #F7A64C !important;
+  --nd-light: #FFFFFF !important;
+  --nd-dark: #0C2B59 !important;
+  --nd-medium: #64748b !important;
 
   // Gradientes
-  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
-  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%);
+  --nd-gradient: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%) !important;
+  --nd-gradient-reverse: linear-gradient(135deg, var(--nd-accent) 0%, var(--nd-secondary) 100%) !important;
+
+  // Forçar modo claro globalmente
+  color-scheme: light only !important;
 }
 
 /* Aplicação global das cores nos componentes Ionic */
@@ -95,12 +98,69 @@ ion-badge {
 /* Melhorias de acessibilidade e contraste */
 :root {
   // Garantir contraste adequado
-  --ion-color-primary-contrast: var(--nd-light);
-  --ion-color-secondary-contrast: var(--nd-light);
-  --ion-color-tertiary-contrast: var(--nd-primary);
+  --ion-color-primary-contrast: var(--nd-light) !important;
+  --ion-color-secondary-contrast: var(--nd-light) !important;
+  --ion-color-tertiary-contrast: var(--nd-primary) !important;
 
   // Cores de foco para acessibilidade
-  --ion-color-primary-shade: #0a2440;
-  --ion-color-secondary-shade: #cc5627;
-  --ion-color-tertiary-shade: #d99343;
+  --ion-color-primary-shade: #0a2440 !important;
+  --ion-color-secondary-shade: #cc5627 !important;
+  --ion-color-tertiary-shade: #d99343 !important;
+}
+
+/* FORÇAR MODO CLARO - Prevenir mudanças do modo escuro do Chrome */
+* {
+  color-scheme: light only !important;
+}
+
+html, body {
+  color-scheme: light only !important;
+  background-color: #F8FAFC !important;
+  color: #0C2B59 !important;
+}
+
+/* Forçar cores específicas em todos os componentes Ionic */
+ion-app {
+  --background: #F8FAFC !important;
+  background-color: #F8FAFC !important;
+  color: #0C2B59 !important;
+}
+
+ion-content {
+  --background: #F8FAFC !important;
+  background-color: #F8FAFC !important;
+  color: #0C2B59 !important;
+}
+
+ion-page {
+  --background: #F8FAFC !important;
+  background-color: #F8FAFC !important;
+  color: #0C2B59 !important;
+}
+
+/* Garantir que textos não fiquem invisíveis */
+h1, h2, h3, h4, h5, h6, p, span, div, ion-label, ion-text {
+  color: #0C2B59 !important;
+}
+
+/* Forçar cores dos botões */
+ion-button {
+  --background: var(--nd-gradient) !important;
+  --color: var(--nd-light) !important;
+  color: var(--nd-light) !important;
+}
+
+/* Forçar cores dos cards */
+ion-card {
+  --background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #0C2B59 !important;
+}
+
+/* Forçar cores dos inputs */
+ion-input, ion-textarea, ion-select {
+  --background: #FFFFFF !important;
+  --color: #0C2B59 !important;
+  background-color: #FFFFFF !important;
+  color: #0C2B59 !important;
 }
