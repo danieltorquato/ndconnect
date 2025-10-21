@@ -1,0 +1,463 @@
+<ion-content class="tutorial-section-content">
+
+  <!-- Seção: Configurações do Sistema -->
+  <ion-card class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="settings" color="primary"></ion-icon>
+        Configurações do Sistema - Personalização Total
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>As <strong>Configurações do Sistema</strong> permitem personalizar completamente a experiência do usuário, desde perfil pessoal até configurações avançadas de segurança e funcionalidades.</p>
+      </div>
+
+      <!-- Accordion com subtópicos -->
+      <ion-accordion-group>
+
+        <!-- Como Configurar Perfil de Usuário -->
+        <ion-accordion value="perfil-usuario">
+          <ion-item slot="header" color="light">
+            <ion-icon name="person" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>Como Configurar Perfil de Usuário</h2>
+              <p>Personalize suas informações pessoais e preferências</p>
+            </ion-label>
+            <ion-badge color="primary" slot="end">Essencial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('perfil-usuario')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('perfil-usuario')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="profile-sections">
+              <h3><ion-icon name="person"></ion-icon> Seções do Perfil:</h3>
+              <div class="section-grid">
+                <div class="section-item">
+                  <ion-icon name="person"></ion-icon>
+                  <h4>Informações Pessoais</h4>
+                  <p>Nome, email, telefone e dados de contato</p>
+                  <ion-chip color="primary" size="small">Básico</ion-chip>
+                </div>
+                <div class="section-item">
+                  <ion-icon name="business"></ion-icon>
+                  <h4>Dados da Empresa</h4>
+                  <p>Nome da empresa, cargo e departamento</p>
+                  <ion-chip color="secondary" size="small">Profissional</ion-chip>
+                </div>
+                <div class="section-item">
+                  <ion-icon name="notifications"></ion-icon>
+                  <h4>Preferências</h4>
+                  <p>Notificações, idioma e fuso horário</p>
+                  <ion-chip color="tertiary" size="small">Personalização</ion-chip>
+                </div>
+                <div class="section-item">
+                  <ion-icon name="shield"></ion-icon>
+                  <h4>Segurança</h4>
+                  <p>Senha, autenticação e privacidade</p>
+                  <ion-chip color="warning" size="small">Segurança</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Configurar:</h3>
+              <ol class="steps-list">
+                <li>Acesse <strong>"Configurações"</strong> no menu principal</li>
+                <li>Clique em <strong>"Perfil de Usuário"</strong></li>
+                <li>Preencha as <strong>informações pessoais</strong></li>
+                <li>Configure as <strong>preferências de notificação</strong></li>
+                <li>Atualize a <strong>senha</strong> se necessário</li>
+                <li>Clique em <strong>"Salvar"</strong> para confirmar</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Gerenciar Níveis de Acesso -->
+        <ion-accordion value="niveis-acesso">
+          <ion-item slot="header" color="light">
+            <ion-icon name="shield" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Como Gerenciar Níveis de Acesso</h2>
+              <p>Configure permissões e roles de usuários</p>
+            </ion-label>
+            <ion-badge color="secondary" slot="end">Administração</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('niveis-acesso')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('niveis-acesso')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="access-levels">
+              <h3><ion-icon name="shield"></ion-icon> Níveis de Acesso Disponíveis:</h3>
+              <div class="level-grid">
+                <div class="level-item dev">
+                  <ion-icon name="construct"></ion-icon>
+                  <h4>Desenvolvedor (Dev)</h4>
+                  <p>Acesso total ao sistema, incluindo configurações avançadas</p>
+                  <ion-chip color="danger" size="small">Máximo</ion-chip>
+                </div>
+                <div class="level-item admin">
+                  <ion-icon name="settings"></ion-icon>
+                  <h4>Administrador (Admin)</h4>
+                  <p>Gerenciamento completo de usuários e configurações</p>
+                  <ion-chip color="warning" size="small">Alto</ion-chip>
+                </div>
+                <div class="level-item gerente">
+                  <ion-icon name="business"></ion-icon>
+                  <h4>Gerente</h4>
+                  <p>Acesso a relatórios e gestão de equipe</p>
+                  <ion-chip color="primary" size="small">Médio</ion-chip>
+                </div>
+                <div class="level-item vendedor">
+                  <ion-icon name="people"></ion-icon>
+                  <h4>Vendedor</h4>
+                  <p>Acesso básico a leads e orçamentos</p>
+                  <ion-chip color="secondary" size="small">Básico</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Gerenciar:</h3>
+              <ol class="steps-list">
+                <li>Acesse <strong>"Níveis de Acesso"</strong> nas configurações</li>
+                <li>Visualize os <strong>níveis disponíveis</strong></li>
+                <li>Configure <strong>permissões específicas</strong> para cada nível</li>
+                <li>Atribua <strong>níveis aos usuários</strong> conforme necessário</li>
+                <li>Teste as <strong>permissões</strong> antes de aplicar</li>
+                <li>Mantenha <strong>backup das configurações</strong></li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Configurar Notificações -->
+        <ion-accordion value="configurar-notificacoes">
+          <ion-item slot="header" color="light">
+            <ion-icon name="notifications" slot="start" color="tertiary"></ion-icon>
+            <ion-label>
+              <h2>Como Configurar Notificações</h2>
+              <p>Personalize alertas e lembretes do sistema</p>
+            </ion-label>
+            <ion-badge color="tertiary" slot="end">Personalização</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('configurar-notificacoes')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('configurar-notificacoes')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="notification-types">
+              <h3><ion-icon name="notifications"></ion-icon> Tipos de Notificação:</h3>
+              <div class="notification-grid">
+                <div class="notification-item">
+                  <ion-icon name="mail"></ion-icon>
+                  <h4>Email</h4>
+                  <p>Notificações por email para eventos importantes</p>
+                </div>
+                <div class="notification-item">
+                  <ion-icon name="phone"></ion-icon>
+                  <h4>SMS</h4>
+                  <p>Alertas por SMS para situações críticas</p>
+                </div>
+                <div class="notification-item">
+                  <ion-icon name="notifications"></ion-icon>
+                  <h4>Push</h4>
+                  <p>Notificações em tempo real no navegador</p>
+                </div>
+                <div class="notification-item">
+                  <ion-icon name="time"></ion-icon>
+                  <h4>Lembretes</h4>
+                  <p>Alertas programados para follow-ups</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Configurar:</h3>
+              <ol class="steps-list">
+                <li>Vá para <strong>"Configurações de Notificação"</strong></li>
+                <li>Selecione os <strong>tipos de notificação</strong> desejados</li>
+                <li>Configure <strong>frequência e horários</strong></li>
+                <li>Defina <strong>eventos que geram notificações</strong></li>
+                <li>Teste as <strong>configurações</strong> antes de salvar</li>
+                <li>Mantenha <strong>notificações importantes</strong> ativas</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Personalizar Interface -->
+        <ion-accordion value="personalizar-interface">
+          <ion-item slot="header" color="light">
+            <ion-icon name="color-palette" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Como Personalizar Interface</h2>
+              <p>Ajuste aparência e comportamento do sistema</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Visual</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('personalizar-interface')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('personalizar-interface')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="interface-options">
+              <h3><ion-icon name="color-palette"></ion-icon> Opções de Personalização:</h3>
+              <div class="option-grid">
+                <div class="option-item">
+                  <ion-icon name="color-palette"></ion-icon>
+                  <h4>Tema de Cores</h4>
+                  <p>Escolha entre temas claro, escuro ou personalizado</p>
+                </div>
+                <div class="option-item">
+                  <ion-icon name="language"></ion-icon>
+                  <h4>Idioma</h4>
+                  <p>Selecione o idioma da interface</p>
+                </div>
+                <div class="option-item">
+                  <ion-icon name="grid"></ion-icon>
+                  <h4>Layout</h4>
+                  <p>Configure densidade e organização dos elementos</p>
+                </div>
+                <div class="option-item">
+                  <ion-icon name="eye"></ion-icon>
+                  <h4>Visibilidade</h4>
+                  <p>Mostre ou oculte elementos da interface</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Personalizar:</h3>
+              <ol class="steps-list">
+                <li>Acesse <strong>"Configurações de Interface"</strong></li>
+                <li>Escolha o <strong>tema de cores</strong> preferido</li>
+                <li>Selecione o <strong>idioma</strong> da interface</li>
+                <li>Ajuste o <strong>layout</strong> conforme necessário</li>
+                <li>Configure <strong>elementos visíveis</strong></li>
+                <li>Salve as <strong>preferências</strong> para aplicar</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Configurar Integrações -->
+        <ion-accordion value="configurar-integracoes">
+          <ion-item slot="header" color="light">
+            <ion-icon name="globe" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h2>Como Configurar Integrações</h2>
+              <p>Conecte o sistema com ferramentas externas</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">Avançado</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('configurar-integracoes')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('configurar-integracoes')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="integration-types">
+              <h3><ion-icon name="globe"></ion-icon> Tipos de Integração:</h3>
+              <div class="integration-grid">
+                <div class="integration-item">
+                  <ion-icon name="mail"></ion-icon>
+                  <h4>Email Marketing</h4>
+                  <p>Conecte com plataformas de email marketing</p>
+                </div>
+                <div class="integration-item">
+                  <ion-icon name="phone"></ion-icon>
+                  <h4>Telefonia</h4>
+                  <p>Integre com sistemas de telefonia</p>
+                </div>
+                <div class="integration-item">
+                  <ion-icon name="analytics"></ion-icon>
+                  <h4>Analytics</h4>
+                  <p>Conecte com ferramentas de análise</p>
+                </div>
+                <div class="integration-item">
+                  <ion-icon name="cloud"></ion-icon>
+                  <h4>Cloud Storage</h4>
+                  <p>Integre com serviços de armazenamento</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Configurar:</h3>
+              <ol class="steps-list">
+                <li>Acesse <strong>"Configurações de Integração"</strong></li>
+                <li>Selecione a <strong>plataforma</strong> desejada</li>
+                <li>Configure as <strong>credenciais de acesso</strong></li>
+                <li>Teste a <strong>conexão</strong> antes de salvar</li>
+                <li>Configure <strong>sincronização</strong> se necessário</li>
+                <li>Monitore o <strong>status das integrações</strong></li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Backup e Segurança -->
+        <ion-accordion value="backup-seguranca">
+          <ion-item slot="header" color="light">
+            <ion-icon name="shield" slot="start" color="danger"></ion-icon>
+            <ion-label>
+              <h2>Backup e Segurança</h2>
+              <p>Proteja seus dados e mantenha backups atualizados</p>
+            </ion-label>
+            <ion-badge color="danger" slot="end">Crítico</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('backup-seguranca')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('backup-seguranca')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="security-features">
+              <h3><ion-icon name="shield"></ion-icon> Recursos de Segurança:</h3>
+              <div class="security-grid">
+                <div class="security-item">
+                  <ion-icon name="lock"></ion-icon>
+                  <h4>Backup Automático</h4>
+                  <p>Backups regulares dos dados do sistema</p>
+                </div>
+                <div class="security-item">
+                  <ion-icon name="key"></ion-icon>
+                  <h4>Autenticação</h4>
+                  <p>Login seguro com verificação em duas etapas</p>
+                </div>
+                <div class="security-item">
+                  <ion-icon name="eye"></ion-icon>
+                  <h4>Auditoria</h4>
+                  <p>Log de todas as ações dos usuários</p>
+                </div>
+                <div class="security-item">
+                  <ion-icon name="download"></ion-icon>
+                  <h4>Exportação</h4>
+                  <p>Exportação de dados para backup manual</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Configurar:</h3>
+              <ol class="steps-list">
+                <li>Acesse <strong>"Configurações de Segurança"</strong></li>
+                <li>Configure <strong>backup automático</strong></li>
+                <li>Ative <strong>autenticação em duas etapas</strong></li>
+                <li>Configure <strong>logs de auditoria</strong></li>
+                <li>Teste o <strong>sistema de backup</strong></li>
+                <li>Mantenha <strong>senhas seguras</strong> e atualizadas</li>
+              </ol>
+            </div>
+
+            <div class="security-tips">
+              <h4><ion-icon name="warning" color="danger"></ion-icon> Dicas de Segurança:</h4>
+              <ul>
+                <li><strong>Faça backups regulares</strong> dos dados importantes</li>
+                <li><strong>Use senhas fortes</strong> e únicas para cada conta</li>
+                <li><strong>Ative autenticação em duas etapas</strong> sempre que possível</li>
+                <li><strong>Monitore logs de acesso</strong> regularmente</li>
+                <li><strong>Mantenha o sistema atualizado</strong> com as últimas versões</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+      </ion-accordion-group>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

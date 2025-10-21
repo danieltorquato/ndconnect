@@ -67,13 +67,18 @@ export class AuthService {
 
   // Fazer login
   login(usuario: string, senha: string): Observable<LoginResponse> {
+    console.log('AuthService: Iniciando login para usuário:', usuario);
     return this.http.post<LoginResponse>(`${this.API_URL}?action=login`, {
       usuario,
       senha
     }).pipe(
       tap(response => {
+        console.log('AuthService: Resposta do login:', response);
         if (response.success && response.usuario && response.token) {
+          console.log('AuthService: Salvando sessão do usuário:', response.usuario.nome);
           this.salvarSessao(response.usuario, response.token);
+        } else {
+          console.log('AuthService: Login falhou ou dados incompletos');
         }
       })
     );

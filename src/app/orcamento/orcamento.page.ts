@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash } from 'ionicons/icons';
+import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash, arrowBack } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -51,7 +51,7 @@ interface Cliente {
   templateUrl: './orcamento.page.html',
   styleUrls: ['./orcamento.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, CommonModule, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, CommonModule, FormsModule],
 })
 export class OrcamentoPage implements OnInit {
   categorias: Categoria[] = [];
@@ -80,6 +80,7 @@ export class OrcamentoPage implements OnInit {
   dataValidade: string = '';
   ultimoOrcamentoId: number | null = null;
   dataMinima: string = '';
+  leadIdExistente: number | null = null; // Para controlar se veio da gestão de leads
 
   private apiUrl = environment.apiUrl;
 
@@ -89,7 +90,7 @@ export class OrcamentoPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    addIcons({list,search,close,add,remove,person,calendar,warning,documentText,calculator,trash,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,informationCircle,star,home});
+    addIcons({arrowBack,list,search,close,add,remove,person,calendar,warning,documentText,calculator,trash,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,informationCircle,star,home});
   }
 
   ngOnInit() {
@@ -392,6 +393,16 @@ export class OrcamentoPage implements OnInit {
       next: (response) => {
         if (response.success) {
           this.ultimoOrcamentoId = response.data.id;
+
+          // Criar lead automaticamente apenas se NÃO veio da gestão de leads
+          if (!this.leadIdExistente) {
+            console.log('OrcamentoPage: Criando novo lead do orçamento');
+            this.criarLeadDoOrcamento(response.data.id);
+          } else {
+            console.log('OrcamentoPage: Veio da gestão de leads, não criando novo lead. LeadId existente:', this.leadIdExistente);
+            this.mostrarNotificacao('Orçamento gerado para lead existente!', 'success');
+          }
+
           window.alert('Orçamento gerado com sucesso!');
           this.gerarPDF(response.data.id);
         } else {
@@ -408,6 +419,39 @@ export class OrcamentoPage implements OnInit {
   gerarPDF(orcamentoId: number) {
     const url = `${this.apiUrl}/simple_pdf.php?id=${orcamentoId}`;
     window.open(url, '_blank');
+  }
+
+  criarLeadDoOrcamento(orcamentoId: number) {
+    // Preparar dados do lead baseado no cliente do orçamento
+    const dadosLead = {
+      nome: this.cliente.nome.trim(),
+      email: this.cliente.email?.trim() || '',
+      telefone: this.cliente.telefone?.trim() || '',
+      empresa: this.cliente.empresa?.trim() || '',
+      origem: 'orcamento', // Origem específica para leads criados a partir de orçamentos
+      mensagem: `Lead criado automaticamente a partir do orçamento #${orcamentoId}. ${this.observacoes ? 'Observações: ' + this.observacoes : ''}`,
+      status: 'contatado', // Já marcar como contatado
+      orcamento_id: orcamentoId, // Referência ao orçamento
+      observacoes: `Cliente interessado em orçamento de R$ ${this.total.toFixed(2).replace('.', ',')}. ${this.observacoes || ''}`
+    };
+
+    console.log('Criando lead do orçamento:', dadosLead);
+
+    this.http.post<any>(`${this.apiUrl}/leads`, dadosLead).subscribe({
+      next: (response) => {
+        if (response.success) {
+          console.log('Lead criado com sucesso:', response.data);
+          this.mostrarNotificacao(`Lead "${this.cliente.nome}" criado e marcado como contatado!`, 'success');
+        } else {
+          console.error('Erro ao criar lead:', response.message);
+          this.mostrarNotificacao('Orçamento gerado, mas houve erro ao criar lead', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao criar lead do orçamento:', error);
+        this.mostrarNotificacao('Orçamento gerado, mas houve erro ao criar lead', 'error');
+      }
+    });
   }
 
   compartilharWhatsApp() {
@@ -657,6 +701,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
     this.subtotal = 0;
     this.total = 0;
     this.ultimoOrcamentoId = null;
+    this.leadIdExistente = null; // Resetar o leadId existente
     this.definirDataValidadePadrao();
   }
 
@@ -785,6 +830,9 @@ Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br`;
   carregarDadosDoLead() {
     this.route.queryParams.subscribe(params => {
       if (params['leadId']) {
+        // Capturar o ID do lead existente
+        this.leadIdExistente = parseInt(params['leadId']);
+
         // Preencher dados do lead
         this.cliente.nome = params['nome'] || '';
         this.cliente.email = params['email'] || '';
@@ -794,11 +842,19 @@ Contato: (11) 99999-9999 | Email: contato@ndconnect.com.br`;
 
         // Mostrar notificação de dados preenchidos
         this.mostrarNotificacao('Dados do lead carregados automaticamente!', 'success');
+
+        console.log('OrcamentoPage: Veio da gestão de leads, leadId:', this.leadIdExistente);
+      } else {
+        console.log('OrcamentoPage: Não veio da gestão de leads, criará novo lead se necessário');
       }
     });
   }
 
   voltarHome() {
     this.router.navigate(['/home']);
+  }
+
+  voltarPainel() {
+    this.router.navigate(['/painel-orcamento']);
   }
 }

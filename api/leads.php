@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'config/database.php';
+require_once 'Config/Database.php';
 
 try {
     $database = new Database();
@@ -65,8 +65,8 @@ function handlePost($db, $action) {
             marcarLeadsComoLidos($db, $input);
             break;
         default:
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Ação não reconhecida']);
+            // Se não há ação específica, criar novo lead
+            createLead($db, $input);
     }
 }
 
@@ -99,7 +99,7 @@ function listLeads($db) {
     $status = $_GET['status'] ?? null;
 
     $sql = "SELECT id, nome, email, telefone, empresa, mensagem, origem, status,
-                   lido, data_leitura, created_at, updated_at, observacoes
+                   lido, data_leitura, created_at, updated_at, observacoes, orcamento_id
             FROM leads";
 
     $params = [];
@@ -145,6 +145,9 @@ function getStats($db) {
         $result[$stat['status']] = (int)$stat['total'];
         $result['total'] += (int)$stat['total'];
     }
+
+    // Log para debug
+    error_log("Stats calculadas: " . json_encode($result));
 
     echo json_encode([
         'success' => true,
@@ -258,6 +261,75 @@ function deleteLead($db, $leadId) {
         echo json_encode([
             'success' => false,
             'message' => 'Erro ao excluir lead'
+        ]);
+    }
+}
+
+function createLead($db, $input) {
+    // Validar dados obrigatórios
+    $nome = $input['nome'] ?? '';
+    $email = $input['email'] ?? '';
+    $telefone = $input['telefone'] ?? '';
+    $empresa = $input['empresa'] ?? '';
+    $origem = $input['origem'] ?? 'outros';
+    $mensagem = $input['mensagem'] ?? '';
+    $status = $input['status'] ?? 'novo';
+    $observacoes = $input['observacoes'] ?? '';
+    $orcamento_id = $input['orcamento_id'] ?? null;
+
+    if (empty($nome)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Nome é obrigatório']);
+        return;
+    }
+
+    try {
+        $stmt = $db->prepare("
+            INSERT INTO leads (nome, email, telefone, empresa, origem, mensagem, status, observacoes, orcamento_id, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+
+        $result = $stmt->execute([
+            $nome,
+            $email,
+            $telefone,
+            $empresa,
+            $origem,
+            $mensagem,
+            $status,
+            $observacoes,
+            $orcamento_id
+        ]);
+
+        if ($result) {
+            $leadId = $db->lastInsertId();
+
+            // Buscar o lead criado para retornar
+            $stmt = $db->prepare("
+                SELECT id, nome, email, telefone, empresa, origem, mensagem, status,
+                       observacoes, orcamento_id, lido, data_leitura, created_at, updated_at
+                FROM leads
+                WHERE id = ?
+            ");
+            $stmt->execute([$leadId]);
+            $lead = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Lead criado com sucesso',
+                'data' => $lead
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erro ao criar lead'
+            ]);
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erro interno: ' . $e->getMessage()
         ]);
     }
 }

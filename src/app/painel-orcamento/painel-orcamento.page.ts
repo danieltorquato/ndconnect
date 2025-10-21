@@ -8,24 +8,14 @@ import {
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonButton,
   IonIcon,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonBadge,
   IonButtons,
   IonChip,
-  IonList,
-  IonItem,
-  IonLabel,
   IonRefresher,
   IonRefresherContent,
-  IonSkeletonText, IonNote } from '@ionic/angular/standalone';
+  IonSkeletonText } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   calculator,
@@ -53,7 +43,7 @@ import {
   trash,
   checkmarkCircleOutline,
   closeCircleOutline,
-  warningOutline, trophy, peopleOutline } from 'ionicons/icons';
+  warningOutline, trophy, peopleOutline, arrowForward, add, school } from 'ionicons/icons';
 import { LeadsService, Lead, LeadStats } from '../services/leads.service';
 import { AuthService } from '../services/auth.service';
 
@@ -62,26 +52,16 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './painel-orcamento.page.html',
   styleUrls: ['./painel-orcamento.page.scss'],
   standalone: true,
-  imports: [IonNote,
+  imports: [
     IonButtons,
     IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonButton,
     IonIcon,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonBadge,
     IonChip,
-    IonList,
-    IonItem,
-    IonLabel,
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
@@ -109,6 +89,7 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
   notificacoes = 0;
   leadsNaoLidos: Lead[] = [];
   primeiraVisualizacao = true;
+  podeAcessarTutorial = false;
 
   // Subscriptions
   private leadsSubscription?: Subscription;
@@ -121,7 +102,7 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
     private leadsService: LeadsService,
     private authService: AuthService
   ) {
-    addIcons({calculator,people,home,logOut,addCircle,call,checkmarkCircle,trophy,time,eye,mail,documentText,peopleOutline,cube,settings,analytics,list,statsChart,trendingUp,cog,notifications,refresh,chatbubbles,create,trash,checkmarkCircleOutline,closeCircleOutline,warningOutline});
+    addIcons({calculator,school,people,logOut,addCircle,trophy,call,arrowForward,cube,analytics,time,eye,mail,documentText,peopleOutline,settings,cog,add,home,checkmarkCircle,list,statsChart,trendingUp,notifications,refresh,chatbubbles,create,trash,checkmarkCircleOutline,closeCircleOutline,warningOutline});
   }
 
   ngOnInit() {
@@ -129,6 +110,7 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
     this.configurarAtualizacaoAutomatica();
     this.configurarVisualizacaoInicial();
     this.configurarNotificacoes();
+    this.verificarAcessoAoTutorial();
   }
 
   ngOnDestroy() {
@@ -150,6 +132,7 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
   carregarDados() {
     this.loading = true;
     this.carregarLeads();
+    this.carregarEstatisticas();
 
     // Marcar leads como lidos na primeira visualização
     setTimeout(() => {
@@ -186,15 +169,18 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
   carregarEstatisticas() {
     this.leadsService.carregarEstatisticas().subscribe({
       next: (response) => {
+        console.log('PainelOrcamento: Resposta da API de estatísticas:', response);
         if (response.success) {
           this.stats = response.data || this.stats;
           this.leadsService.atualizarStats(this.stats);
+          console.log('PainelOrcamento: Estatísticas atualizadas:', this.stats);
         }
       },
       error: (error) => {
         console.error('Erro ao carregar estatísticas:', error);
         // Calcular stats localmente se a API falhar
         this.stats = this.leadsService.calcularStats(this.leads);
+        console.log('PainelOrcamento: Estatísticas calculadas localmente:', this.stats);
       }
     });
   }
@@ -235,10 +221,20 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
     );
   }
 
+  verificarAcessoAoTutorial() {
+    const usuario = this.authService.getUsuarioAtual();
+    if (usuario) {
+      this.podeAcessarTutorial = ['dev', 'admin'].includes(usuario.nivel_acesso);
+      console.log('PainelOrcamento: Usuário pode acessar tutorial:', this.podeAcessarTutorial, 'Nível:', usuario.nivel_acesso);
+    }
+  }
+
   marcarLeadsComoLidos() {
     if (this.primeiraVisualizacao && this.notificacoes > 0) {
+      console.log('PainelOrcamento: Marcando leads como lidos automaticamente...');
       this.leadsService.marcarTodosComoLidos().subscribe({
         next: (response) => {
+          console.log('PainelOrcamento: Resposta ao marcar leads como lidos:', response);
           if (response.success) {
             this.primeiraVisualizacao = false;
             localStorage.setItem('ultima_visualizacao_painel', new Date().getTime().toString());
@@ -246,10 +242,13 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
             // Atualizar estado local
             this.atualizarLeadsNaoLidos();
             this.calcularNotificacoes();
+            console.log('PainelOrcamento: Leads marcados como lidos com sucesso');
+          } else {
+            console.error('PainelOrcamento: Falha ao marcar leads como lidos:', response.message);
           }
         },
         error: (error) => {
-          console.error('Erro ao marcar leads como lidos automaticamente:', error);
+          console.error('PainelOrcamento: Erro ao marcar leads como lidos automaticamente:', error);
         }
       });
     }
@@ -405,5 +404,6 @@ export class PainelOrcamentoPage implements OnInit, OnDestroy {
       minute: '2-digit'
     });
   }
+
 
 }

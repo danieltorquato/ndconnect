@@ -1,0 +1,421 @@
+<ion-content class="tutorial-section-content">
+
+  <!-- Seção: Catálogo de Produtos -->
+  <ion-card class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="cube" color="primary"></ion-icon>
+        Catálogo de Produtos - Gestão Completa
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>O <strong>Catálogo de Produtos</strong> é onde você gerencia todo o portfólio de produtos e serviços da sua empresa, organizando preços, descrições e categorias.</p>
+      </div>
+
+      <!-- Accordion com subtópicos -->
+      <ion-accordion-group>
+
+        <!-- Como Adicionar um Produto -->
+        <ion-accordion value="adicionar-produto">
+          <ion-item slot="header" color="light">
+            <ion-icon name="add-circle" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>Como Adicionar um Produto</h2>
+              <p>Cadastre novos produtos no catálogo</p>
+            </ion-label>
+            <ion-badge color="primary" slot="end">Essencial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('adicionar-produto')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('adicionar-produto')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="list"></ion-icon> Passos para Adicionar um Produto:</h3>
+              <ol class="steps-list">
+                <li>
+                  <strong>Clique no botão "Adicionar Produto"</strong> na página de produtos
+                </li>
+                <li>
+                  <strong>Preencha as informações básicas:</strong>
+                  <ul>
+                    <li>Nome do produto (obrigatório)</li>
+                    <li>Descrição detalhada</li>
+                    <li>Categoria do produto</li>
+                    <li>Preço unitário</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Configure informações adicionais:</strong>
+                  <ul>
+                    <li>Código do produto (SKU)</li>
+                    <li>Unidade de medida</li>
+                    <li>Estoque disponível</li>
+                    <li>Status (ativo/inativo)</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Adicione imagens</strong> se disponível
+                </li>
+                <li>
+                  <strong>Clique em "Salvar"</strong> para adicionar ao catálogo
+                </li>
+              </ol>
+            </div>
+
+            <div class="tips-box">
+              <h4><ion-icon name="bulb" color="warning"></ion-icon> Dicas Importantes:</h4>
+              <ul>
+                <li>O <strong>nome do produto é obrigatório</strong> para salvar</li>
+                <li>Use <strong>descrições claras</strong> para facilitar a busca</li>
+                <li>Organize por <strong>categorias</strong> para melhor navegação</li>
+                <li>Mantenha <strong>preços atualizados</strong> regularmente</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Organizar por Categorias -->
+        <ion-accordion value="organizar-categorias">
+          <ion-item slot="header" color="light">
+            <ion-icon name="construct" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Como Organizar por Categorias</h2>
+              <p>Estruture seu catálogo de forma lógica</p>
+            </ion-label>
+            <ion-badge color="secondary" slot="end">Organização</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('organizar-categorias')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('organizar-categorias')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="categories-explanation">
+              <h3><ion-icon name="construct"></ion-icon> Sistema de Categorias:</h3>
+              <div class="category-grid">
+                <div class="category-item">
+                  <ion-icon name="cube"></ion-icon>
+                  <h4>Produtos Físicos</h4>
+                  <p>Mercadorias, equipamentos, materiais</p>
+                  <ion-chip color="primary" size="small">Ex: Equipamentos</ion-chip>
+                </div>
+                <div class="category-item">
+                  <ion-icon name="construct"></ion-icon>
+                  <h4>Serviços</h4>
+                  <p>Consultoria, manutenção, instalação</p>
+                  <ion-chip color="secondary" size="small">Ex: Consultoria</ion-chip>
+                </div>
+                <div class="category-item">
+                  <ion-icon name="document-text"></ion-icon>
+                  <h4>Licenças</h4>
+                  <p>Software, direitos, permissões</p>
+                  <ion-chip color="tertiary" size="small">Ex: Software</ion-chip>
+                </div>
+                <div class="category-item">
+                  <ion-icon name="business"></ion-icon>
+                  <h4>Pacotes</h4>
+                  <p>Combos, kits, soluções completas</p>
+                  <ion-chip color="success" size="small">Ex: Pacotes</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Organizar:</h3>
+              <ol class="steps-list">
+                <li>Defina <strong>categorias principais</strong> do seu negócio</li>
+                <li>Use <strong>nomes descritivos</strong> para as categorias</li>
+                <li>Considere <strong>subcategorias</strong> para produtos complexos</li>
+                <li>Mantenha <strong>consistência</strong> na nomenclatura</li>
+                <li>Revise e <strong>ajuste categorias</strong> periodicamente</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Buscar Produtos -->
+        <ion-accordion value="buscar-produtos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="search" slot="start" color="tertiary"></ion-icon>
+            <ion-label>
+              <h2>Como Buscar Produtos</h2>
+              <p>Encontre produtos rapidamente no catálogo</p>
+            </ion-label>
+            <ion-badge color="tertiary" slot="end">Busca</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('buscar-produtos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('buscar-produtos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="search-explanation">
+              <h3><ion-icon name="search"></ion-icon> Critérios de Busca:</h3>
+              <p>Você pode buscar produtos por qualquer um destes campos:</p>
+              <ul>
+                <li><strong>Nome</strong> do produto</li>
+                <li><strong>Descrição</strong> ou palavras-chave</li>
+                <li><strong>Código</strong> do produto (SKU)</li>
+                <li><strong>Categoria</strong> do produto</li>
+                <li><strong>Preço</strong> (faixa de valores)</li>
+              </ul>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Buscar:</h3>
+              <ol class="steps-list">
+                <li>Digite o termo na <strong>barra de pesquisa</strong></li>
+                <li>A busca é <strong>instantânea</strong> - resultados aparecem conforme você digita</li>
+                <li>Use <strong>filtros por categoria</strong> para refinar resultados</li>
+                <li>Combine <strong>busca + filtros</strong> para resultados precisos</li>
+                <li>Limpe a busca para <strong>ver todos os produtos</strong> novamente</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Editar Produtos -->
+        <ion-accordion value="editar-produtos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="create" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Como Editar Produtos</h2>
+              <p>Atualize informações e preços dos produtos</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Manutenção</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('editar-produtos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('editar-produtos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Editar:</h3>
+              <ol class="steps-list">
+                <li>Localize o produto na <strong>lista do catálogo</strong></li>
+                <li>Clique no botão <strong>"Editar"</strong> (ícone de lápis)</li>
+                <li>Modifique as <strong>informações desejadas</strong></li>
+                <li>Atualize <strong>preços, descrições ou categorias</strong></li>
+                <li>Clique em <strong>"Salvar"</strong> para confirmar as alterações</li>
+              </ol>
+            </div>
+
+            <div class="edit-tips">
+              <h4><ion-icon name="information-circle" color="primary"></ion-icon> Dicas de Edição:</h4>
+              <ul>
+                <li><strong>Preços atualizados</strong> refletem automaticamente nos orçamentos</li>
+                <li><strong>Descrições claras</strong> melhoram a experiência do cliente</li>
+                <li><strong>Categorias corretas</strong> facilitam a organização</li>
+                <li><strong>Status ativo/inativo</strong> controla a visibilidade</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Gerenciar Estoque -->
+        <ion-accordion value="gerenciar-estoque">
+          <ion-item slot="header" color="light">
+            <ion-icon name="analytics" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h2>Como Gerenciar Estoque</h2>
+              <p>Controle a disponibilidade dos produtos</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">Controle</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('gerenciar-estoque')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('gerenciar-estoque')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="stock-features">
+              <h3><ion-icon name="analytics"></ion-icon> Funcionalidades de Estoque:</h3>
+              <div class="feature-grid">
+                <div class="feature-item">
+                  <ion-icon name="eye"></ion-icon>
+                  <h4>Controle de Disponibilidade</h4>
+                  <p>Visualize quantos itens estão disponíveis</p>
+                </div>
+                <div class="feature-item">
+                  <ion-icon name="warning"></ion-icon>
+                  <h4>Alertas de Estoque Baixo</h4>
+                  <p>Notificações quando estoque está crítico</p>
+                </div>
+                <div class="feature-item">
+                  <ion-icon name="refresh"></ion-icon>
+                  <h4>Atualização Automática</h4>
+                  <p>Estoque é atualizado com cada venda</p>
+                </div>
+                <div class="feature-item">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  <h4>Status de Disponibilidade</h4>
+                  <p>Produtos podem ser marcados como indisponíveis</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Gerenciar:</h3>
+              <ol class="steps-list">
+                <li>Acesse a <strong>página de produtos</strong></li>
+                <li>Visualize a <strong>coluna de estoque</strong> para cada produto</li>
+                <li>Edite o produto para <strong>atualizar quantidade</strong></li>
+                <li>Configure <strong>alertas de estoque baixo</strong></li>
+                <li>Marque produtos como <strong>indisponíveis</strong> quando necessário</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Integração com Orçamentos -->
+        <ion-accordion value="integracao-orcamentos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="calculator" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Integração com Sistema de Orçamentos</h2>
+              <p>Como produtos se conectam com propostas comerciais</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Integração</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('integracao-orcamentos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('integracao-orcamentos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="integration-flow">
+              <h3><ion-icon name="swap-horizontal"></ion-icon> Fluxo de Integração:</h3>
+              <div class="flow-steps">
+                <div class="flow-step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <strong>Produto Cadastrado</strong>
+                    <p>Produto disponível no catálogo</p>
+                  </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <strong>Seleção no Orçamento</strong>
+                    <p>Produto é adicionado à proposta</p>
+                  </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <strong>Cálculo Automático</strong>
+                    <p>Preços são calculados automaticamente</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="integration-benefits">
+              <h4><ion-icon name="trophy" color="primary"></ion-icon> Benefícios da Integração:</h4>
+              <ul>
+                <li><strong>Preços sempre atualizados</strong> nos orçamentos</li>
+                <li><strong>Descrições padronizadas</strong> em todas as propostas</li>
+                <li><strong>Controle de estoque</strong> integrado</li>
+                <li><strong>Relatórios precisos</strong> de vendas por produto</li>
+                <li><strong>Facilita a criação</strong> de orçamentos</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+      </ion-accordion-group>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

@@ -114,6 +114,41 @@ export const routes: Routes = [
     loadComponent: () => import('./admin/gestao-funcionarios/gestao-funcionarios.page').then( m => m.GestaoFuncionariosPage),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'tutorial',
+    loadComponent: () => import('./tutorial/tutorial-layout/tutorial-layout.page').then( m => m.TutorialLayoutPage),
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./tutorial/tutorial.page').then( m => m.TutorialPage)
+      },
+      {
+        path: 'painel-principal',
+        loadComponent: () => import('./tutorial/sections/painel-principal/painel-principal.page').then( m => m.PainelPrincipalTutorialPage)
+      },
+      {
+        path: 'gestao-leads',
+        loadComponent: () => import('./tutorial/sections/gestao-leads/gestao-leads.page').then( m => m.GestaoLeadsTutorialPage)
+      },
+      {
+        path: 'orcamentos',
+        loadComponent: () => import('./tutorial/sections/orcamentos/orcamentos.page').then( m => m.OrcamentosTutorialPage)
+      },
+      {
+        path: 'produtos',
+        loadComponent: () => import('./tutorial/sections/produtos/produtos.page').then( m => m.ProdutosTutorialPage)
+      },
+      {
+        path: 'relatorios',
+        loadComponent: () => import('./tutorial/sections/relatorios/relatorios.page').then( m => m.RelatoriosTutorialPage)
+      },
+      {
+        path: 'configuracoes',
+        loadComponent: () => import('./tutorial/sections/configuracoes/configuracoes.page').then( m => m.ConfiguracoesTutorialPage)
+      }
+    ]
+  },
 
 
 ];

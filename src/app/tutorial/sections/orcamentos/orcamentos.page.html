@@ -1,0 +1,406 @@
+<ion-content class="tutorial-section-content">
+
+  <!-- Seção: Sistema de Orçamentos -->
+  <ion-card class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="calculator" color="tertiary"></ion-icon>
+        Sistema de Orçamentos - Propostas Comerciais
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>O <strong>Sistema de Orçamentos</strong> permite criar, gerenciar e acompanhar propostas comerciais de forma profissional e organizada.</p>
+      </div>
+
+      <!-- Accordion com subtópicos -->
+      <ion-accordion-group>
+
+        <!-- Como Criar um Orçamento -->
+        <ion-accordion value="criar-orcamento">
+          <ion-item slot="header" color="light">
+            <ion-icon name="add-circle" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>Como Criar um Orçamento</h2>
+              <p>Passo a passo para gerar propostas comerciais</p>
+            </ion-label>
+            <ion-badge color="primary" slot="end">Essencial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('criar-orcamento')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('criar-orcamento')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="list"></ion-icon> Passos para Criar um Orçamento:</h3>
+              <ol class="steps-list">
+                <li>
+                  <strong>Preencha os dados do cliente:</strong>
+                  <ul>
+                    <li>Nome completo (obrigatório)</li>
+                    <li>Email de contato</li>
+                    <li>Telefone</li>
+                    <li>Empresa</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Adicione produtos/serviços:</strong>
+                  <ul>
+                    <li>Selecione do catálogo</li>
+                    <li>Defina quantidades</li>
+                    <li>Preços são calculados automaticamente</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Configure descontos:</strong>
+                  <ul>
+                    <li>Desconto em valor (R$)</li>
+                    <li>Desconto em porcentagem (%)</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Defina validade:</strong>
+                  <ul>
+                    <li>Data de validade do orçamento</li>
+                    <li>Padrão: 15 dias</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Adicione observações</strong> se necessário
+                </li>
+                <li>
+                  <strong>Clique em "Gerar Orçamento"</strong> para criar o PDF
+                </li>
+              </ol>
+            </div>
+
+            <div class="tips-box">
+              <h4><ion-icon name="bulb" color="warning"></ion-icon> Dicas Importantes:</h4>
+              <ul>
+                <li>O <strong>nome do cliente é obrigatório</strong> para gerar orçamento</li>
+                <li>Adicione <strong>pelo menos um produto</strong> antes de gerar</li>
+                <li>O sistema <strong>cria automaticamente um lead</strong> quando o orçamento é gerado</li>
+                <li>Use o botão <strong>"Voltar"</strong> para retornar ao painel</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Adicionar Produtos ao Orçamento -->
+        <ion-accordion value="adicionar-produtos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="construct" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Como Adicionar Produtos ao Orçamento</h2>
+              <p>Configure itens e quantidades na proposta</p>
+            </ion-label>
+            <ion-badge color="secondary" slot="end">Configuração</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('adicionar-produtos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('adicionar-produtos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Adicionar Produtos:</h3>
+              <ol class="steps-list">
+                <li>Clique no botão <strong>"Adicionar Produto"</strong></li>
+                <li>Selecione o produto do <strong>catálogo disponível</strong></li>
+                <li>Defina a <strong>quantidade desejada</strong></li>
+                <li>O <strong>preço unitário</strong> é preenchido automaticamente</li>
+                <li>O <strong>subtotal</strong> é calculado automaticamente</li>
+                <li>Use o botão <strong>"Remover"</strong> para excluir itens</li>
+              </ol>
+            </div>
+
+            <div class="calculation-explanation">
+              <h4><ion-icon name="calculator" color="primary"></ion-icon> Cálculos Automáticos:</h4>
+              <ul>
+                <li><strong>Subtotal por item:</strong> Quantidade × Preço Unitário</li>
+                <li><strong>Subtotal geral:</strong> Soma de todos os itens</li>
+                <li><strong>Desconto:</strong> Aplicado sobre o subtotal</li>
+                <li><strong>Total final:</strong> Subtotal - Desconto</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Aplicar Descontos -->
+        <ion-accordion value="aplicar-descontos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="analytics" slot="start" color="tertiary"></ion-icon>
+            <ion-label>
+              <h2>Como Aplicar Descontos</h2>
+              <p>Configure descontos em valor ou porcentagem</p>
+            </ion-label>
+            <ion-badge color="tertiary" slot="end">Comercial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('aplicar-descontos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('aplicar-descontos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="discount-types">
+              <h3><ion-icon name="analytics"></ion-icon> Tipos de Desconto:</h3>
+              <div class="discount-grid">
+                <div class="discount-item valor">
+                  <ion-icon name="calculator"></ion-icon>
+                  <h4>Desconto em Valor</h4>
+                  <p>Desconto fixo em reais (R$)</p>
+                  <ion-chip color="primary" size="small">Ex: R$ 100,00</ion-chip>
+                </div>
+                <div class="discount-item porcentagem">
+                  <ion-icon name="analytics"></ion-icon>
+                  <h4>Desconto em Porcentagem</h4>
+                  <p>Desconto percentual sobre o total</p>
+                  <ion-chip color="secondary" size="small">Ex: 10%</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Aplicar:</h3>
+              <ol class="steps-list">
+                <li>Selecione o <strong>tipo de desconto</strong> (valor ou porcentagem)</li>
+                <li>Digite o <strong>valor do desconto</strong></li>
+                <li>O <strong>total é recalculado</strong> automaticamente</li>
+                <li>Para <strong>remover desconto</strong>, digite 0</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Gerar PDF do Orçamento -->
+        <ion-accordion value="gerar-pdf">
+          <ion-item slot="header" color="light">
+            <ion-icon name="document-text" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Como Gerar PDF do Orçamento</h2>
+              <p>Crie documentos profissionais para envio</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Finalização</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('gerar-pdf')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('gerar-pdf')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Gerar PDF:</h3>
+              <ol class="steps-list">
+                <li>Verifique se todos os <strong>dados estão preenchidos</strong></li>
+                <li>Confirme se há <strong>pelo menos um produto</strong> adicionado</li>
+                <li>Clique no botão <strong>"Gerar Orçamento"</strong></li>
+                <li>O PDF será <strong>gerado automaticamente</strong></li>
+                <li>O arquivo será <strong>aberto em nova aba</strong> para visualização</li>
+                <li>Use <strong>Ctrl+P</strong> para imprimir ou salvar</li>
+              </ol>
+            </div>
+
+            <div class="pdf-features">
+              <h4><ion-icon name="document-text" color="primary"></ion-icon> Características do PDF:</h4>
+              <ul>
+                <li><strong>Layout profissional</strong> com logo da empresa</li>
+                <li><strong>Dados completos</strong> do cliente e produtos</li>
+                <li><strong>Cálculos automáticos</strong> de subtotal, desconto e total</li>
+                <li><strong>Data de validade</strong> destacada</li>
+                <li><strong>Observações</strong> e termos comerciais</li>
+                <li><strong>Numeração automática</strong> do orçamento</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Acessar Histórico de Orçamentos -->
+        <ion-accordion value="historico-orcamentos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="time" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h2>Como Acessar Histórico de Orçamentos</h2>
+              <p>Visualize e gerencie orçamentos anteriores</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">Histórico</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('historico-orcamentos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('historico-orcamentos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Acessar:</h3>
+              <ol class="steps-list">
+                <li>Clique no botão <strong>"Histórico"</strong> na página de orçamentos</li>
+                <li>O histórico será <strong>aberto em nova aba</strong></li>
+                <li>Visualize todos os <strong>orçamentos criados</strong></li>
+                <li>Use <strong>filtros por data</strong> se necessário</li>
+                <li>Clique em um orçamento para <strong>visualizar o PDF</strong></li>
+              </ol>
+            </div>
+
+            <div class="history-features">
+              <h4><ion-icon name="eye" color="primary"></ion-icon> Funcionalidades do Histórico:</h4>
+              <ul>
+                <li><strong>Lista cronológica</strong> de todos os orçamentos</li>
+                <li><strong>Filtros por data</strong> e cliente</li>
+                <li><strong>Status de aprovação</strong> (pendente, aprovado, rejeitado)</li>
+                <li><strong>Download de PDFs</strong> anteriores</li>
+                <li><strong>Busca por cliente</strong> ou número do orçamento</li>
+                <li><strong>Informações detalhadas</strong> de cada proposta</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Integração com Leads -->
+        <ion-accordion value="integracao-leads">
+          <ion-item slot="header" color="light">
+            <ion-icon name="person" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Integração com Sistema de Leads</h2>
+              <p>Como orçamentos se conectam com o pipeline de vendas</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Integração</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('integracao-leads')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('integracao-leads')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="integration-flow">
+              <h3><ion-icon name="swap-horizontal"></ion-icon> Fluxo de Integração:</h3>
+              <div class="flow-steps">
+                <div class="flow-step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <strong>Orçamento Criado</strong>
+                    <p>Sistema gera orçamento automaticamente</p>
+                  </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <strong>Lead Criado</strong>
+                    <p>Lead é criado com status "Contatado"</p>
+                  </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <strong>Referência Cruzada</strong>
+                    <p>Lead e orçamento ficam vinculados</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="integration-benefits">
+              <h4><ion-icon name="trophy" color="primary"></ion-icon> Benefícios da Integração:</h4>
+              <ul>
+                <li><strong>Histórico completo</strong> de interações com o cliente</li>
+                <li><strong>Rastreamento automático</strong> do pipeline de vendas</li>
+                <li><strong>Evita duplicação</strong> de leads</li>
+                <li><strong>Métricas precisas</strong> de conversão</li>
+                <li><strong>Follow-up facilitado</strong> com histórico completo</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+      </ion-accordion-group>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

@@ -8,6 +8,7 @@ import { addIcons } from 'ionicons';
 import { eye, eyeOff, logIn, arrowBack, alertCircle, person, lockClosed, logoFacebook, logoTwitter, logoGoogle } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -114,38 +115,74 @@ export class LoginPage implements OnInit {
     const { usuario, senha } = this.loginForm.value;
 
     try {
-      const response = await this.authService.login(usuario, senha).toPromise();
+      const response = await firstValueFrom(this.authService.login(usuario, senha));
 
       if (response?.success) {
+        console.log('LoginPage: Login bem-sucedido, redirecionando...');
         await this.showToast('Login realizado com sucesso!', 'success');
 
-        // Redirecionar baseado no nível de acesso
-        this.redirecionarPorNivel(response.usuario?.nivel_acesso);
+        // Aguardar um pouco para o toast aparecer antes de redirecionar
+        setTimeout(() => {
+          this.redirecionarPorNivel(response.usuario?.nivel_acesso);
+        }, 1000);
+
+        // Fallback adicional: se após 3 segundos ainda estiver na página de login, forçar redirecionamento
+        setTimeout(() => {
+          if (this.router.url === '/login') {
+            console.log('LoginPage: Fallback - forçando redirecionamento após 3 segundos');
+            this.redirecionarPorNivel(response.usuario?.nivel_acesso);
+          }
+        }, 3000);
       } else {
+        console.log('LoginPage: Login falhou:', response?.message);
         this.errorMessage = response?.message || 'Erro ao fazer login';
+        this.isLoading = false;
       }
     } catch (error) {
       console.error('Erro no login:', error);
       this.errorMessage = 'Erro de conexão. Tente novamente.';
-    } finally {
       this.isLoading = false;
     }
   }
 
   private redirecionarPorNivel(nivel?: string) {
+    this.isLoading = false; // Garantir que o loading seja removido
+
+    console.log('LoginPage: Redirecionando usuário com nível:', nivel);
+
     switch (nivel) {
       case 'admin':
       case 'gerente':
-        this.router.navigate(['/painel-orcamento']);
-        break;
       case 'vendedor':
-        this.router.navigate(['/painel-orcamento']);
+        console.log('LoginPage: Tentando redirecionar para painel-orcamento');
+        this.router.navigate(['/painel-orcamento']).then(() => {
+          console.log('LoginPage: Redirecionamento para painel-orcamento realizado com sucesso');
+        }).catch(error => {
+          console.error('LoginPage: Erro ao redirecionar para painel-orcamento:', error);
+          // Fallback: usar window.location
+          console.log('LoginPage: Usando fallback com window.location');
+          window.location.href = '/painel-orcamento';
+        });
         break;
       case 'cliente':
-        this.router.navigate(['/']);
+        console.log('LoginPage: Tentando redirecionar para home');
+        this.router.navigate(['/']).then(() => {
+          console.log('LoginPage: Redirecionamento para home realizado com sucesso');
+        }).catch(error => {
+          console.error('LoginPage: Erro ao redirecionar para home:', error);
+          // Fallback: usar window.location
+          window.location.href = '/';
+        });
         break;
       default:
-        this.router.navigate(['/']);
+        console.log('LoginPage: Tentando redirecionamento padrão para home');
+        this.router.navigate(['/']).then(() => {
+          console.log('LoginPage: Redirecionamento padrão para home realizado com sucesso');
+        }).catch(error => {
+          console.error('LoginPage: Erro ao redirecionar para home (padrão):', error);
+          // Fallback: usar window.location
+          window.location.href = '/';
+        });
     }
   }
 

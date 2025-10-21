@@ -1,0 +1,478 @@
+<ion-content [fullscreen]="true" class="tutorial-content">
+
+  <!-- Índice de Navegação -->
+  <ion-card class="index-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="list"></ion-icon>
+        Índice do Tutorial
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="6">
+            <ion-button
+              fill="outline"
+              expand="block"
+              routerLink="/tutorial/painel-principal"
+              class="index-btn">
+              <ion-icon name="home" slot="start"></ion-icon>
+              Painel Principal
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-button
+              fill="outline"
+              expand="block"
+              routerLink="/tutorial/gestao-leads"
+              class="index-btn">
+              <ion-icon name="people" slot="start"></ion-icon>
+              Gestão de Leads
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-button
+              fill="outline"
+              expand="block"
+              routerLink="/tutorial/orcamentos"
+              class="index-btn">
+              <ion-icon name="calculator" slot="start"></ion-icon>
+              Orçamentos
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-button
+              fill="outline"
+              expand="block"
+              routerLink="/tutorial/produtos"
+              class="index-btn">
+              <ion-icon name="cube" slot="start"></ion-icon>
+              Produtos
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-button
+              fill="outline"
+              expand="block"
+              routerLink="/tutorial/relatorios"
+              class="index-btn">
+              <ion-icon name="analytics" slot="start"></ion-icon>
+              Relatórios
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-button
+              fill="outline"
+              expand="block"
+              routerLink="/tutorial/configuracoes"
+              class="index-btn">
+              <ion-icon name="settings" slot="start"></ion-icon>
+              Configurações
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção: Painel Principal -->
+  <ion-card id="painel-principal" class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="home" color="primary"></ion-icon>
+        Painel Principal - Centro de Controle
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>O <strong>Painel Principal</strong> é o centro de controle do sistema N.D Connect. Aqui você tem uma visão geral de todos os leads, estatísticas em tempo real e acesso rápido às principais funcionalidades.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="bar-chart"></ion-icon> Estatísticas em Tempo Real</h3>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <ion-icon name="people" color="primary"></ion-icon>
+            <div>
+              <h4>Total de Leads</h4>
+              <p>Número total de leads cadastrados no sistema</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="add-circle" color="warning"></ion-icon>
+            <div>
+              <h4>Leads Novos</h4>
+              <p>Leads recém-cadastrados que precisam de atenção</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="trophy" color="success"></ion-icon>
+            <div>
+              <h4>Leads Convertidos</h4>
+              <p>Leads que se tornaram clientes</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="call" color="tertiary"></ion-icon>
+            <div>
+              <h4>Leads Contatados</h4>
+              <p>Leads que já foram contatados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="flash"></ion-icon> Ações Rápidas</h3>
+        <div class="action-grid">
+          <div class="action-item">
+            <ion-icon name="calculator" color="primary"></ion-icon>
+            <h4>Novo Orçamento</h4>
+            <p>Criar orçamento para cliente</p>
+          </div>
+          <div class="action-item">
+            <ion-icon name="people" color="secondary"></ion-icon>
+            <h4>Gestão de Leads</h4>
+            <p>Gerenciar prospects</p>
+          </div>
+          <div class="action-item">
+            <ion-icon name="cube" color="tertiary"></ion-icon>
+            <h4>Produtos</h4>
+            <p>Gerenciar catálogo</p>
+          </div>
+          <div class="action-item">
+            <ion-icon name="analytics" color="success"></ion-icon>
+            <h4>Relatórios</h4>
+            <p>Análises e métricas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="time"></ion-icon> Leads Recentes</h3>
+        <p>Visualização dos 5 leads mais recentes com:</p>
+        <ul>
+          <li><strong>Status visual</strong> com cores e ícones</li>
+          <li><strong>Ações rápidas</strong>: ligar, email, WhatsApp, criar orçamento</li>
+          <li><strong>Indicador de "não lido"</strong> para leads novos</li>
+          <li><strong>Informações completas</strong>: nome, email, telefone, data</li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="add"></ion-icon> Botão Flutuante</h3>
+        <p>No canto inferior direito, você encontra um botão flutuante com ícone "+" que permite:</p>
+        <ul>
+          <li><strong>Criar novo lead</strong> rapidamente</li>
+          <li><strong>Acesso direto</strong> ao formulário de criação</li>
+          <li><strong>Preenchimento automático</strong> dos dados</li>
+        </ul>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção: Gestão de Leads -->
+  <ion-card id="gestao-leads" class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="people" color="secondary"></ion-icon>
+        Gestão de Leads - Controle Total
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>A <strong>Gestão de Leads</strong> é onde você gerencia todo o pipeline de vendas, desde o primeiro contato até a conversão em cliente.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="filter"></ion-icon> Filtros por Status</h3>
+        <div class="status-grid">
+          <div class="status-item novo">
+            <ion-icon name="add-circle"></ion-icon>
+            <h4>Novos</h4>
+            <p>Leads recém-cadastrados</p>
+          </div>
+          <div class="status-item contatado">
+            <ion-icon name="call"></ion-icon>
+            <h4>Contatados</h4>
+            <p>Leads que já foram contatados</p>
+          </div>
+          <div class="status-item qualificado">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <h4>Qualificados</h4>
+            <p>Leads com potencial de compra</p>
+          </div>
+          <div class="status-item convertido">
+            <ion-icon name="trophy"></ion-icon>
+            <h4>Convertidos</h4>
+            <p>Leads que viraram clientes</p>
+          </div>
+          <div class="status-item perdido">
+            <ion-icon name="close-circle"></ion-icon>
+            <h4>Perdidos</h4>
+            <p>Leads que não avançaram</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="search"></ion-icon> Busca Inteligente</h3>
+        <p>Pesquise leads por:</p>
+        <ul>
+          <li><strong>Nome</strong> do lead</li>
+          <li><strong>Email</strong> de contato</li>
+          <li><strong>Telefone</strong></li>
+          <li><strong>Empresa</strong></li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="construct"></ion-icon> Ações Disponíveis</h3>
+        <div class="actions-grid">
+          <div class="action-detail">
+            <ion-icon name="chatbubbles" color="primary"></ion-icon>
+            <div>
+              <h4>Ver Detalhes</h4>
+              <p>Visualizar informações completas do lead</p>
+            </div>
+          </div>
+          <div class="action-detail">
+            <ion-icon name="call" color="success"></ion-icon>
+            <div>
+              <h4>Ligar</h4>
+              <p>Fazer ligação direta</p>
+            </div>
+          </div>
+          <div class="action-detail">
+            <ion-icon name="chatbubbles" color="success"></ion-icon>
+            <div>
+              <h4>WhatsApp</h4>
+              <p>Enviar mensagem via WhatsApp</p>
+            </div>
+          </div>
+          <div class="action-detail">
+            <ion-icon name="create" color="warning"></ion-icon>
+            <div>
+              <h4>Atualizar</h4>
+              <p>Alterar status e adicionar observações</p>
+            </div>
+          </div>
+          <div class="action-detail">
+            <ion-icon name="document-text" color="tertiary"></ion-icon>
+            <div>
+              <h4>Criar Orçamento</h4>
+              <p>Gerar orçamento para o lead</p>
+            </div>
+          </div>
+          <div class="action-detail">
+            <ion-icon name="swap-horizontal" color="success"></ion-icon>
+            <div>
+              <h4>Converter</h4>
+              <p>Transformar lead em cliente</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="information-circle"></ion-icon> Lógica Inteligente de Orçamentos</h3>
+        <div class="logic-box">
+          <h4>Para Leads Contatados:</h4>
+          <ul>
+            <li><strong>Se já tem orçamento:</strong> Abre o orçamento existente</li>
+            <li><strong>Se não tem orçamento:</strong> Mostra alerta perguntando se deseja criar</li>
+          </ul>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção: Orçamentos -->
+  <ion-card id="orcamentos" class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="calculator" color="tertiary"></ion-icon>
+        Sistema de Orçamentos - Criação Inteligente
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>O <strong>Sistema de Orçamentos</strong> permite criar orçamentos profissionais com produtos do catálogo, aplicação de descontos e geração automática de PDFs.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="search"></ion-icon> Busca de Produtos</h3>
+        <ul>
+          <li><strong>Pesquisa por nome</strong> ou descrição</li>
+          <li><strong>Filtro por categoria</strong></li>
+          <li><strong>Produtos populares</strong> destacados</li>
+          <li><strong>Alternância</strong> entre populares e todos</li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="list"></ion-icon> Gestão do Orçamento</h3>
+        <ul>
+          <li><strong>Adicionar/remover</strong> produtos</li>
+          <li><strong>Alterar quantidades</strong></li>
+          <li><strong>Descontos por item</strong> (valor ou porcentagem)</li>
+          <li><strong>Desconto geral</strong> no orçamento</li>
+          <li><strong>Cálculo automático</strong> de totais</li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="person"></ion-icon> Dados do Cliente</h3>
+        <ul>
+          <li><strong>Preenchimento automático</strong> quando vem de lead</li>
+          <li><strong>Validação de campos</strong> obrigatórios</li>
+          <li><strong>Formatação automática</strong> de telefone</li>
+          <li><strong>Validação de email</strong></li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="calendar"></ion-icon> Validade do Orçamento</h3>
+        <ul>
+          <li><strong>Data mínima</strong> de 10 dias (conforme legislação)</li>
+          <li><strong>Validação automática</strong> da data</li>
+          <li><strong>Alerta</strong> se data for menor que 10 dias</li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="document"></ion-icon> Geração e Compartilhamento</h3>
+        <ul>
+          <li><strong>PDF profissional</strong> com logo da empresa</li>
+          <li><strong>Compartilhamento via WhatsApp</strong></li>
+          <li><strong>Envio por email</strong></li>
+          <li><strong>Download direto</strong> do PDF</li>
+          <li><strong>Cópia de link</strong> para compartilhamento</li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="add-circle"></ion-icon> Criação Automática de Lead</h3>
+        <div class="logic-box">
+          <h4>Lógica Inteligente:</h4>
+          <ul>
+            <li><strong>Se veio da gestão de leads:</strong> NÃO cria novo lead</li>
+            <li><strong>Se acesso direto:</strong> Cria lead automaticamente com status "contatado"</li>
+            <li><strong>Referência ao orçamento</strong> salva no lead</li>
+          </ul>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção: Produtos -->
+  <ion-card id="produtos" class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="cube" color="success"></ion-icon>
+        Catálogo de Produtos
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>O <strong>Catálogo de Produtos</strong> permite gerenciar todos os produtos disponíveis para orçamento.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="grid"></ion-icon> Organização</h3>
+        <ul>
+          <li><strong>Categorias</strong> para organização</li>
+          <li><strong>Preços</strong> e unidades</li>
+          <li><strong>Descrições</strong> detalhadas</li>
+          <li><strong>Sistema de popularidade</strong></li>
+        </ul>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção: Relatórios -->
+  <ion-card id="relatorios" class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="analytics" color="warning"></ion-icon>
+        Relatórios e Análises
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>Os <strong>Relatórios</strong> fornecem insights sobre o desempenho do negócio.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="stats-chart"></ion-icon> Métricas Disponíveis</h3>
+        <ul>
+          <li><strong>Conversão de leads</strong></li>
+          <li><strong>Performance por período</strong></li>
+          <li><strong>Produtos mais vendidos</strong></li>
+          <li><strong>Análise de orçamentos</strong></li>
+        </ul>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Seção: Configurações -->
+  <ion-card id="configuracoes" class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="settings" color="medium"></ion-icon>
+        Configurações do Sistema
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>As <strong>Configurações</strong> permitem personalizar o sistema conforme suas necessidades.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3><ion-icon name="cog"></ion-icon> Opções Disponíveis</h3>
+        <ul>
+          <li><strong>Gestão de usuários</strong></li>
+          <li><strong>Níveis de acesso</strong></li>
+          <li><strong>Configurações de email</strong></li>
+          <li><strong>Personalização de templates</strong></li>
+        </ul>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Dicas Finais -->
+  <ion-card class="tips-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="bulb" color="warning"></ion-icon>
+        Dicas Importantes
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <ion-icon name="refresh" color="primary"></ion-icon>
+          <h4>Atualização Automática</h4>
+          <p>O sistema atualiza os dados automaticamente a cada 30 segundos</p>
+        </div>
+        <div class="tip-item">
+          <ion-icon name="notifications" color="warning"></ion-icon>
+          <h4>Notificações</h4>
+          <p>Leads novos são marcados automaticamente como lidos na primeira visualização</p>
+        </div>
+        <div class="tip-item">
+          <ion-icon name="checkmark-circle" color="success"></ion-icon>
+          <h4>Validações</h4>
+          <p>O sistema valida automaticamente emails, telefones e datas</p>
+        </div>
+        <div class="tip-item">
+          <ion-icon name="document-text" color="tertiary"></ion-icon>
+          <h4>PDFs</h4>
+          <p>Todos os orçamentos são gerados em PDF profissional</p>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

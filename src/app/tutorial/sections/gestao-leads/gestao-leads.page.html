@@ -1,0 +1,404 @@
+<ion-content class="tutorial-section-content">
+
+  <!-- Seção: Gestão de Leads -->
+  <ion-card class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="people" color="secondary"></ion-icon>
+        Gestão de Leads - Controle Total
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>A <strong>Gestão de Leads</strong> é onde você gerencia todo o pipeline de vendas, desde o primeiro contato até a conversão em cliente.</p>
+      </div>
+
+      <!-- Accordion com subtópicos -->
+      <ion-accordion-group>
+
+        <!-- Como Adicionar um Lead -->
+        <ion-accordion value="adicionar-lead">
+          <ion-item slot="header" color="light">
+            <ion-icon name="person-add" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>Como Adicionar um Lead</h2>
+              <p>Passo a passo para criar novos leads no sistema</p>
+            </ion-label>
+            <ion-badge color="primary" slot="end">Essencial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('adicionar-lead')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('adicionar-lead')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="list"></ion-icon> Passos para Adicionar um Lead:</h3>
+              <ol class="steps-list">
+                <li>
+                  <strong>Clique no botão flutuante "+"</strong> no canto inferior direito da tela
+                  <ion-chip color="primary" size="small">Novo</ion-chip>
+                </li>
+                <li>
+                  <strong>Preencha os dados obrigatórios:</strong>
+                  <ul>
+                    <li>Nome do lead (obrigatório)</li>
+                    <li>Email de contato</li>
+                    <li>Telefone</li>
+                    <li>Empresa</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Selecione a origem:</strong> Site, WhatsApp, Email, Telefone, Indicação ou Outros
+                </li>
+                <li>
+                  <strong>Adicione observações</strong> se necessário
+                </li>
+                <li>
+                  <strong>Clique em "Salvar"</strong> para criar o lead
+                </li>
+              </ol>
+            </div>
+
+            <div class="tips-box">
+              <h4><ion-icon name="bulb" color="warning"></ion-icon> Dicas Importantes:</h4>
+              <ul>
+                <li>O <strong>nome é obrigatório</strong> - sem ele não é possível salvar</li>
+                <li>Leads criados manualmente começam com status <strong>"Novo"</strong></li>
+                <li>Use o <strong>botão no header</strong> como alternativa ao botão flutuante</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Filtrar Leads por Status -->
+        <ion-accordion value="filtrar-status">
+          <ion-item slot="header" color="light">
+            <ion-icon name="filter" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Como Filtrar Leads por Status</h2>
+              <p>Organize leads por estágio do pipeline de vendas</p>
+            </ion-label>
+            <ion-badge color="secondary" slot="end">Organização</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('filtrar-status')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('filtrar-status')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="status-explanation">
+              <h3><ion-icon name="swap-horizontal"></ion-icon> Status Disponíveis:</h3>
+              <div class="status-grid">
+                <div class="status-item novo">
+                  <ion-icon name="add-circle"></ion-icon>
+                  <h4>Novos</h4>
+                  <p>Leads recém-cadastrados que precisam de atenção</p>
+                </div>
+                <div class="status-item contatado">
+                  <ion-icon name="call"></ion-icon>
+                  <h4>Contatados</h4>
+                  <p>Leads que já foram contatados pela primeira vez</p>
+                </div>
+                <div class="status-item qualificado">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  <h4>Qualificados</h4>
+                  <p>Leads com potencial comprovado de compra</p>
+                </div>
+                <div class="status-item convertido">
+                  <ion-icon name="trophy"></ion-icon>
+                  <h4>Convertidos</h4>
+                  <p>Leads que se tornaram clientes</p>
+                </div>
+                <div class="status-item perdido">
+                  <ion-icon name="close-circle"></ion-icon>
+                  <h4>Perdidos</h4>
+                  <p>Leads que não avançaram no pipeline</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Filtrar:</h3>
+              <ol class="steps-list">
+                <li>Use os <strong>chips de status</strong> no topo da página</li>
+                <li>Clique em um status para <strong>filtrar apenas leads</strong> daquele estágio</li>
+                <li>Clique em <strong>"Todos"</strong> para ver todos os leads</li>
+                <li>Os <strong>badges numéricos</strong> mostram quantos leads há em cada status</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Buscar Leads -->
+        <ion-accordion value="buscar-leads">
+          <ion-item slot="header" color="light">
+            <ion-icon name="search" slot="start" color="tertiary"></ion-icon>
+            <ion-label>
+              <h2>Como Buscar Leads</h2>
+              <p>Encontre leads específicos rapidamente</p>
+            </ion-label>
+            <ion-badge color="tertiary" slot="end">Busca</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('buscar-leads')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('buscar-leads')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="search-explanation">
+              <h3><ion-icon name="search"></ion-icon> Critérios de Busca:</h3>
+              <p>Você pode buscar leads por qualquer um destes campos:</p>
+              <ul>
+                <li><strong>Nome</strong> do lead</li>
+                <li><strong>Email</strong> de contato</li>
+                <li><strong>Telefone</strong></li>
+                <li><strong>Empresa</strong></li>
+              </ul>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Buscar:</h3>
+              <ol class="steps-list">
+                <li>Digite o termo de busca na <strong>barra de pesquisa</strong></li>
+                <li>A busca é <strong>instantânea</strong> - resultados aparecem conforme você digita</li>
+                <li>Use <strong>parte do nome</strong> ou email para encontrar leads</li>
+                <li>Limpe a busca para <strong>ver todos os leads</strong> novamente</li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Atualizar Status de um Lead -->
+        <ion-accordion value="atualizar-status">
+          <ion-item slot="header" color="light">
+            <ion-icon name="swap-horizontal" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Como Atualizar Status de um Lead</h2>
+              <p>Mova leads através do pipeline de vendas</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Progressão</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('atualizar-status')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('atualizar-status')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Atualizar Status:</h3>
+              <ol class="steps-list">
+                <li>Clique no botão <strong>"Atualizar"</strong> (ícone de lápis) do lead</li>
+                <li>Selecione o <strong>novo status</strong> no modal que abrir</li>
+                <li>Adicione <strong>observações</strong> sobre a mudança</li>
+                <li>Clique em <strong>"Salvar"</strong> para confirmar</li>
+              </ol>
+            </div>
+
+            <div class="workflow-tips">
+              <h4><ion-icon name="time" color="primary"></ion-icon> Fluxo Recomendado:</h4>
+              <div class="workflow-steps">
+                <div class="workflow-step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <strong>Novo</strong> → <strong>Contatado</strong>
+                    <p>Após fazer o primeiro contato</p>
+                  </div>
+                </div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <strong>Contatado</strong> → <strong>Qualificado</strong>
+                    <p>Quando confirmar interesse</p>
+                  </div>
+                </div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <strong>Qualificado</strong> → <strong>Convertido</strong>
+                    <p>Após fechar a venda</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Criar Orçamento para um Lead -->
+        <ion-accordion value="criar-orcamento">
+          <ion-item slot="header" color="light">
+            <ion-icon name="document-text" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h2>Como Criar Orçamento para um Lead</h2>
+              <p>Gere propostas comerciais personalizadas</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">Vendas</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('criar-orcamento')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('criar-orcamento')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Criar Orçamento:</h3>
+              <ol class="steps-list">
+                <li>Clique no botão <strong>"Orçamento"</strong> do lead desejado</li>
+                <li>O sistema irá:
+                  <ul>
+                    <li><strong>Se for lead novo:</strong> Criar novo orçamento com dados preenchidos</li>
+                    <li><strong>Se for lead contatado:</strong> Verificar se já tem orçamento</li>
+                    <li><strong>Se já tem orçamento:</strong> Abrir o orçamento existente</li>
+                    <li><strong>Se não tem orçamento:</strong> Perguntar se deseja criar</li>
+                  </ul>
+                </li>
+                <li>Preencha os <strong>produtos/serviços</strong> desejados</li>
+                <li>Configure <strong>quantidades e preços</strong></li>
+                <li>Aplique <strong>descontos</strong> se necessário</li>
+                <li>Defina a <strong>validade</strong> do orçamento</li>
+                <li>Gere o <strong>PDF</strong> para envio ao cliente</li>
+              </ol>
+            </div>
+
+            <div class="logic-explanation">
+              <h4><ion-icon name="information-circle" color="primary"></ion-icon> Lógica Inteligente:</h4>
+              <p>O sistema é inteligente e evita duplicações:</p>
+              <ul>
+                <li><strong>Leads novos:</strong> Cria orçamento + lead automaticamente</li>
+                <li><strong>Leads contatados:</strong> Usa lead existente, não cria duplicado</li>
+                <li><strong>Orçamentos existentes:</strong> Abre o PDF diretamente</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Converter Lead em Cliente -->
+        <ion-accordion value="converter-cliente">
+          <ion-item slot="header" color="light">
+            <ion-icon name="trophy" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Como Converter Lead em Cliente</h2>
+              <p>Finalize vendas e acompanhe conversões</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Conversão</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('converter-cliente')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('converter-cliente')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Converter:</h3>
+              <ol class="steps-list">
+                <li>Após fechar a venda, clique em <strong>"Converter"</strong></li>
+                <li>Confirme a conversão no modal</li>
+                <li>O lead será marcado como <strong>"Convertido"</strong></li>
+                <li>Aparecerá nas <strong>estatísticas de conversão</strong></li>
+              </ol>
+            </div>
+
+            <div class="conversion-benefits">
+              <h4><ion-icon name="analytics" color="primary"></ion-icon> Benefícios da Conversão:</h4>
+              <ul>
+                <li><strong>Métricas precisas</strong> de performance</li>
+                <li><strong>Relatórios de conversão</strong> atualizados</li>
+                <li><strong>Histórico completo</strong> do pipeline</li>
+                <li><strong>Análise de ROI</strong> por origem</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+      </ion-accordion-group>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

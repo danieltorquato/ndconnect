@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-require_once 'config/database.php';
+require_once 'Config/Database.php';
 
 try {
     $database = new Database();
@@ -76,6 +76,11 @@ try {
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Erro interno: ' . $e->getMessage()]);
+    error_log("Erro em marcar_lead_lido.php: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erro interno do servidor',
+        'error' => $e->getMessage()
+    ]);
 }
 ?>

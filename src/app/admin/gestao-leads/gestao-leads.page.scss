@@ -225,3 +225,58 @@ ion-modal {
   }
 }
 
+// Botão flutuante para criar lead
+.fab-create-lead {
+  --background: linear-gradient(135deg, #FF6B00 0%, #e55a00 100%);
+  --color: #ffffff;
+  --box-shadow: 0 8px 16px 0 rgb(255, 107, 0, 0.3), 0 4px 8px -4px rgb(255, 107, 0, 0.2);
+  --border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    --background: linear-gradient(135deg, #e55a00 0%, #cc4f00 100%);
+    transform: scale(1.1);
+    --box-shadow: 0 12px 24px 0 rgb(255, 107, 0, 0.4), 0 6px 12px -6px rgb(255, 107, 0, 0.3);
+  }
+
+  ion-icon {
+    font-size: 1.5rem;
+    color: #ffffff !important;
+  }
+}
+
+// Indicador de carregamento
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--nd-primary);
+  font-weight: 500;
+
+  ion-icon {
+    font-size: 1.5rem;
+  }
+
+  span {
+    font-size: 1rem;
+  }
+}
+
+// Animação de rotação para o ícone de refresh
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { interval, Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
 import {
   arrowBack, personAdd, call, mail, business, chatbubbles,
   checkmarkCircle, closeCircle, time, search, create, trash,
-  swapHorizontal, documentText, addCircle } from 'ionicons/icons';
+  swapHorizontal, documentText, addCircle, add, refresh } from 'ionicons/icons';
 import {
   IonHeader,
   IonToolbar,
@@ -29,6 +30,9 @@ import {
   IonTextarea,
   IonSelect,
   IonSelectOption,
+  IonInput,
+  IonFab,
+  IonFabButton,
   AlertController
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
@@ -47,6 +51,7 @@ interface Lead {
   observacoes?: string;
   lido?: boolean;
   data_leitura?: string;
+  orcamento_id?: number;
 }
 
 @Component({
@@ -76,15 +81,22 @@ interface Lead {
     IonTextarea,
     IonSelect,
     IonSelectOption,
+    IonInput,
+    IonFab,
+    IonFabButton,
     CommonModule,
     FormsModule
   ]
 })
-export class GestaoLeadsPage implements OnInit {
+export class GestaoLeadsPage implements OnInit, OnDestroy {
   leads: Lead[] = [];
   leadsFiltrados: Lead[] = [];
   statusFiltro: string = 'novo';
   termoPesquisa: string = '';
+  carregando: boolean = false;
+
+  // Refresh automático
+  private refreshSubscription?: Subscription;
 
   // Modal de detalhes
   modalDetalhesAberto: boolean = false;
@@ -94,6 +106,18 @@ export class GestaoLeadsPage implements OnInit {
   modalAtualizarAberto: boolean = false;
   novoStatus: string = '';
   observacoes: string = '';
+
+  // Modal de criação
+  modalCriarLeadAberto: boolean = false;
+  novoLead: Partial<Lead> = {
+    nome: '',
+    email: '',
+    telefone: '',
+    empresa: '',
+    origem: 'outros',
+    mensagem: '',
+    status: 'novo'
+  };
 
   // Contadores
   contadores = {
@@ -109,16 +133,41 @@ export class GestaoLeadsPage implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private route: ActivatedRoute,
     private alertController: AlertController
   ) {
-    addIcons({arrowBack,personAdd,addCircle,call,mail,time,chatbubbles,create,documentText,swapHorizontal,checkmarkCircle,trash,closeCircle,business,search});
+    addIcons({arrowBack,refresh,personAdd,addCircle,call,mail,time,chatbubbles,create,documentText,swapHorizontal,checkmarkCircle,trash,closeCircle,add,business,search});
   }
 
   ngOnInit() {
+    // Forçar atualização sempre que entrar na página
+    this.atualizarDados();
+
+    // Configurar refresh automático a cada 30 segundos
+    this.configurarRefreshAutomatico();
+  }
+
+  ngOnDestroy() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
+  }
+
+  configurarRefreshAutomatico() {
+    // Atualizar dados a cada 30 segundos
+    this.refreshSubscription = interval(30000).subscribe(() => {
+      console.log('GestaoLeads: Refresh automático executado');
+      this.carregarLeads();
+    });
+  }
+
+  atualizarDados() {
+    console.log('GestaoLeads: Atualizando dados...');
     this.carregarLeads();
   }
 
   carregarLeads() {
+    this.carregando = true;
     const endpoint = this.statusFiltro === 'todos'
       ? `${this.apiUrl}/leads`
       : `${this.apiUrl}/leads?status=${this.statusFiltro}`;
@@ -130,9 +179,11 @@ export class GestaoLeadsPage implements OnInit {
           this.filtrarLeads();
           this.calcularContadores();
         }
+        this.carregando = false;
       },
       error: (error) => {
         console.error('Erro ao carregar leads:', error);
+        this.carregando = false;
       }
     });
   }
@@ -354,8 +405,61 @@ export class GestaoLeadsPage implements OnInit {
     }
   }
 
-  criarOrcamento(lead: any) {
+  async criarOrcamento(lead: Lead) {
     console.log('Criando orçamento para lead:', lead);
+
+    // Se o lead tem status "contatado", verificar se já tem orçamento
+    if (lead.status === 'contatado') {
+      if (lead.orcamento_id) {
+        // Lead já tem orçamento, abrir o orçamento existente
+        console.log('Lead contatado já tem orçamento, abrindo orçamento ID:', lead.orcamento_id);
+        this.abrirOrcamentoExistente(lead.orcamento_id);
+        return;
+      } else {
+        // Lead contatado não tem orçamento, mostrar alerta
+        console.log('Lead contatado não tem orçamento, mostrando alerta');
+        await this.mostrarAlertaOrcamentoNaoCriado(lead);
+        return;
+      }
+    }
+
+    // Para outros status, criar novo orçamento normalmente
+    this.criarNovoOrcamento(lead);
+  }
+
+  abrirOrcamentoExistente(orcamentoId: number) {
+    // Abrir orçamento existente em nova aba
+    const url = `${this.apiUrl}/simple_pdf.php?id=${orcamentoId}`;
+    window.open(url, '_blank');
+  }
+
+  async mostrarAlertaOrcamentoNaoCriado(lead: Lead) {
+    const alert = await this.alertController.create({
+      header: 'Orçamento não encontrado',
+      message: `O lead "${lead.nome}" está marcado como contatado, mas ainda não possui um orçamento criado. Deseja criar um orçamento agora?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('Usuário cancelou criação de orçamento');
+          }
+        },
+        {
+          text: 'Criar Orçamento',
+          handler: () => {
+            console.log('Usuário escolheu criar orçamento');
+            this.criarNovoOrcamento(lead);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  criarNovoOrcamento(lead: Lead) {
+    console.log('Criando novo orçamento para lead:', lead);
 
     // Criar orçamento a partir do lead
     this.http.post<any>(`${this.apiUrl}/orcamentos/from-lead`, { lead_id: lead.id }).subscribe({
@@ -419,6 +523,68 @@ export class GestaoLeadsPage implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao marcar lead como lido:', error);
+      }
+    });
+  }
+
+  // Métodos para criação de lead
+  abrirModalCriarLead() {
+    this.novoLead = {
+      nome: '',
+      email: '',
+      telefone: '',
+      empresa: '',
+      origem: 'outros',
+      mensagem: '',
+      status: 'novo'
+    };
+    this.modalCriarLeadAberto = true;
+  }
+
+  fecharModalCriarLead() {
+    this.modalCriarLeadAberto = false;
+    this.novoLead = {
+      nome: '',
+      email: '',
+      telefone: '',
+      empresa: '',
+      origem: 'outros',
+      mensagem: '',
+      status: 'novo'
+    };
+  }
+
+  async criarLead() {
+    // Validação obrigatória do nome
+    if (!this.novoLead.nome?.trim()) {
+      await this.mostrarAlerta('Erro', 'O nome é obrigatório para criar um lead.');
+      return;
+    }
+
+    // Preparar dados para envio
+    const dadosLead = {
+      nome: this.novoLead.nome.trim(),
+      email: this.novoLead.email?.trim() || '',
+      telefone: this.novoLead.telefone?.trim() || '',
+      empresa: this.novoLead.empresa?.trim() || '',
+      origem: this.novoLead.origem || 'outros',
+      mensagem: this.novoLead.mensagem?.trim() || 'Lead criado manualmente',
+      status: 'novo'
+    };
+
+    this.http.post<any>(`${this.apiUrl}/leads`, dadosLead).subscribe({
+      next: async (response) => {
+        if (response.success) {
+          await this.mostrarAlerta('Sucesso', 'Lead criado com sucesso!');
+          this.fecharModalCriarLead();
+          this.carregarLeads(); // Recarregar a lista de leads
+        } else {
+          await this.mostrarAlerta('Erro', response.message || 'Erro ao criar lead');
+        }
+      },
+      error: async (error) => {
+        console.error('Erro ao criar lead:', error);
+        await this.mostrarAlerta('Erro', 'Não foi possível criar o lead. Tente novamente.');
       }
     });
   }

@@ -6,6 +6,14 @@
       </ion-button>
     </ion-buttons>
     <ion-title>Gestão de Leads</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="atualizarDados()" [disabled]="carregando">
+        <ion-icon name="refresh" [class.spin]="carregando"></ion-icon>
+      </ion-button>
+      <ion-button (click)="abrirModalCriarLead()">
+        <ion-icon name="person-add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 
   <ion-toolbar>
@@ -46,7 +54,13 @@
       debounce="300">
     </ion-searchbar>
 
-    <ion-card *ngIf="leadsFiltrados.length === 0" class="empty-state">
+    <!-- Indicador de carregamento -->
+    <div *ngIf="carregando" class="loading-indicator">
+      <ion-icon name="refresh" class="spin"></ion-icon>
+      <span>Carregando leads...</span>
+    </div>
+
+    <ion-card *ngIf="leadsFiltrados.length === 0 && !carregando" class="empty-state">
       <ion-card-content>
         <ion-icon name="person-add" color="medium"></ion-icon>
         <p>Nenhum lead encontrado</p>
@@ -239,5 +253,107 @@
       </ion-content>
     </ng-template>
   </ion-modal>
+
+  <!-- Modal de Criação de Lead -->
+  <ion-modal [isOpen]="modalCriarLeadAberto" (didDismiss)="fecharModalCriarLead()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Novo Lead</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharModalCriarLead()">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-card>
+          <ion-card-content>
+            <form #leadForm="ngForm" (ngSubmit)="criarLead()">
+              <ion-item>
+                <ion-label position="stacked">Nome *</ion-label>
+                <ion-input
+                  [(ngModel)]="novoLead.nome"
+                  name="nome"
+                  type="text"
+                  placeholder="Nome completo do lead"
+                  required>
+                </ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">E-mail</ion-label>
+                <ion-input
+                  [(ngModel)]="novoLead.email"
+                  name="email"
+                  type="email"
+                  placeholder="email@exemplo.com">
+                </ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Telefone</ion-label>
+                <ion-input
+                  [(ngModel)]="novoLead.telefone"
+                  name="telefone"
+                  type="tel"
+                  placeholder="(11) 99999-9999">
+                </ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Empresa</ion-label>
+                <ion-input
+                  [(ngModel)]="novoLead.empresa"
+                  name="empresa"
+                  type="text"
+                  placeholder="Nome da empresa">
+                </ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Origem</ion-label>
+                <ion-select [(ngModel)]="novoLead.origem" name="origem" placeholder="Como conheceu?">
+                  <ion-select-option value="site">Site</ion-select-option>
+                  <ion-select-option value="whatsapp">WhatsApp</ion-select-option>
+                  <ion-select-option value="email">E-mail</ion-select-option>
+                  <ion-select-option value="telefone">Telefone</ion-select-option>
+                  <ion-select-option value="indicacao">Indicação</ion-select-option>
+                  <ion-select-option value="outros">Outros</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-label position="stacked">Mensagem</ion-label>
+                <ion-textarea
+                  [(ngModel)]="novoLead.mensagem"
+                  name="mensagem"
+                  rows="4"
+                  placeholder="Descreva o interesse ou necessidade do lead...">
+                </ion-textarea>
+              </ion-item>
+
+              <ion-button
+                expand="block"
+                type="submit"
+                [disabled]="!leadForm.valid || !novoLead.nome?.trim()">
+                <ion-icon name="add-circle" slot="start"></ion-icon>
+                Criar Lead
+              </ion-button>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Botão flutuante para criar lead -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="abrirModalCriarLead()" class="fab-create-lead">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface Lead {
@@ -63,7 +63,7 @@ export class LeadsService {
 
   // Carregar estatísticas dos leads
   carregarEstatisticas(): Observable<any> {
-    return this.http.get<any>(`${this.API_URL}/stats`);
+    return this.http.get<any>(`${this.API_URL}?action=stats`);
   }
 
   // Atualizar status de um lead
@@ -163,7 +163,17 @@ export class LeadsService {
   marcarLeadsComoLidos(leadIds: number[]): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/marcar_leads_lidos.php`, {
       lead_ids: leadIds
-    });
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Erro ao marcar leads como lidos:', error);
+        // Retornar uma resposta de erro estruturada
+        return of({
+          success: false,
+          message: 'Erro ao marcar leads como lidos',
+          error: error.message || 'Erro desconhecido'
+        });
+      })
+    );
   }
 
   // Marcar lead individual como lido
@@ -202,8 +212,11 @@ export class LeadsService {
 
     if (leadsNovosNaoLidos.length > 0) {
       const leadIds = leadsNovosNaoLidos.map(lead => lead.id);
+      console.log('LeadsService: Marcando leads como lidos:', leadIds);
+
       return this.marcarLeadsComoLidos(leadIds).pipe(
         tap((response: any) => {
+          console.log('LeadsService: Resposta ao marcar leads como lidos:', response);
           if (response.success) {
             // Atualizar estado local
             const leadsAtuais = this.leadsSubject.value.map(lead => {
@@ -217,11 +230,23 @@ export class LeadsService {
               return lead;
             });
             this.atualizarLeads(leadsAtuais);
+            console.log('LeadsService: Estado local atualizado com sucesso');
+          } else {
+            console.error('LeadsService: Falha ao marcar leads como lidos:', response.message);
           }
+        }),
+        catchError((error: any) => {
+          console.error('LeadsService: Erro ao marcar leads como lidos:', error);
+          return of({
+            success: false,
+            message: 'Erro ao marcar leads como lidos',
+            error: error.message || 'Erro desconhecido'
+          });
         })
       );
     }
 
+    console.log('LeadsService: Nenhum lead novo para marcar como lido');
     return of({ success: true, message: 'Nenhum lead novo para marcar como lido' });
   }
 }

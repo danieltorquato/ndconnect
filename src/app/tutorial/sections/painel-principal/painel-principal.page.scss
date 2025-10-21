@@ -1,0 +1,232 @@
+.tutorial-section-content {
+  --background: transparent;
+  padding: 0;
+}
+
+.section-card {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+
+  ion-card-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+  }
+
+  ion-card-content {
+    padding: 24px;
+  }
+}
+
+.section-intro {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border-left: 4px solid #3498db;
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #2c3e50;
+  }
+}
+
+.feature-section {
+  margin-bottom: 32px;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ecf0f1;
+
+    ion-icon {
+      font-size: 1.3rem;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+
+    li {
+      margin-bottom: 8px;
+      line-height: 1.6;
+      color: #34495e;
+
+      strong {
+        color: #2c3e50;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border-left: 4px solid #3498db;
+
+  ion-icon {
+    font-size: 1.5rem;
+    margin-top: 4px;
+  }
+
+  h4 {
+    margin: 0 0 4px 0;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.action-item {
+  text-align: center;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
+  }
+
+  ion-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+}
+
+.tips-card {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+
+  ion-card-header {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  border-left: 4px solid #ff9800;
+
+  ion-icon {
+    font-size: 1.5rem;
+    margin-top: 4px;
+  }
+
+  h4 {
+    margin: 0 0 4px 0;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .section-card ion-card-content {
+    padding: 16px;
+  }
+
+  .feature-grid,
+  .action-grid,
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-section {
+    margin-bottom: 24px;
+  }
+}

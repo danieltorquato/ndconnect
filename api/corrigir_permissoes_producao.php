@@ -1,6 +1,6 @@
 <?php
 // Script para corrigir permissões no servidor de produção
-require_once 'config/database.php';
+require_once 'Config/Database.php';
 
 try {
     $database = new Database();

@@ -1,0 +1,115 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" color="light" (click)="voltarPainel()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="header-content">
+        <ion-icon name="school" class="title-icon"></ion-icon>
+        <span>Guia do Sistema N.D Connect</span>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="light" (click)="voltarTutorial()">
+        <ion-icon name="home"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="tutorial-layout-content">
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs-container">
+    <ion-breadcrumbs>
+      <ion-breadcrumb *ngFor="let crumb of breadcrumbs; let last = last"
+                      [href]="last ? undefined : crumb.path">
+        {{ crumb.label }}
+        <ion-icon *ngIf="!last" name="chevron-forward" slot="separator"></ion-icon>
+      </ion-breadcrumb>
+    </ion-breadcrumbs>
+  </div>
+
+  <!-- Navegação lateral (desktop) -->
+  <div class="tutorial-navigation">
+    <ion-card class="nav-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="list"></ion-icon>
+          Navegação
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="nav-menu">
+          <ion-button
+            fill="clear"
+            expand="block"
+            [color]="currentSection === 'tutorial' ? 'primary' : 'medium'"
+            (click)="voltarTutorial()"
+            class="nav-item">
+            <ion-icon name="home" slot="start"></ion-icon>
+            Painel Principal
+          </ion-button>
+
+          <ion-button
+            fill="clear"
+            expand="block"
+            [color]="currentSection === 'gestao-leads' ? 'primary' : 'medium'"
+            (click)="irParaSecao('gestao-leads')"
+            class="nav-item">
+            <ion-icon name="people" slot="start"></ion-icon>
+            Gestão de Leads
+          </ion-button>
+
+          <ion-button
+            fill="clear"
+            expand="block"
+            [color]="currentSection === 'orcamentos' ? 'primary' : 'medium'"
+            (click)="irParaSecao('orcamentos')"
+            class="nav-item">
+            <ion-icon name="calculator" slot="start"></ion-icon>
+            Orçamentos
+          </ion-button>
+
+          <ion-button
+            fill="clear"
+            expand="block"
+            [color]="currentSection === 'produtos' ? 'primary' : 'medium'"
+            (click)="irParaSecao('produtos')"
+            class="nav-item">
+            <ion-icon name="cube" slot="start"></ion-icon>
+            Produtos
+          </ion-button>
+
+          <ion-button
+            fill="clear"
+            expand="block"
+            [color]="currentSection === 'relatorios' ? 'primary' : 'medium'"
+            (click)="irParaSecao('relatorios')"
+            class="nav-item">
+            <ion-icon name="analytics" slot="start"></ion-icon>
+            Relatórios
+          </ion-button>
+
+          <ion-button
+            fill="clear"
+            expand="block"
+            [color]="currentSection === 'configuracoes' ? 'primary' : 'medium'"
+            (click)="irParaSecao('configuracoes')"
+            class="nav-item">
+            <ion-icon name="settings" slot="start"></ion-icon>
+            Configurações
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="tutorial-content">
+    <router-outlet></router-outlet>
+  </div>
+
+</ion-content>

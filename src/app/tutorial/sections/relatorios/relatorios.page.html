@@ -1,0 +1,453 @@
+<ion-content class="tutorial-section-content">
+
+  <!-- Seção: Relatórios e Analytics -->
+  <ion-card class="section-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="analytics" color="success"></ion-icon>
+        Relatórios e Analytics - Insights de Negócio
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="section-intro">
+        <p>Os <strong>Relatórios e Analytics</strong> fornecem insights valiosos sobre o desempenho do seu negócio, ajudando na tomada de decisões estratégicas.</p>
+      </div>
+
+      <!-- Accordion com subtópicos -->
+      <ion-accordion-group>
+
+        <!-- Como Visualizar Relatórios de Leads -->
+        <ion-accordion value="relatorios-leads">
+          <ion-item slot="header" color="light">
+            <ion-icon name="people" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h2>Como Visualizar Relatórios de Leads</h2>
+              <p>Analise o desempenho do seu pipeline de vendas</p>
+            </ion-label>
+            <ion-badge color="primary" slot="end">Essencial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('relatorios-leads')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('relatorios-leads')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="report-types">
+              <h3><ion-icon name="bar-chart"></ion-icon> Tipos de Relatórios de Leads:</h3>
+              <div class="report-grid">
+                <div class="report-item">
+                  <ion-icon name="people"></ion-icon>
+                  <h4>Leads por Status</h4>
+                  <p>Distribuição de leads em cada estágio do pipeline</p>
+                  <ion-chip color="primary" size="small">Pipeline</ion-chip>
+                </div>
+                <div class="report-item">
+                  <ion-icon name="trending-up"></ion-icon>
+                  <h4>Conversão por Origem</h4>
+                  <p>Taxa de conversão de cada canal de aquisição</p>
+                  <ion-chip color="secondary" size="small">Origem</ion-chip>
+                </div>
+                <div class="report-item">
+                  <ion-icon name="calendar"></ion-icon>
+                  <h4>Leads por Período</h4>
+                  <p>Evolução temporal do número de leads</p>
+                  <ion-chip color="tertiary" size="small">Temporal</ion-chip>
+                </div>
+                <div class="report-item">
+                  <ion-icon name="trophy"></ion-icon>
+                  <h4>Taxa de Conversão</h4>
+                  <p>Percentual de leads que se tornam clientes</p>
+                  <ion-chip color="success" size="small">Performance</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Visualizar:</h3>
+              <ol class="steps-list">
+                <li>Acesse a <strong>página de relatórios</strong></li>
+                <li>Selecione <strong>"Relatórios de Leads"</strong></li>
+                <li>Escolha o <strong>período de análise</strong></li>
+                <li>Configure <strong>filtros específicos</strong> se necessário</li>
+                <li>Visualize os <strong>gráficos e métricas</strong></li>
+                <li>Exporte o relatório em <strong>PDF ou Excel</strong></li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Analisar Performance de Orçamentos -->
+        <ion-accordion value="performance-orcamentos">
+          <ion-item slot="header" color="light">
+            <ion-icon name="calculator" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h2>Como Analisar Performance de Orçamentos</h2>
+              <p>Métricas de eficácia das propostas comerciais</p>
+            </ion-label>
+            <ion-badge color="secondary" slot="end">Comercial</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('performance-orcamentos')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('performance-orcamentos')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="metrics-explanation">
+              <h3><ion-icon name="analytics"></ion-icon> Métricas de Orçamentos:</h3>
+              <div class="metrics-grid">
+                <div class="metric-item">
+                  <ion-icon name="document-text"></ion-icon>
+                  <h4>Total de Orçamentos</h4>
+                  <p>Quantidade total de propostas geradas</p>
+                </div>
+                <div class="metric-item">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  <h4>Taxa de Aprovação</h4>
+                  <p>Percentual de orçamentos aprovados</p>
+                </div>
+                <div class="metric-item">
+                  <ion-icon name="trending-up"></ion-icon>
+                  <h4>Valor Médio</h4>
+                  <p>Valor médio dos orçamentos gerados</p>
+                </div>
+                <div class="metric-item">
+                  <ion-icon name="time"></ion-icon>
+                  <h4>Tempo de Resposta</h4>
+                  <p>Tempo médio para aprovação</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Analisar:</h3>
+              <ol class="steps-list">
+                <li>Selecione <strong>"Relatórios de Orçamentos"</strong></li>
+                <li>Defina o <strong>período de análise</strong></li>
+                <li>Visualize <strong>gráficos de tendência</strong></li>
+                <li>Analise <strong>produtos mais vendidos</strong></li>
+                <li>Identifique <strong>padrões sazonais</strong></li>
+                <li>Compare <strong>períodos diferentes</strong></li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Gerar Relatórios Personalizados -->
+        <ion-accordion value="relatorios-personalizados">
+          <ion-item slot="header" color="light">
+            <ion-icon name="construct" slot="start" color="tertiary"></ion-icon>
+            <ion-label>
+              <h2>Como Gerar Relatórios Personalizados</h2>
+              <p>Crie análises específicas para suas necessidades</p>
+            </ion-label>
+            <ion-badge color="tertiary" slot="end">Avançado</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('relatorios-personalizados')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('relatorios-personalizados')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="customization-options">
+              <h3><ion-icon name="settings"></ion-icon> Opções de Personalização:</h3>
+              <div class="options-grid">
+                <div class="option-item">
+                  <ion-icon name="calendar"></ion-icon>
+                  <h4>Período Personalizado</h4>
+                  <p>Defina datas específicas para análise</p>
+                </div>
+                <div class="option-item">
+                  <ion-icon name="filter"></ion-icon>
+                  <h4>Filtros Avançados</h4>
+                  <p>Filtre por status, origem, vendedor</p>
+                </div>
+                <div class="option-item">
+                  <ion-icon name="bar-chart"></ion-icon>
+                  <h4>Tipos de Gráfico</h4>
+                  <p>Escolha entre barras, pizza, linha</p>
+                </div>
+                <div class="option-item">
+                  <ion-icon name="download"></ion-icon>
+                  <h4>Formatos de Export</h4>
+                  <p>PDF, Excel, CSV, PNG</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Personalizar:</h3>
+              <ol class="steps-list">
+                <li>Clique em <strong>"Relatório Personalizado"</strong></li>
+                <li>Selecione os <strong>dados a incluir</strong></li>
+                <li>Configure <strong>filtros específicos</strong></li>
+                <li>Escolha o <strong>formato de visualização</strong></li>
+                <li>Defina o <strong>período de análise</strong></li>
+                <li>Gere e <strong>exporte o relatório</strong></li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Interpretar Métricas de Conversão -->
+        <ion-accordion value="metricas-conversao">
+          <ion-item slot="header" color="light">
+            <ion-icon name="trending-up" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Como Interpretar Métricas de Conversão</h2>
+              <p>Entenda os indicadores de performance do negócio</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Análise</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('metricas-conversao')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('metricas-conversao')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="kpi-explanation">
+              <h3><ion-icon name="stats-chart"></ion-icon> KPIs Principais:</h3>
+              <div class="kpi-grid">
+                <div class="kpi-item">
+                  <ion-icon name="people"></ion-icon>
+                  <h4>Taxa de Conversão</h4>
+                  <p>Leads convertidos / Total de leads × 100</p>
+                  <ion-chip color="success" size="small">Meta: >20%</ion-chip>
+                </div>
+                <div class="kpi-item">
+                  <ion-icon name="time"></ion-icon>
+                  <h4>Tempo de Ciclo</h4>
+                  <p>Média de dias do lead ao fechamento</p>
+                  <ion-chip color="warning" size="small">Meta: <30 dias</ion-chip>
+                </div>
+                <div class="kpi-item">
+                  <ion-icon name="calculator"></ion-icon>
+                  <h4>Valor por Lead</h4>
+                  <p>Receita total / Número de leads</p>
+                  <ion-chip color="primary" size="small">Meta: Crescimento</ion-chip>
+                </div>
+                <div class="kpi-item">
+                  <ion-icon name="trending-up"></ion-icon>
+                  <h4>Crescimento Mensal</h4>
+                  <p>Variação percentual mês a mês</p>
+                  <ion-chip color="tertiary" size="small">Meta: >10%</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="interpretation-tips">
+              <h4><ion-icon name="bulb" color="warning"></ion-icon> Dicas de Interpretação:</h4>
+              <ul>
+                <li><strong>Taxa de conversão baixa:</strong> Revise o processo de qualificação</li>
+                <li><strong>Ciclo longo:</strong> Identifique gargalos no pipeline</li>
+                <li><strong>Valor por lead baixo:</strong> Foque em leads de maior valor</li>
+                <li><strong>Crescimento negativo:</strong> Analise canais de aquisição</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Como Exportar e Compartilhar Relatórios -->
+        <ion-accordion value="exportar-relatorios">
+          <ion-item slot="header" color="light">
+            <ion-icon name="download" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h2>Como Exportar e Compartilhar Relatórios</h2>
+              <p>Distribua insights com sua equipe e stakeholders</p>
+            </ion-label>
+            <ion-badge color="warning" slot="end">Distribuição</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('exportar-relatorios')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('exportar-relatorios')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="export-formats">
+              <h3><ion-icon name="document-text"></ion-icon> Formatos de Exportação:</h3>
+              <div class="format-grid">
+                <div class="format-item">
+                  <ion-icon name="document-text"></ion-icon>
+                  <h4>PDF</h4>
+                  <p>Relatórios formatados para apresentação</p>
+                  <ion-chip color="danger" size="small">Apresentação</ion-chip>
+                </div>
+                <div class="format-item">
+                  <ion-icon name="bar-chart"></ion-icon>
+                  <h4>Excel</h4>
+                  <p>Dados brutos para análise detalhada</p>
+                  <ion-chip color="success" size="small">Análise</ion-chip>
+                </div>
+                <div class="format-item">
+                  <ion-icon name="image"></ion-icon>
+                  <h4>PNG/JPG</h4>
+                  <p>Gráficos para uso em apresentações</p>
+                  <ion-chip color="primary" size="small">Visual</ion-chip>
+                </div>
+                <div class="format-item">
+                  <ion-icon name="list"></ion-icon>
+                  <h4>CSV</h4>
+                  <p>Dados estruturados para importação</p>
+                  <ion-chip color="secondary" size="small">Dados</ion-chip>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-container">
+              <h3><ion-icon name="construct"></ion-icon> Como Exportar:</h3>
+              <ol class="steps-list">
+                <li>Configure o <strong>relatório desejado</strong></li>
+                <li>Clique no botão <strong>"Exportar"</strong></li>
+                <li>Selecione o <strong>formato de arquivo</strong></li>
+                <li>Escolha o <strong>período de dados</strong></li>
+                <li>Clique em <strong>"Download"</strong></li>
+                <li>Compartilhe o arquivo com <strong>sua equipe</strong></li>
+              </ol>
+            </div>
+          </div>
+        </ion-accordion>
+
+        <!-- Dashboard Executivo -->
+        <ion-accordion value="dashboard-executivo">
+          <ion-item slot="header" color="light">
+            <ion-icon name="business" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h2>Dashboard Executivo</h2>
+              <p>Visão geral de todos os indicadores importantes</p>
+            </ion-label>
+            <ion-badge color="success" slot="end">Executivo</ion-badge>
+          </ion-item>
+          <div slot="content" class="accordion-content">
+
+            <!-- Espaço para vídeo -->
+            <div class="video-container">
+              <div class="video-placeholder" *ngIf="!isDev">
+                <ion-icon name="videocam" color="medium"></ion-icon>
+                <p>Vídeo tutorial será adicionado em breve</p>
+              </div>
+              <div class="video-controls" *ngIf="isDev">
+                <ion-button fill="outline" size="small" (click)="adicionarVideo('dashboard-executivo')">
+                  <ion-icon name="add" slot="start"></ion-icon>
+                  Adicionar Vídeo
+                </ion-button>
+                <ion-button fill="outline" size="small" color="warning" (click)="editarVideo('dashboard-executivo')">
+                  <ion-icon name="pencil" slot="start"></ion-icon>
+                  Editar Vídeo
+                </ion-button>
+              </div>
+            </div>
+
+            <div class="dashboard-widgets">
+              <h3><ion-icon name="grid"></ion-icon> Widgets do Dashboard:</h3>
+              <div class="widget-grid">
+                <div class="widget-item">
+                  <ion-icon name="people"></ion-icon>
+                  <h4>Resumo de Leads</h4>
+                  <p>Total, novos, convertidos e perdidos</p>
+                </div>
+                <div class="widget-item">
+                  <ion-icon name="calculator"></ion-icon>
+                  <h4>Performance de Orçamentos</h4>
+                  <p>Gerados, aprovados e valores</p>
+                </div>
+                <div class="widget-item">
+                  <ion-icon name="trending-up"></ion-icon>
+                  <h4>Evolução de Vendas</h4>
+                  <p>Gráfico de tendência mensal</p>
+                </div>
+                <div class="widget-item">
+                  <ion-icon name="analytics"></ion-icon>
+                  <h4>Métricas de Conversão</h4>
+                  <p>Taxas e indicadores de performance</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-benefits">
+              <h4><ion-icon name="trophy" color="primary"></ion-icon> Benefícios do Dashboard:</h4>
+              <ul>
+                <li><strong>Visão consolidada</strong> de todos os indicadores</li>
+                <li><strong>Atualização em tempo real</strong> dos dados</li>
+                <li><strong>Fácil identificação</strong> de tendências</li>
+                <li><strong>Tomada de decisão</strong> mais rápida</li>
+                <li><strong>Compartilhamento</strong> com stakeholders</li>
+              </ul>
+            </div>
+          </div>
+        </ion-accordion>
+
+      </ion-accordion-group>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

@@ -12,42 +12,7 @@
         <a (click)="irPara('/portfolio')" class="nav-link" [class.active]="router.url === '/portfolio'">Portfólio</a>
         <a (click)="irPara('/contato')" class="nav-link" [class.active]="router.url === '/contato'">Contato</a>
 
-        <!-- Menu do usuário logado -->
-        <div class="user-menu" *ngIf="isLoggedIn">
-          <ion-button fill="clear" class="user-btn" (click)="toggleUserMenu()">
-            <ion-icon name="person-circle" slot="start"></ion-icon>
-            {{ usuario?.nome }}
-            <ion-icon name="chevron-down" slot="end"></ion-icon>
-          </ion-button>
 
-          <!-- Dropdown do usuário -->
-          <div class="user-dropdown" [class.active]="userMenuOpen">
-            <div class="user-info">
-              <p class="user-name">{{ usuario?.nome }}</p>
-              <p class="user-email">{{ usuario?.email }}</p>
-              <p class="user-level">{{ getNivelDisplay(usuario?.nivel_acesso) }}</p>
-            </div>
-            <div class="user-actions">
-              <a (click)="irPara('/painel')" class="dropdown-item">
-                <ion-icon name="home" slot="start"></ion-icon>
-                Painel
-              </a>
-              <a (click)="irPara('/orcamento')" class="dropdown-item" *ngIf="canAccess('orcamento')">
-                <ion-icon name="document-text" slot="start"></ion-icon>
-                Orçamentos
-              </a>
-              <a (click)="irPara('/produtos')" class="dropdown-item" *ngIf="canAccess('produtos')">
-                <ion-icon name="cube" slot="start"></ion-icon>
-                Produtos
-              </a>
-              <a (click)="logout()" class="dropdown-item logout">
-                <ion-icon name="log-out" slot="start"></ion-icon>
-                Sair
-              </a>
-
-            </div>
-          </div>
-        </div>
 
         <ion-button (click)="irPara('/solicitar-orcamento')" class="cta-header">
           Solicitar Orçamento
