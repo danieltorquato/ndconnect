@@ -27,12 +27,16 @@ class OrcamentoController {
             $data_evento = isset($dados['data_evento']) ? $dados['data_evento'] : json_encode([date('Y-m-d', strtotime('+30 days'))]);
             $nome_evento = isset($dados['nome_evento']) ? $dados['nome_evento'] : 'Evento';
 
+            // Dados de múltiplos shows
+            $quantidade_shows = isset($dados['quantidade_shows']) ? $dados['quantidade_shows'] : 1;
+            $shows_data = isset($dados['shows']) ? json_encode($dados['shows']) : json_encode([]);
+
             // Inserir orçamento
             $desconto_tipo = isset($dados['desconto_tipo']) ? $dados['desconto_tipo'] : 'valor';
 
             $query = "INSERT INTO " . $this->table_orcamento . "
-                     (cliente_id, numero_orcamento, data_orcamento, data_evento, nome_evento, subtotal, desconto, desconto_tipo, total, observacoes)
-                     VALUES (:cliente_id, :numero_orcamento, :data_orcamento, :data_evento, :nome_evento, :subtotal, :desconto, :desconto_tipo, :total, :observacoes)";
+                     (cliente_id, numero_orcamento, data_orcamento, data_evento, nome_evento, subtotal, desconto, desconto_tipo, total, observacoes, quantidade_shows, shows)
+                     VALUES (:cliente_id, :numero_orcamento, :data_orcamento, :data_evento, :nome_evento, :subtotal, :desconto, :desconto_tipo, :total, :observacoes, :quantidade_shows, :shows)";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':cliente_id', $cliente_id);
@@ -45,6 +49,8 @@ class OrcamentoController {
             $stmt->bindParam(':desconto_tipo', $desconto_tipo);
             $stmt->bindParam(':total', $dados['total']);
             $stmt->bindParam(':observacoes', $dados['observacoes']);
+            $stmt->bindParam(':quantidade_shows', $quantidade_shows);
+            $stmt->bindParam(':shows', $shows_data);
             $stmt->execute();
 
             $orcamento_id = $this->conn->lastInsertId();

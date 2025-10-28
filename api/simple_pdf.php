@@ -1,6 +1,21 @@
 <?php
 require_once 'Controllers/OrcamentoController.php';
 
+// Verificar se há parâmetro de tipo e redirecionar adequadamente
+if (isset($_GET['tipo'])) {
+    $tipo = $_GET['tipo'];
+    $id = $_GET['id'] ?? '';
+
+    if ($tipo === 'completo') {
+        // Redirecionar para pdf_real.php para PDF completo com múltiplos shows
+        header("Location: pdf_real.php?id=" . $id . "&action=view");
+        exit;
+    } elseif ($tipo === 'simples') {
+        // Continuar com o simple_pdf.php normal
+        // Não fazer nada, continuar com o código abaixo
+    }
+}
+
 // Função para converter imagem para base64
 function getLogoBase64() {
   $logoPath = 'https://ndconnect.torquatoit.com/assets/img/logo.jpeg';

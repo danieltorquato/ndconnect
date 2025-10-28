@@ -73,7 +73,7 @@
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="add"></ion-icon>
-        Adicionar Produto Customizado
+        Adicionar Produto Customizado - Show {{showAtual}}
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
@@ -146,7 +146,7 @@
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="document"></ion-icon>
-        Orçamento Atual
+        Orçamento Atual - Show {{showAtual}}
         <ion-badge color="primary">{{itensOrcamento.length}} itens</ion-badge>
       </ion-card-title>
     </ion-card-header>
@@ -303,12 +303,64 @@
     </ion-card-content>
   </ion-card>
 
+  <!-- Seção de Configuração de Shows -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="star"></ion-icon>
+        Configuração de Shows
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Quantidade de Shows *</ion-label>
+        <ion-select
+          [(ngModel)]="quantidadeShows"
+          (ionChange)="definirQuantidadeShows($event.detail.value)"
+          placeholder="Selecione a quantidade">
+          <ion-select-option value="1">1 Show</ion-select-option>
+          <ion-select-option value="2">2 Shows</ion-select-option>
+          <ion-select-option value="3">3 Shows</ion-select-option>
+          <ion-select-option value="4">4 Shows</ion-select-option>
+          <ion-select-option value="5">5 Shows</ion-select-option>
+          <ion-select-option value="6">6 Shows</ion-select-option>
+          <ion-select-option value="7">7 Shows</ion-select-option>
+          <ion-select-option value="8">8 Shows</ion-select-option>
+          <ion-select-option value="9">9 Shows</ion-select-option>
+          <ion-select-option value="10">10 Shows</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Navegação entre shows -->
+      <ion-item *ngIf="quantidadeShows > 1">
+        <ion-label position="stacked">Show Atual</ion-label>
+        <ion-segment
+          [(ngModel)]="showAtual"
+          (ionChange)="navegarParaShow(+($event.detail.value ?? 0))"
+        >
+          <ng-container *ngFor="let show of shows; let i = index">
+            <ion-segment-button [value]="i + 1">
+              <ion-label>Show {{i + 1}}</ion-label>
+            </ion-segment-button>
+          </ng-container>
+        </ion-segment>
+      </ion-item>
+
+      <ion-note color="medium">
+        <p><ion-icon name="information-circle" color="primary"></ion-icon> <strong>Informações importantes:</strong></p>
+        <p>• Cada show terá suas próprias datas e produtos</p>
+        <p>• O PDF será gerado com uma página para cada show</p>
+        <p>• Você pode navegar entre shows para editar cada um</p>
+      </ion-note>
+    </ion-card-content>
+  </ion-card>
+
   <!-- Seção de Dados do Evento -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="calendar"></ion-icon>
-        Dados do Evento
+        Dados do Evento - Show {{showAtual}}
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
@@ -370,13 +422,20 @@
   <!-- Botões de Ação -->
   <ion-card *ngIf="itensOrcamento.length > 0">
     <ion-card-content>
+      <!-- Informações do Show Atual -->
+      <div class="show-info" *ngIf="quantidadeShows > 1">
+        <h3>Show {{showAtual}} de {{quantidadeShows}}</h3>
+        <p><strong>Total do Show {{showAtual}}:</strong> R$ {{total.toFixed(2).replace('.', ',')}}</p>
+        <p><strong>Total Geral (Todos os Shows):</strong> R$ {{calcularTotalGeral().toFixed(2).replace('.', ',')}}</p>
+      </div>
+
       <ion-button
         expand="block"
         color="primary"
         (click)="gerarOrcamento()"
         class="action-button">
         <ion-icon name="calculator" slot="start"></ion-icon>
-        Gerar Orçamento
+        Gerar Orçamento {{quantidadeShows > 1 ? '(Todos os Shows)' : ''}}
       </ion-button>
 
       <ion-button

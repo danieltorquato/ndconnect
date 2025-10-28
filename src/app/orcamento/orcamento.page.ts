@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, IonModal, IonChip } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, IonModal, IonChip, IonSegmentButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash, arrowBack } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
@@ -51,6 +51,27 @@ interface ProdutoCustomizado {
   usarValorTotal: boolean; // Flag para indicar se deve usar valor total em vez de unitário
 }
 
+interface Show {
+  id: number;
+  nome: string;
+  datasEvento: string[];
+  itensOrcamento: ItemOrcamento[];
+  observacoes: string;
+  subtotal: number;
+  desconto: number;
+  descontoTipo: 'porcentagem' | 'valor';
+  total: number;
+}
+
+interface OrcamentoMultiShow {
+  cliente: Cliente;
+  nomeEvento: string;
+  quantidadeShows: number;
+  shows: Show[];
+  observacoesGerais: string;
+  totalGeral: number;
+}
+
 interface Cliente {
   nome: string;
   email: string;
@@ -65,7 +86,7 @@ interface Cliente {
   templateUrl: './orcamento.page.html',
   styleUrls: ['./orcamento.page.scss'],
   standalone: true,
-  imports: [IonChip, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, CommonModule, FormsModule],
+  imports: [IonSegmentButton, IonChip, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, CommonModule, FormsModule],
 })
 export class OrcamentoPage implements OnInit {
   categorias: Categoria[] = [];
@@ -113,6 +134,12 @@ export class OrcamentoPage implements OnInit {
   modalDatasAberto: boolean = false;
   dataSelecionada: string = '';
 
+  // Propriedades para múltiplos shows
+  quantidadeShows: number = 1;
+  showAtual: number = 1;
+  shows: Show[] = [];
+  modoMultiShow: boolean = false;
+
   private apiUrl = environment.apiUrl;
 
   constructor(
@@ -121,7 +148,7 @@ export class OrcamentoPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    addIcons({arrowBack,list,add,remove,person,calendar,close,informationCircle,documentText,calculator,trash,search,warning,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,star,home});
+    addIcons({arrowBack,list,add,remove,person,star,informationCircle,calendar,close,documentText,calculator,trash,search,warning,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,home});
   }
 
   ngOnInit() {
@@ -129,6 +156,99 @@ export class OrcamentoPage implements OnInit {
     this.carregarProdutosIniciais();
     this.carregarDadosDoLead();
     this.definirDataMinima();
+    this.inicializarShows();
+  }
+
+  inicializarShows() {
+    // Inicializar com um show padrão
+    this.shows = [{
+      id: 1,
+      nome: 'Show 1',
+      datasEvento: [],
+      itensOrcamento: [],
+      observacoes: '',
+      subtotal: 0,
+      desconto: 0,
+      descontoTipo: 'valor',
+      total: 0
+    }];
+    this.showAtual = 1;
+    this.quantidadeShows = 1;
+  }
+
+  definirQuantidadeShows(quantidade: number) {
+    this.quantidadeShows = quantidade;
+
+    // Salvar o show atual antes de mudar
+    this.salvarShowAtual();
+
+    // Ajustar array de shows
+    if (quantidade > this.shows.length) {
+      // Adicionar novos shows
+      for (let i = this.shows.length + 1; i <= quantidade; i++) {
+        this.shows.push({
+          id: i,
+          nome: `Show ${i}`,
+          datasEvento: [],
+          itensOrcamento: [],
+          observacoes: '',
+          subtotal: 0,
+          desconto: 0,
+          descontoTipo: 'valor',
+          total: 0
+        });
+      }
+    } else if (quantidade < this.shows.length) {
+      // Remover shows extras
+      this.shows = this.shows.slice(0, quantidade);
+      if (this.showAtual > quantidade) {
+        this.showAtual = quantidade;
+      }
+    }
+
+    // Carregar o show atual
+    this.carregarShowAtual();
+  }
+
+  salvarShowAtual() {
+    if (this.shows[this.showAtual - 1]) {
+      this.shows[this.showAtual - 1] = {
+        id: this.showAtual,
+        nome: `Show ${this.showAtual}`,
+        datasEvento: [...this.datasEvento],
+        itensOrcamento: [...this.itensOrcamento],
+        observacoes: this.observacoes,
+        subtotal: this.subtotal,
+        desconto: this.desconto,
+        descontoTipo: this.descontoTipo,
+        total: this.total
+      };
+    }
+  }
+
+  carregarShowAtual() {
+    const show = this.shows[this.showAtual - 1];
+    if (show) {
+      this.datasEvento = [...show.datasEvento];
+      this.itensOrcamento = [...show.itensOrcamento];
+      this.observacoes = show.observacoes;
+      this.subtotal = show.subtotal;
+      this.desconto = show.desconto;
+      this.descontoTipo = show.descontoTipo;
+      this.total = show.total;
+    }
+  }
+
+  navegarParaShow(showId: number) {
+    if (showId >= 1 && showId <= this.quantidadeShows) {
+      this.salvarShowAtual();
+      this.showAtual = showId;
+      this.carregarShowAtual();
+    }
+  }
+
+  calcularTotalGeral() {
+    return this.shows.reduce((total, show) => total + show.total, 0);
   }
 
   definirDataEventoPadrao() {
@@ -543,6 +663,9 @@ export class OrcamentoPage implements OnInit {
   }
 
   gerarOrcamento() {
+    // Salvar o show atual antes de gerar
+    this.salvarShowAtual();
+
     if (this.itensOrcamento.length === 0) {
       window.alert('Adicione pelo menos um item ao orçamento');
       return;
@@ -568,7 +691,9 @@ export class OrcamentoPage implements OnInit {
       total: this.total,
       data_orcamento: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
       data_evento: JSON.stringify(this.datasEvento), // Múltiplas datas como JSON
-      nome_evento: this.nomeEvento
+      nome_evento: this.nomeEvento,
+      quantidade_shows: this.quantidadeShows,
+      shows: this.shows // Incluir todos os shows
     };
 
     console.log('Enviando orçamento:', orcamento);
@@ -601,17 +726,25 @@ export class OrcamentoPage implements OnInit {
   }
 
   gerarPDFCompleto() {
-    if (this.ultimoOrcamentoId) {
-      const url = `${this.apiUrl}/generate_pdf_real.php?id=${this.ultimoOrcamentoId}&valores=1`;
-      window.open(url, '_blank');
+    if (!this.ultimoOrcamentoId) {
+      this.mostrarNotificacao('Gere um orçamento primeiro', 'error');
+      return;
     }
+
+    // Redirecionar para simple_pdf.php com parâmetro para PDF completo
+    const url = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}&tipo=completo`;
+    window.open(url, '_blank');
   }
 
   gerarPDFSimples() {
-    if (this.ultimoOrcamentoId) {
-      const url = `${this.apiUrl}/generate_pdf_simples.php?id=${this.ultimoOrcamentoId}`;
-      window.open(url, '_blank');
+    if (!this.ultimoOrcamentoId) {
+      this.mostrarNotificacao('Gere um orçamento primeiro', 'error');
+      return;
     }
+
+    // Redirecionar para simple_pdf.php com parâmetro para PDF simples
+    const url = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}&tipo=simples`;
+    window.open(url, '_blank');
   }
 
   criarLeadDoOrcamento(orcamentoId: number) {
@@ -909,6 +1042,9 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
 
     // Limpar múltiplas datas
     this.datasEvento = [];
+
+    // Reinicializar shows
+    this.inicializarShows();
   }
 
   trackByProdutoId(index: number, produto: Produto): number {
