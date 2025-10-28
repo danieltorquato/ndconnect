@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, IonModal, IonChip } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash, arrowBack } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
@@ -25,9 +25,9 @@ interface Categoria {
 }
 
 interface ItemOrcamento {
-  produto_id: number;
+  produto_id?: number;
   produto_nome: string;
-  categoria_nome: string;
+  categoria_nome?: string;
   quantidade: number;
   preco_unitario: number;
   subtotal: number;
@@ -35,6 +35,20 @@ interface ItemOrcamento {
   desconto_porcentagem?: number;
   desconto_valor?: number;
   subtotal_com_desconto?: number;
+  produto_customizado?: boolean;
+  nome_customizado?: string;
+  valor_unitario_customizado?: number;
+  unidade_customizada?: string;
+}
+
+interface ProdutoCustomizado {
+  nome: string;
+  valorUnitario: number;
+  valorTotal: number; // Novo campo para valor total manual
+  unidade: string;
+  quantidade: number;
+  subtotal: number;
+  usarValorTotal: boolean; // Flag para indicar se deve usar valor total em vez de unitário
 }
 
 interface Cliente {
@@ -51,7 +65,7 @@ interface Cliente {
   templateUrl: './orcamento.page.html',
   styleUrls: ['./orcamento.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, CommonModule, FormsModule],
+  imports: [IonChip, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, CommonModule, FormsModule],
 })
 export class OrcamentoPage implements OnInit {
   categorias: Categoria[] = [];
@@ -77,10 +91,27 @@ export class OrcamentoPage implements OnInit {
   descontoTipo: 'valor' | 'porcentagem' = 'valor';
   subtotal: number = 0;
   total: number = 0;
-  dataValidade: string = '';
+  dataEvento: string = '';
+  nomeEvento: string = '';
   ultimoOrcamentoId: number | null = null;
   dataMinima: string = '';
   leadIdExistente: number | null = null; // Para controlar se veio da gestão de leads
+
+  // Novas propriedades para produtos customizados
+  produtoCustomizado: ProdutoCustomizado = {
+    nome: '',
+    valorUnitario: 0,
+    valorTotal: 0,
+    unidade: '',
+    quantidade: 1,
+    subtotal: 0,
+    usarValorTotal: false
+  };
+
+  // Novas propriedades para múltiplas datas
+  datasEvento: string[] = [];
+  modalDatasAberto: boolean = false;
+  dataSelecionada: string = '';
 
   private apiUrl = environment.apiUrl;
 
@@ -90,58 +121,208 @@ export class OrcamentoPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    addIcons({arrowBack,list,search,close,add,remove,person,calendar,warning,documentText,calculator,trash,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,informationCircle,star,home});
+    addIcons({arrowBack,list,add,remove,person,calendar,close,informationCircle,documentText,calculator,trash,search,warning,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,star,home});
   }
 
   ngOnInit() {
     this.carregarCategorias();
     this.carregarProdutosIniciais();
     this.carregarDadosDoLead();
-    this.definirDataValidadePadrao();
     this.definirDataMinima();
   }
 
-  definirDataValidadePadrao() {
+  definirDataEventoPadrao() {
     const hoje = new Date();
-    const validade = new Date(hoje);
-    validade.setDate(hoje.getDate() + 10); // 10 dias a partir de hoje
-    this.dataValidade = validade.toISOString();
+    const dataEvento = new Date(hoje);
+    dataEvento.setDate(hoje.getDate() + 30); // 30 dias a partir de hoje
+    this.dataEvento = dataEvento.toISOString();
   }
 
   definirDataMinima() {
     this.dataMinima = new Date().toISOString();
   }
 
-  validarDataValidade() {
-    const hoje = new Date();
-    const dataValidade = new Date(this.dataValidade);
-    const diferencaDias = Math.ceil((dataValidade.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (diferencaDias < 10) {
-      this.mostrarAlertaValidade(diferencaDias);
+  validarDadosEvento() {
+    if (!this.nomeEvento.trim()) {
+      window.alert('Informe o nome do evento');
       return false;
     }
+
+    if (this.datasEvento.length === 0) {
+      window.alert('Selecione pelo menos uma data para o evento');
+      return false;
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
+
+    for (let dataStr of this.datasEvento) {
+      const dataEvento = new Date(dataStr);
+      dataEvento.setHours(0, 0, 0, 0);
+
+      if (dataEvento < hoje) {
+        window.alert('Nenhuma data do evento pode ser anterior a hoje');
+        return false;
+      }
+    }
+
     return true;
   }
 
-  mostrarAlertaValidade(dias: number) {
-    const mensagem = `A data de validade selecionada é de apenas ${dias} dias.\n\nConforme a legislação brasileira, o prazo mínimo para orçamentos é de 10 dias.\n\nDeseja continuar mesmo assim?`;
+  // Métodos para múltiplas datas
+  abrirSeletorDatas() {
+    this.modalDatasAberto = true;
+  }
 
-    if (window.confirm(mensagem)) {
-      // Usuário escolheu continuar
-      return true;
-    } else {
-      // Usuário cancelou - restaurar data padrão
-      this.definirDataValidadePadrao();
-      return false;
+  fecharModalDatas() {
+    this.modalDatasAberto = false;
+  }
+
+  adicionarDataSelecionada(event: any) {
+    let dataParaAdicionar = '';
+
+    if (event && event.detail && event.detail.value) {
+      dataParaAdicionar = event.detail.value;
+    } else if (this.dataSelecionada) {
+      dataParaAdicionar = this.dataSelecionada;
+    }
+
+    if (dataParaAdicionar) {
+      // Verificar se a data já não foi adicionada
+      if (!this.datasEvento.includes(dataParaAdicionar)) {
+        this.datasEvento.push(dataParaAdicionar);
+        console.log('Data adicionada:', dataParaAdicionar);
+        console.log('Datas atuais:', this.datasEvento);
+      } else {
+        this.mostrarNotificacao('Esta data já foi selecionada', 'info');
+      }
     }
   }
 
-  onDataValidadeChange() {
-    // Validar quando a data for alterada
-    setTimeout(() => {
-      this.validarDataValidade();
-    }, 100);
+  onDataSelecionadaChange(event: any) {
+    // Este método será chamado quando o ion-datetime com multiple=true for alterado
+    // O valor será um array de strings no formato ISO
+    console.log('Evento de mudança de data:', event);
+
+    if (event && event.detail && event.detail.value) {
+      const valor = event.detail.value;
+      console.log('Valor recebido:', valor);
+
+      if (Array.isArray(valor)) {
+        this.datasEvento = [...valor];
+      } else {
+        this.datasEvento = [valor];
+      }
+
+      console.log('Datas atualizadas:', this.datasEvento);
+    }
+  }
+
+  confirmarDatas() {
+    if (this.datasEvento.length > 0) {
+      this.fecharModalDatas();
+      this.mostrarNotificacao(`${this.datasEvento.length} data(s) selecionada(s)`, 'success');
+    }
+  }
+
+  removerData(index: number) {
+    this.datasEvento.splice(index, 1);
+  }
+
+  formatarData(dataStr: string): string {
+    const data = new Date(dataStr);
+    return data.toLocaleDateString('pt-BR');
+  }
+
+  formatarDatasParaPDF(): string {
+    if (this.datasEvento.length === 0) return '---';
+
+    const datasFormatadas = this.datasEvento.map(data => {
+      const d = new Date(data);
+      return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    });
+
+    if (datasFormatadas.length === 1) {
+      return datasFormatadas[0];
+    } else if (datasFormatadas.length === 2) {
+      return `${datasFormatadas[0]} e ${datasFormatadas[1]}`;
+    } else {
+      const ultimaData = datasFormatadas.pop();
+      return `${datasFormatadas.join(', ')} e ${ultimaData}`;
+    }
+  }
+
+  calcularSubtotalCustomizado() {
+    if (this.produtoCustomizado.usarValorTotal) {
+      // Se está usando valor total, usar o valor total diretamente
+      this.produtoCustomizado.subtotal = this.produtoCustomizado.valorTotal;
+    } else if (this.produtoCustomizado.valorUnitario && this.produtoCustomizado.quantidade) {
+      // Se está usando valor unitário, calcular subtotal
+      this.produtoCustomizado.subtotal = this.produtoCustomizado.valorUnitario * this.produtoCustomizado.quantidade;
+    } else {
+      this.produtoCustomizado.subtotal = 0;
+    }
+  }
+
+  adicionarProdutoCustomizado() {
+    if (!this.produtoCustomizado.nome.trim()) {
+      window.alert('Informe o nome do produto');
+      return;
+    }
+
+    if (!this.produtoCustomizado.unidade.trim()) {
+      window.alert('Informe a unidade do produto');
+      return;
+    }
+
+    if (!this.produtoCustomizado.quantidade || this.produtoCustomizado.quantidade <= 0) {
+      window.alert('Informe uma quantidade válida');
+      return;
+    }
+
+    // Validar se tem algum valor definido
+    if (!this.produtoCustomizado.usarValorTotal && !this.produtoCustomizado.valorUnitario) {
+      window.alert('Informe o valor unitário ou marque para usar valor total');
+      return;
+    }
+
+    if (this.produtoCustomizado.usarValorTotal && !this.produtoCustomizado.valorTotal) {
+      window.alert('Informe o valor total');
+      return;
+    }
+
+    // Gerar ID único para produto customizado (negativo para diferenciar)
+    const customId = -(Date.now() + Math.random() * 1000);
+
+    const novoItem: ItemOrcamento = {
+      produto_id: customId, // ID único negativo para produtos customizados
+      produto_nome: this.produtoCustomizado.nome,
+      categoria_nome: 'Customizado',
+      quantidade: this.produtoCustomizado.quantidade,
+      preco_unitario: this.produtoCustomizado.usarValorTotal ? 0 : (this.produtoCustomizado.valorUnitario || 0),
+      subtotal: this.produtoCustomizado.subtotal,
+      unidade: this.produtoCustomizado.unidade,
+      produto_customizado: true,
+      nome_customizado: this.produtoCustomizado.nome,
+      valor_unitario_customizado: this.produtoCustomizado.usarValorTotal ? undefined : this.produtoCustomizado.valorUnitario,
+      unidade_customizada: this.produtoCustomizado.unidade
+    };
+
+    this.itensOrcamento.push(novoItem);
+    this.calcularTotal();
+
+    // Limpar formulário
+    this.produtoCustomizado = {
+      nome: '',
+      valorUnitario: 0,
+      valorTotal: 0,
+      unidade: '',
+      quantidade: 1,
+      subtotal: 0,
+      usarValorTotal: false
+    };
+
+    this.mostrarNotificacao('Produto customizado adicionado!', 'success');
   }
 
   carregarCategorias() {
@@ -286,15 +467,17 @@ export class OrcamentoPage implements OnInit {
     console.log('Itens no orçamento:', this.itensOrcamento);
   }
 
-  removerItem(produtoId: number) {
-    const index = this.itensOrcamento.findIndex(item => item.produto_id === produtoId);
-    if (index > -1) {
-      this.itensOrcamento = this.itensOrcamento.filter(item => item.produto_id !== produtoId);
-      this.calcularTotal();
+  removerItem(produtoId: number | undefined) {
+    if (produtoId) {
+      const index = this.itensOrcamento.findIndex(item => item.produto_id === produtoId);
+      if (index > -1) {
+        this.itensOrcamento = this.itensOrcamento.filter(item => item.produto_id !== produtoId);
+        this.calcularTotal();
+      }
     }
   }
 
-  atualizarQuantidade(produtoId: number, quantidade: number) {
+  atualizarQuantidade(produtoId: number | undefined, quantidade: number) {
     console.log('Atualizando quantidade:', produtoId, quantidade);
     const item = this.itensOrcamento.find(item => item.produto_id === produtoId);
     if (item) {
@@ -329,7 +512,7 @@ export class OrcamentoPage implements OnInit {
     }
   }
 
-  aplicarDescontoItem(produtoId: number, tipo: 'porcentagem' | 'valor', valor: number) {
+  aplicarDescontoItem(produtoId: number | undefined, tipo: 'porcentagem' | 'valor', valor: number) {
     const item = this.itensOrcamento.find(item => item.produto_id === produtoId);
     if (item) {
       if (tipo === 'porcentagem') {
@@ -365,13 +548,13 @@ export class OrcamentoPage implements OnInit {
       return;
     }
 
-    if (!this.cliente.nome.trim()) {
-      window.alert('Informe o nome do cliente');
+    if (!this.cliente.empresa.trim()) {
+      window.alert('Informe o nome da empresa');
       return;
     }
 
-    // Validar data de validade antes de gerar orçamento
-    if (!this.validarDataValidade()) {
+    // Validar dados do evento antes de gerar orçamento
+    if (!this.validarDadosEvento()) {
       return; // Se a validação falhar, não continuar
     }
 
@@ -384,7 +567,8 @@ export class OrcamentoPage implements OnInit {
       subtotal: this.subtotal,
       total: this.total,
       data_orcamento: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
-      data_validade: this.dataValidade.split('T')[0] // Data de validade no formato YYYY-MM-DD
+      data_evento: JSON.stringify(this.datasEvento), // Múltiplas datas como JSON
+      nome_evento: this.nomeEvento
     };
 
     console.log('Enviando orçamento:', orcamento);
@@ -404,7 +588,7 @@ export class OrcamentoPage implements OnInit {
           }
 
           window.alert('Orçamento gerado com sucesso!');
-          this.gerarPDF(response.data.id);
+          // PDF será gerado manualmente pelos botões específicos
         } else {
           window.alert('Erro ao gerar orçamento: ' + response.message);
         }
@@ -416,15 +600,24 @@ export class OrcamentoPage implements OnInit {
     });
   }
 
-  gerarPDF(orcamentoId: number) {
-    const url = `${this.apiUrl}/simple_pdf.php?id=${orcamentoId}`;
-    window.open(url, '_blank');
+  gerarPDFCompleto() {
+    if (this.ultimoOrcamentoId) {
+      const url = `${this.apiUrl}/generate_pdf_real.php?id=${this.ultimoOrcamentoId}&valores=1`;
+      window.open(url, '_blank');
+    }
+  }
+
+  gerarPDFSimples() {
+    if (this.ultimoOrcamentoId) {
+      const url = `${this.apiUrl}/generate_pdf_simples.php?id=${this.ultimoOrcamentoId}`;
+      window.open(url, '_blank');
+    }
   }
 
   criarLeadDoOrcamento(orcamentoId: number) {
     // Preparar dados do lead baseado no cliente do orçamento
     const dadosLead = {
-      nome: this.cliente.nome.trim(),
+      nome: this.cliente.nome?.trim() || this.cliente.empresa.trim(),
       email: this.cliente.email?.trim() || '',
       telefone: this.cliente.telefone?.trim() || '',
       empresa: this.cliente.empresa?.trim() || '',
@@ -441,7 +634,7 @@ export class OrcamentoPage implements OnInit {
       next: (response) => {
         if (response.success) {
           console.log('Lead criado com sucesso:', response.data);
-          this.mostrarNotificacao(`Lead "${this.cliente.nome}" criado e marcado como contatado!`, 'success');
+          this.mostrarNotificacao(`Lead "${this.cliente.nome || this.cliente.empresa}" criado e marcado como contatado!`, 'success');
         } else {
           console.error('Erro ao criar lead:', response.message);
           this.mostrarNotificacao('Orçamento gerado, mas houve erro ao criar lead', 'error');
@@ -470,13 +663,13 @@ export class OrcamentoPage implements OnInit {
       const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
       const mensagem = `🏢 *N.D CONNECT - EQUIPAMENTOS PARA EVENTOS*
 
-Olá ${this.cliente.nome}! 👋
+Olá ${this.cliente.nome || this.cliente.empresa}! 👋
 
 Segue o orçamento solicitado:
 
 📋 *Orçamento Nº ${this.ultimoOrcamentoId}*
 💰 *Valor Total: R$ ${this.total.toFixed(2).replace('.', ',')}*
-📅 *Válido até: ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}*
+📅 *Data do Evento: ${this.formatarDatasParaPDF()}*
 
 📄 *Visualizar PDF:* ${pdfUrl}
 
@@ -525,7 +718,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
       // Criar link temporário para download
       const link = this.document.createElement('a');
       link.href = pdfUrl;
-      const primeiroNome = this.cliente.nome.split(' ')[0].toLowerCase();
+      const primeiroNome = (this.cliente.nome || this.cliente.empresa).split(' ')[0].toLowerCase();
       link.download = `orcamento_${primeiroNome}_${this.ultimoOrcamentoId}.pdf`;
       link.target = '_blank';
       this.document.body.appendChild(link);
@@ -566,7 +759,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
     try {
       const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
       const titulo = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}`;
-      const texto = `Orçamento de R$ ${this.total.toFixed(2).replace('.', ',')} - Válido até ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}`;
+      const texto = `Orçamento de R$ ${this.total.toFixed(2).replace('.', ',')} - Evento: ${this.nomeEvento || 'Evento'} em ${this.formatarDatasParaPDF()}`;
 
       await navigator.share({
         title: titulo,
@@ -605,7 +798,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
 
     try {
       const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
-      const textoCompleto = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}\nValor: R$ ${this.total.toFixed(2).replace('.', ',')}\nVálido até: ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}\n\nVisualizar: ${pdfUrl}`;
+      const textoCompleto = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}\nValor: R$ ${this.total.toFixed(2).replace('.', ',')}\nEvento: ${this.nomeEvento || 'Evento'} em ${this.formatarDatasParaPDF()}\n\nVisualizar: ${pdfUrl}`;
 
       if (navigator.clipboard) {
         navigator.clipboard.writeText(textoCompleto).then(() => {
@@ -702,7 +895,20 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
     this.total = 0;
     this.ultimoOrcamentoId = null;
     this.leadIdExistente = null; // Resetar o leadId existente
-    this.definirDataValidadePadrao();
+
+    // Limpar produtos customizados
+    this.produtoCustomizado = {
+      nome: '',
+      valorUnitario: 0,
+      valorTotal: 0,
+      unidade: '',
+      quantidade: 1,
+      subtotal: 0,
+      usarValorTotal: false
+    };
+
+    // Limpar múltiplas datas
+    this.datasEvento = [];
   }
 
   trackByProdutoId(index: number, produto: Produto): number {
@@ -710,7 +916,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
   }
 
   trackByItemId(index: number, item: ItemOrcamento): number {
-    return item.produto_id;
+    return item.produto_id || index;
   }
 
   abrirHistorico() {
@@ -785,14 +991,14 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
 
       const assunto = `Orçamento N.D Connect - Nº ${this.ultimoOrcamentoId.toString().padStart(6, '0')}`;
 
-      const corpo = `Olá ${this.cliente.nome}! 👋
+      const corpo = `Olá ${this.cliente.nome || this.cliente.empresa}! 👋
 
 Esperamos que esteja bem! Segue em anexo o orçamento solicitado para seu evento.
 
 📋 *DETALHES DO ORÇAMENTO*
 • Número: ${this.ultimoOrcamentoId.toString().padStart(6, '0')}
 • Valor Total: R$ ${this.total.toFixed(2).replace('.', ',')}
-• Válido até: ${new Date(this.dataValidade).toLocaleDateString('pt-BR')}
+• Data do Evento: ${this.formatarDatasParaPDF()}
 
 📦 *ITENS INCLUÍDOS*
 ${this.itensOrcamento.map(item => `• ${item.produto_nome} (${item.quantidade}x) - R$ ${(item.preco_unitario * item.quantidade).toFixed(2).replace('.', ',')}`).join('\n')}

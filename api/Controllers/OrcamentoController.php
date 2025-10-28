@@ -23,21 +23,23 @@ class OrcamentoController {
             // Gerar número do orçamento
             $numero_orcamento = $this->generateNumeroOrcamento();
 
-            // Definir data de validade (padrão: 10 dias se não fornecida)
-            $data_validade = isset($dados['data_validade']) ? $dados['data_validade'] : date('Y-m-d', strtotime('+10 days'));
+            // Definir dados do evento
+            $data_evento = isset($dados['data_evento']) ? $dados['data_evento'] : json_encode([date('Y-m-d', strtotime('+30 days'))]);
+            $nome_evento = isset($dados['nome_evento']) ? $dados['nome_evento'] : 'Evento';
 
             // Inserir orçamento
             $desconto_tipo = isset($dados['desconto_tipo']) ? $dados['desconto_tipo'] : 'valor';
 
             $query = "INSERT INTO " . $this->table_orcamento . "
-                     (cliente_id, numero_orcamento, data_orcamento, data_validade, subtotal, desconto, desconto_tipo, total, observacoes)
-                     VALUES (:cliente_id, :numero_orcamento, :data_orcamento, :data_validade, :subtotal, :desconto, :desconto_tipo, :total, :observacoes)";
+                     (cliente_id, numero_orcamento, data_orcamento, data_evento, nome_evento, subtotal, desconto, desconto_tipo, total, observacoes)
+                     VALUES (:cliente_id, :numero_orcamento, :data_orcamento, :data_evento, :nome_evento, :subtotal, :desconto, :desconto_tipo, :total, :observacoes)";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':cliente_id', $cliente_id);
             $stmt->bindParam(':numero_orcamento', $numero_orcamento);
             $stmt->bindParam(':data_orcamento', $dados['data_orcamento']);
-            $stmt->bindParam(':data_validade', $data_validade);
+            $stmt->bindParam(':data_evento', $data_evento);
+            $stmt->bindParam(':nome_evento', $nome_evento);
             $stmt->bindParam(':subtotal', $dados['subtotal']);
             $stmt->bindParam(':desconto', $dados['desconto']);
             $stmt->bindParam(':desconto_tipo', $desconto_tipo);
@@ -53,19 +55,30 @@ class OrcamentoController {
                 $desconto_valor = isset($item['desconto_valor']) ? $item['desconto_valor'] : 0;
                 $subtotal_com_desconto = isset($item['subtotal_com_desconto']) ? $item['subtotal_com_desconto'] : $item['subtotal'];
 
+                // Verificar se é produto customizado
+                $produto_customizado = isset($item['produto_customizado']) ? $item['produto_customizado'] : false;
+                $produto_id = $produto_customizado ? null : $item['produto_id'];
+                $nome_customizado = isset($item['nome_customizado']) ? $item['nome_customizado'] : null;
+                $valor_unitario_customizado = isset($item['valor_unitario_customizado']) ? $item['valor_unitario_customizado'] : null;
+                $unidade_customizada = isset($item['unidade_customizada']) ? $item['unidade_customizada'] : null;
+
                 $query_item = "INSERT INTO " . $this->table_itens . "
-                              (orcamento_id, produto_id, quantidade, preco_unitario, subtotal, desconto_porcentagem, desconto_valor, subtotal_com_desconto)
-                              VALUES (:orcamento_id, :produto_id, :quantidade, :preco_unitario, :subtotal, :desconto_porcentagem, :desconto_valor, :subtotal_com_desconto)";
+                              (orcamento_id, produto_id, quantidade, preco_unitario, subtotal, desconto_porcentagem, desconto_valor, subtotal_com_desconto, produto_customizado, nome_customizado, valor_unitario_customizado, unidade_customizada)
+                              VALUES (:orcamento_id, :produto_id, :quantidade, :preco_unitario, :subtotal, :desconto_porcentagem, :desconto_valor, :subtotal_com_desconto, :produto_customizado, :nome_customizado, :valor_unitario_customizado, :unidade_customizada)";
 
                 $stmt_item = $this->conn->prepare($query_item);
                 $stmt_item->bindParam(':orcamento_id', $orcamento_id);
-                $stmt_item->bindParam(':produto_id', $item['produto_id']);
+                $stmt_item->bindParam(':produto_id', $produto_id);
                 $stmt_item->bindParam(':quantidade', $item['quantidade']);
                 $stmt_item->bindParam(':preco_unitario', $item['preco_unitario']);
                 $stmt_item->bindParam(':subtotal', $item['subtotal']);
                 $stmt_item->bindParam(':desconto_porcentagem', $desconto_porcentagem);
                 $stmt_item->bindParam(':desconto_valor', $desconto_valor);
                 $stmt_item->bindParam(':subtotal_com_desconto', $subtotal_com_desconto);
+                $stmt_item->bindParam(':produto_customizado', $produto_customizado, PDO::PARAM_BOOL);
+                $stmt_item->bindParam(':nome_customizado', $nome_customizado);
+                $stmt_item->bindParam(':valor_unitario_customizado', $valor_unitario_customizado);
+                $stmt_item->bindParam(':unidade_customizada', $unidade_customizada);
                 $stmt_item->execute();
             }
 
@@ -113,8 +126,8 @@ class OrcamentoController {
 
         // Criar novo cliente
         $query = "INSERT INTO " . $this->table_cliente . "
-                 (nome, email, telefone, endereco, cpf_cnpj, tipo, status)
-                 VALUES (:nome, :email, :telefone, :endereco, :cpf_cnpj, :tipo, :status)";
+                 (nome, email, telefone, endereco, cpf_cnpj, empresa, tipo, status)
+                 VALUES (:nome, :email, :telefone, :endereco, :cpf_cnpj, :empresa, :tipo, :status)";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':nome', $cliente_data['nome']);
@@ -123,6 +136,7 @@ class OrcamentoController {
         $telefone = isset($cliente_data['telefone']) ? $cliente_data['telefone'] : '';
         $endereco = isset($cliente_data['endereco']) ? $cliente_data['endereco'] : '';
         $cpf_cnpj = isset($cliente_data['cpf_cnpj']) ? $cliente_data['cpf_cnpj'] : '';
+        $empresa = isset($cliente_data['empresa']) ? $cliente_data['empresa'] : '';
         $tipo = isset($cliente_data['tipo']) ? $cliente_data['tipo'] : 'pessoa_fisica';
         $status = isset($cliente_data['status']) ? $cliente_data['status'] : 'ativo';
 
@@ -130,6 +144,7 @@ class OrcamentoController {
         $stmt->bindParam(':telefone', $telefone);
         $stmt->bindParam(':endereco', $endereco);
         $stmt->bindParam(':cpf_cnpj', $cpf_cnpj);
+        $stmt->bindParam(':empresa', $empresa);
         $stmt->bindParam(':tipo', $tipo);
         $stmt->bindParam(':status', $status);
         $stmt->execute();
@@ -438,8 +453,9 @@ class OrcamentoController {
             // Gerar número do orçamento
             $numero_orcamento = $this->generateNumeroOrcamento();
 
-            // Definir data de validade (padrão: 10 dias)
-            $data_validade = date('Y-m-d', strtotime('+10 days'));
+            // Definir dados do evento (padrão: 30 dias)
+            $data_evento = json_encode([date('Y-m-d', strtotime('+30 days'))]);
+            $nome_evento = 'Evento';
 
             // Preparar observações com dados do lead
             $observacoes = $lead['mensagem'];
@@ -451,13 +467,14 @@ class OrcamentoController {
 
             // Inserir orçamento sem cliente (cliente_id será NULL)
             $query = "INSERT INTO " . $this->table_orcamento . "
-                     (cliente_id, numero_orcamento, data_orcamento, data_validade, subtotal, desconto, total, observacoes, status)
-                     VALUES (NULL, :numero_orcamento, :data_orcamento, :data_validade, 0, 0, 0, :observacoes, 'pendente')";
+                     (cliente_id, numero_orcamento, data_orcamento, data_evento, nome_evento, subtotal, desconto, total, observacoes, status)
+                     VALUES (NULL, :numero_orcamento, :data_orcamento, :data_evento, :nome_evento, 0, 0, 0, :observacoes, 'pendente')";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':numero_orcamento', $numero_orcamento);
             $stmt->bindParam(':data_orcamento', date('Y-m-d'));
-            $stmt->bindParam(':data_validade', $data_validade);
+            $stmt->bindParam(':data_evento', $data_evento);
+            $stmt->bindParam(':nome_evento', $nome_evento);
             $stmt->bindParam(':observacoes', $observacoes);
             $stmt->execute();
 

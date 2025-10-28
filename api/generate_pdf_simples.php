@@ -46,7 +46,7 @@ function getOrcamentoData($id) {
 }
 
 // Função para gerar PDF usando HTML2PDF (alternativa mais leve)
-function generatePDF($orcamento, $mostrarValoresUnitarios = true) {
+function generatePDF($orcamento) {
     // Verificar se mPDF está disponível
     if (file_exists('vendor/autoload.php')) {
         require_once 'vendor/autoload.php';
@@ -64,24 +64,24 @@ function generatePDF($orcamento, $mostrarValoresUnitarios = true) {
                 'margin_footer' => 9
             ]);
 
-            $html = generateOrcamentoHTML($orcamento, $mostrarValoresUnitarios);
+            $html = generateOrcamentoHTML($orcamento);
             $mpdf->WriteHTML($html);
 
             return $mpdf->Output('orcamento_' . $orcamento['id'] . '.pdf', 'S'); // Retorna como string
 
         } catch (Exception $e) {
-        // Se mPDF falhar, usar fallback
-        return generatePDFFallback($orcamento, $mostrarValoresUnitarios);
+            // Se mPDF falhar, usar fallback
+            return generatePDFFallback($orcamento);
         }
     } else {
         // Usar fallback se mPDF não estiver disponível
-        return generatePDFFallback($orcamento, $mostrarValoresUnitarios);
+        return generatePDFFallback($orcamento);
     }
 }
 
 // Fallback: Gerar PDF usando wkhtmltopdf ou similar
-function generatePDFFallback($orcamento, $mostrarValoresUnitarios = true) {
-    $html = generateOrcamentoHTML($orcamento, $mostrarValoresUnitarios);
+function generatePDFFallback($orcamento) {
+    $html = generateOrcamentoHTML($orcamento);
 
     // Salvar HTML temporário
     $tempFile = tempnam(sys_get_temp_dir(), 'orcamento_') . '.html';
@@ -101,22 +101,22 @@ function generatePDFFallback($orcamento, $mostrarValoresUnitarios = true) {
     }
 
     // Se wkhtmltopdf não estiver disponível, usar uma solução mais simples
-    return generateSimplePDF($orcamento, $mostrarValoresUnitarios);
+    return generateSimplePDF($orcamento);
 }
 
 // Solução mais simples: Gerar PDF básico usando FPDF
-function generateSimplePDF($orcamento, $mostrarValoresUnitarios = true) {
+function generateSimplePDF($orcamento) {
     // Esta é uma implementação básica - você pode expandir conforme necessário
     $dataOrcamento = date('d/m/Y', strtotime($orcamento['data_orcamento']));
     $dataEvento = isset($orcamento['data_evento']) ? date('d/m/Y', strtotime($orcamento['data_evento'])) : '-';
 
     // Por enquanto, vamos retornar o HTML para download
     // Em produção, você pode implementar FPDF ou similar
-    return generateOrcamentoHTML($orcamento, $mostrarValoresUnitarios);
+    return generateOrcamentoHTML($orcamento);
 }
 
-// Função para gerar HTML do orçamento
-function generateOrcamentoHTML($orcamento, $mostrarValoresUnitarios = true) {
+// Função para gerar HTML do orçamento SEM valores unitários
+function generateOrcamentoHTML($orcamento) {
     $dataOrcamento = date('d/m/Y', strtotime($orcamento['data_orcamento']));
 
     // Processar múltiplas datas do evento
@@ -352,37 +352,22 @@ function generateOrcamentoHTML($orcamento, $mostrarValoresUnitarios = true) {
                         <thead>
                             <tr>
                                 <th>PRODUTO</th>
-                                <th>QTD</th>';
-
-    if ($mostrarValoresUnitarios) {
-        $html .= '<th>PREÇO UNIT.</th>
-                                <th>SUBTOTAL</th>';
-    } else {
-        $html .= '<th>SUBTOTAL</th>';
-    }
-
-    $html .= '<th>UNID.</th>
+                                <th>QTD</th>
+                                <th>SUBTOTAL</th>
+                                <th>UNID.</th>
                             </tr>
                         </thead>
                         <tbody>';
 
     foreach ($orcamento['itens'] as $item) {
-        $precoUnitario = number_format($item['preco_unitario'], 2, ',', '.');
         $subtotal = number_format($item['subtotal'], 2, ',', '.');
 
         $html .= '
                             <tr>
                                 <td>' . htmlspecialchars($item['produto_nome']) . '</td>
-                                <td>' . $item['quantidade'] . '</td>';
-
-        if ($mostrarValoresUnitarios) {
-            $html .= '<td>R$ ' . $precoUnitario . '</td>
-                                <td>R$ ' . $subtotal . '</td>';
-        } else {
-            $html .= '<td>R$ ' . $subtotal . '</td>';
-        }
-
-        $html .= '<td>' . htmlspecialchars($item['unidade']) . '</td>
+                                <td>' . $item['quantidade'] . '</td>
+                                <td>R$ ' . $subtotal . '</td>
+                                <td>' . htmlspecialchars($item['unidade']) . '</td>
                             </tr>';
     }
 
@@ -445,20 +430,18 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $orcamentoId = (int)$_GET['id'];
-$mostrarValoresUnitarios = isset($_GET['valores']) ? (bool)$_GET['valores'] : true;
-
 $orcamento = getOrcamentoData($orcamentoId);
 
 if (!$orcamento) {
     die('Orçamento não encontrado');
 }
 
-// Gerar PDF
-$pdfContent = generatePDF($orcamento, $mostrarValoresUnitarios);
+// Gerar PDF SEM valores unitários
+$pdfContent = generatePDF($orcamento);
 
 // Configurar headers para download
 header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="orcamento_' . $orcamentoId . '.pdf"');
+header('Content-Disposition: attachment; filename="orcamento_' . $orcamentoId . '_simples.pdf"');
 header('Content-Length: ' . strlen($pdfContent));
 header('Cache-Control: no-cache, must-revalidate');
 header('Pragma: no-cache');

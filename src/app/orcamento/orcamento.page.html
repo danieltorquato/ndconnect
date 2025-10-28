@@ -30,7 +30,7 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Seção de Filtros e Pesquisa -->
+  <!-- Seção de Filtros e Pesquisa
   <ion-card>
     <ion-card-header>
       <ion-card-title>Filtrar e Pesquisar Produtos</ion-card-title>
@@ -66,70 +66,80 @@
         </ion-button>
       </ion-item>
     </ion-card-content>
-  </ion-card>
+  </ion-card> -->
 
-  <!-- Seção de Produtos -->
+  <!-- Seção de Produtos Customizados -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>
-        <span *ngIf="!mostrarTodosProdutos && !termoPesquisa.trim() && categoriaSelecionada === 0">
-          Produtos Mais Populares
-        </span>
-        <span *ngIf="mostrarTodosProdutos || termoPesquisa.trim() || categoriaSelecionada !== 0">
-          Produtos Disponíveis
-        </span>
-        <ion-badge color="primary">{{produtosFiltrados.length}} produtos</ion-badge>
+        <ion-icon name="add"></ion-icon>
+        Adicionar Produto Customizado
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div *ngIf="produtosFiltrados.length === 0" class="no-results">
-        <ion-icon name="search" size="large" color="medium"></ion-icon>
-        <h3>Nenhum produto encontrado</h3>
-        <p>Tente ajustar os filtros ou termo de pesquisa</p>
-      </div>
+      <ion-item>
+        <ion-label position="stacked">Nome do Produto *</ion-label>
+        <ion-input [(ngModel)]="produtoCustomizado.nome" placeholder="Ex: Palco 3x3m, Gerador 5kW, etc."></ion-input>
+      </ion-item>
 
-      <!-- Botão para alternar entre produtos populares e todos os produtos -->
-      <div *ngIf="!termoPesquisa.trim() && categoriaSelecionada === 0 && produtosFiltrados.length > 0" class="ver-todos-container">
-        <ion-button
-          fill="outline"
-          color="secondary"
-          (click)="alternarVisualizacao()"
-          expand="block">
-          <ion-icon [name]="mostrarTodosProdutos ? 'list' : 'star'" slot="start"></ion-icon>
-          {{ mostrarTodosProdutos ? 'Mostrar Somente Populares' : 'Ver Todos os Produtos' }}
-        </ion-button>
-      </div>
+      <ion-item>
+        <ion-label position="stacked">Valor Unitário (opcional)</ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="produtoCustomizado.valorUnitario"
+          placeholder="0,00"
+          [disabled]="produtoCustomizado.usarValorTotal"
+          (ionInput)="calcularSubtotalCustomizado()">
+        </ion-input>
+      </ion-item>
 
-      <ion-grid *ngIf="produtosFiltrados.length > 0">
-        <ion-row>
-          <ion-col size="12" size-md="6" size-lg="4" *ngFor="let produto of produtosFiltrados; trackBy: trackByProdutoId">
-            <ion-card class="produto-card">
-              <ion-card-content>
-                <div class="produto-header">
-                  <h3>{{produto.nome}}</h3>
-                  <ion-badge color="secondary" class="categoria-badge">{{produto.categoria_nome}}</ion-badge>
-                </div>
-                <p class="descricao">{{produto.descricao}}</p>
-                <div class="preco-container">
-                  <span class="preco">R$ {{produto.preco | number:'1.2-2'}}</span>
-                  <span class="unidade">/ {{produto.unidade}}</span>
-                </div>
-                <ion-button
-                  expand="block"
-                  fill="outline"
-                  color="primary"
-                  (click)="adicionarItem(produto)"
-                  class="add-button">
-                  <ion-icon name="add" slot="start"></ion-icon>
-                  Adicionar
-                </ion-button>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+      <ion-item>
+        <ion-checkbox [(ngModel)]="produtoCustomizado.usarValorTotal" (ionChange)="calcularSubtotalCustomizado()"></ion-checkbox>
+        <ion-label class="ion-margin-start">Usar valor total em vez de unitário</ion-label>
+      </ion-item>
+
+      <ion-item *ngIf="produtoCustomizado.usarValorTotal">
+        <ion-label position="stacked">Valor Total *</ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="produtoCustomizado.valorTotal"
+          placeholder="0,00"
+          (ionInput)="calcularSubtotalCustomizado()">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Unidade *</ion-label>
+        <ion-input [(ngModel)]="produtoCustomizado.unidade" placeholder="Ex: unidade, metro, hora, etc."></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Quantidade *</ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="produtoCustomizado.quantidade"
+          placeholder="1"
+          (ionInput)="calcularSubtotalCustomizado()">
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="produtoCustomizado.subtotal > 0">
+        <ion-label position="stacked">Subtotal</ion-label>
+        <ion-input readonly [value]="'R$ ' + produtoCustomizado.subtotal.toFixed(2).replace('.', ',')"></ion-input>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="adicionarProdutoCustomizado()"
+        [disabled]="!produtoCustomizado.nome || !produtoCustomizado.unidade || !produtoCustomizado.quantidade || (!produtoCustomizado.usarValorTotal && !produtoCustomizado.valorUnitario) || (produtoCustomizado.usarValorTotal && !produtoCustomizado.valorTotal)">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Adicionar Produto
+      </ion-button>
     </ion-card-content>
   </ion-card>
+
+
 
   <!-- Seção do Orçamento -->
   <ion-card *ngIf="itensOrcamento.length > 0">
@@ -185,7 +195,7 @@
               <ion-button
                 fill="outline"
                 size="small"
-                (click)="atualizarQuantidade(item.produto_id, item.quantidade - 1)">
+                (click)="atualizarQuantidade(item.produto_id, (item.quantidade ?? 0) - 1)">
                 <ion-icon name="remove"></ion-icon>
               </ion-button>
               <span class="quantidade">{{item.quantidade}}</span>
@@ -256,11 +266,11 @@
     </ion-card-header>
     <ion-card-content>
       <ion-item>
-        <ion-label position="stacked">Nome *</ion-label>
+        <ion-label position="stacked">Nome</ion-label>
         <ion-input [(ngModel)]="cliente.nome" placeholder="Nome completo do cliente"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="stacked">Empresa</ion-label>
+        <ion-label position="stacked">Empresa *</ion-label>
         <ion-input [(ngModel)]="cliente.empresa" placeholder="Nome da empresa"></ion-input>
       </ion-item>
       <ion-item>
@@ -293,28 +303,47 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Seção de Validade do Orçamento -->
+  <!-- Seção de Dados do Evento -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="calendar"></ion-icon>
-        Validade do Orçamento
+        Dados do Evento
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-item>
-        <ion-label position="stacked">Data de Validade *</ion-label>
-        <ion-datetime
-          [(ngModel)]="dataValidade"
-          presentation="date"
-          [min]="dataMinima"
-          (ionChange)="onDataValidadeChange()"
-          placeholder="Selecione a data de validade">
-        </ion-datetime>
+        <ion-label position="stacked">Nome do Evento *</ion-label>
+        <ion-input [(ngModel)]="nomeEvento" placeholder="Ex: Festa de Aniversário, Casamento, etc."></ion-input>
       </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Datas do Evento *</ion-label>
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="abrirSeletorDatas()">
+          <ion-icon name="calendar" slot="start"></ion-icon>
+          {{datasEvento.length > 0 ? 'Selecionar Datas (' + datasEvento.length + ')' : 'Selecionar Datas'}}
+        </ion-button>
+      </ion-item>
+
+      <!-- Exibir datas selecionadas -->
+      <ion-item *ngIf="datasEvento.length > 0">
+        <ion-label position="stacked">Datas Selecionadas</ion-label>
+        <div class="datas-selecionadas">
+          <ion-chip *ngFor="let data of datasEvento; let i = index" color="primary">
+            <ion-label>{{formatarData(data)}}</ion-label>
+            <ion-icon name="close" (click)="removerData(i)"></ion-icon>
+          </ion-chip>
+        </div>
+      </ion-item>
+
       <ion-note color="medium">
-        <p><ion-icon name="warning" color="warning"></ion-icon> <strong>Validade mínima:</strong> 10 dias conforme legislação brasileira</p>
-        <p>Você pode alterar a data conforme necessário</p>
+        <p><ion-icon name="information-circle" color="primary"></ion-icon> <strong>Informações importantes:</strong></p>
+        <p>• Selecione uma ou mais datas para o evento</p>
+        <p>• Nome do evento é obrigatório</p>
+        <p>• As datas serão exibidas formatadas no PDF</p>
       </ion-note>
     </ion-card-content>
   </ion-card>
@@ -353,6 +382,28 @@
       <ion-button
         expand="block"
         fill="outline"
+        color="secondary"
+        (click)="gerarPDFCompleto()"
+        class="action-button"
+        *ngIf="ultimoOrcamentoId">
+        <ion-icon name="document-text" slot="start"></ion-icon>
+        PDF Completo (com valores unitários)
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="tertiary"
+        (click)="gerarPDFSimples()"
+        class="action-button"
+        *ngIf="ultimoOrcamentoId">
+        <ion-icon name="document" slot="start"></ion-icon>
+        PDF Simples (apenas total)
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        fill="outline"
         color="medium"
         (click)="limparOrcamento()"
         class="action-button">
@@ -362,3 +413,57 @@
     </ion-card-content>
   </ion-card>
 </ion-content>
+
+<!-- Modal para seleção de datas múltiplas -->
+<ion-modal [isOpen]="modalDatasAberto" (didDismiss)="fecharModalDatas()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Selecionar Datas do Evento</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="fecharModalDatas()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-item>
+        <ion-label position="stacked">Selecione uma data</ion-label>
+        <ion-datetime
+          [(ngModel)]="dataSelecionada"
+          presentation="date"
+          [min]="dataMinima"
+          (ionChange)="adicionarDataSelecionada($event)">
+        </ion-datetime>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="secondary"
+        (click)="adicionarDataSelecionada(null)"
+        [disabled]="!dataSelecionada">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Adicionar Data Selecionada
+      </ion-button>
+
+      <div *ngIf="datasEvento.length > 0" class="datas-preview">
+        <h3>Datas Selecionadas:</h3>
+        <ion-chip *ngFor="let data of datasEvento; let i = index" color="primary">
+          <ion-label>{{formatarData(data)}}</ion-label>
+          <ion-icon name="close" (click)="removerData(i)"></ion-icon>
+        </ion-chip>
+      </div>
+
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="confirmarDatas()"
+        [disabled]="datasEvento.length === 0">
+        Confirmar Datas ({{datasEvento.length}})
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>
