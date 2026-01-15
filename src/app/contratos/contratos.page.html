@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Contratos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="contratoForm" (ngSubmit)="gerarContrato()">
+    <ion-item>
+      <ion-label position="stacked">Nome da Empresa *</ion-label>
+      <ion-input formControlName="nomeEmpresa"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Endereço da Empresa</ion-label>
+      <ion-input formControlName="enderecoEmpresa"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">CNPJ</ion-label>
+      <ion-input formControlName="cnpj"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Representante</ion-label>
+      <ion-input formControlName="representante"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Valor do Acordo</ion-label>
+      <ion-input formControlName="valorAcordo"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Prazo</ion-label>
+      <ion-input formControlName="prazo"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Descrição do Acordo</ion-label>
+      <ion-textarea formControlName="descricaoAcordo"></ion-textarea>
+    </ion-item>
+
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Opções a incluir no contrato</ion-label>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>Nome da Empresa</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['nomeEmpresa']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Endereço da Empresa</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['enderecoEmpresa']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>CNPJ</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['cnpj']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Representante</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['representante']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Valor do Acordo</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['valorAcordo']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Prazo</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['prazo']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Descrição do Acordo</ion-label>
+        <ion-checkbox [(ngModel)]="opcoesSelecionadas['descricaoAcordo']" [ngModelOptions]="{standalone: true}"></ion-checkbox>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" type="submit" [disabled]="!contratoForm.valid">
+      Gerar Contrato
+    </ion-button>
+  </form>
+</ion-content>

@@ -115,6 +115,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'admin/contratos',
+    loadComponent: () => import('./contratos/contratos.page').then( m => m.ContratosPage),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'tutorial',
     loadComponent: () => import('./tutorial/tutorial-layout/tutorial-layout.page').then( m => m.TutorialLayoutPage),
     canActivate: [AuthGuard],
