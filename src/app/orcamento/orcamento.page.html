@@ -23,506 +23,431 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="nd-content">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Orçamentos</ion-title>
+      <ion-title size="large">Criar Orçamento</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <!-- Seção de Filtros e Pesquisa
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtrar e Pesquisar Produtos</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Pesquisar produtos</ion-label>
-        <ion-input
-          [(ngModel)]="termoPesquisa"
-          (ionInput)="pesquisarProdutos()"
-          placeholder="Digite o nome, descrição ou categoria do produto..."
-          clearInput="true">
-          <ion-icon name="search" slot="start"></ion-icon>
-        </ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label>Categoria</ion-label>
-        <ion-select [(ngModel)]="categoriaSelecionada" (ionChange)="filtrarPorCategoria()" placeholder="Todas as categorias">
-          <ion-select-option [value]="0">Todas as categorias</ion-select-option>
-          <ion-select-option *ngFor="let categoria of categorias" [value]="categoria.id">
-            {{categoria.nome}}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-item *ngIf="termoPesquisa.trim() || categoriaSelecionada !== 0">
-        <ion-button
-          fill="outline"
-          color="medium"
-          (click)="limparFiltros()"
-          expand="block">
-          <ion-icon name="close" slot="start"></ion-icon>
-          Limpar Filtros
-        </ion-button>
-      </ion-item>
-    </ion-card-content>
-  </ion-card> -->
+  <!-- Seção Inicial - Resumo -->
+  <div class="nd-hero" *ngIf="itensOrcamento.length > 0">
+    <div class="hero-card">
+      <div class="hero-stat">
+        <span class="stat-value">{{itensOrcamento.length}}</span>
+        <span class="stat-label">Produtos</span>
+      </div>
+      <div class="hero-separator"></div>
+      <div class="hero-stat">
+        <span class="stat-value">R$ {{total | number:'1.2-2'}}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Seção de Produtos Customizados -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="add"></ion-icon>
-        Adicionar Produto Customizado - Show {{showAtual}}
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Nome do Produto *</ion-label>
-        <ion-input [(ngModel)]="produtoCustomizado.nome" placeholder="Ex: Palco 3x3m, Gerador 5kW, etc."></ion-input>
-      </ion-item>
+  <div class="nd-section">
+    <div class="section-header">
+      <ion-icon name="add-circle"></ion-icon>
+      <h2>Adicionar Produto</h2>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Valor Unitário (opcional)</ion-label>
-        <ion-input
-          type="number"
-          [(ngModel)]="produtoCustomizado.valorUnitario"
-          placeholder="0,00"
-          [disabled]="produtoCustomizado.usarValorTotal"
-          (ionInput)="calcularSubtotalCustomizado()">
-        </ion-input>
-      </ion-item>
+    <ion-card class="nd-card">
+      <ion-card-content class="product-form">
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">Nome do Produto *</ion-label>
+            <ion-input
+              [(ngModel)]="produtoCustomizado.nome"
+              placeholder="Ex: Palco 3x3m, Gerador 5kW, etc."
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
 
-      <ion-item>
-        <ion-checkbox [(ngModel)]="produtoCustomizado.usarValorTotal" (ionChange)="calcularSubtotalCustomizado()"></ion-checkbox>
-        <ion-label class="ion-margin-start">Usar valor total em vez de unitário</ion-label>
-      </ion-item>
+        <div class="form-row">
+          <div class="form-group">
+            <ion-item lines="none">
+              <ion-label position="stacked">Unidade *</ion-label>
+              <ion-input
+                [(ngModel)]="produtoCustomizado.unidade"
+                placeholder="Ex: un, hora, m²"
+                class="nd-input">
+              </ion-input>
+            </ion-item>
+          </div>
+          <div class="form-group">
+            <ion-item lines="none">
+              <ion-label position="stacked">Quantidade *</ion-label>
+              <ion-input
+                type="number"
+                [(ngModel)]="produtoCustomizado.quantidade"
+                placeholder="1"
+                (ionInput)="calcularSubtotalCustomizado()"
+                class="nd-input">
+              </ion-input>
+            </ion-item>
+          </div>
+        </div>
 
-      <ion-item *ngIf="produtoCustomizado.usarValorTotal">
-        <ion-label position="stacked">Valor Total *</ion-label>
-        <ion-input
-          type="number"
-          [(ngModel)]="produtoCustomizado.valorTotal"
-          placeholder="0,00"
-          (ionInput)="calcularSubtotalCustomizado()">
-        </ion-input>
-      </ion-item>
+        <div class="form-group checkbox-group">
+          <ion-item lines="none">
+            <ion-checkbox
+              [(ngModel)]="produtoCustomizado.usarValorTotal"
+              (ionChange)="calcularSubtotalCustomizado()"
+              class="nd-checkbox">
+            </ion-checkbox>
+            <ion-label>Informar valor unitário</ion-label>
+          </ion-item>
+        </div>
 
-      <ion-item>
-        <ion-label position="stacked">Unidade *</ion-label>
-        <ion-input [(ngModel)]="produtoCustomizado.unidade" placeholder="Ex: unidade, metro, hora, etc."></ion-input>
-      </ion-item>
+        <div class="form-group" *ngIf="produtoCustomizado.usarValorTotal">
+          <ion-item lines="none">
+            <ion-label position="stacked">Valor Unitário</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="produtoCustomizado.valorUnitario"
+              placeholder="0,00"
+              (ionInput)="calcularSubtotalCustomizado()"
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
 
-      <ion-item>
-        <ion-label position="stacked">Quantidade *</ion-label>
-        <ion-input
-          type="number"
-          [(ngModel)]="produtoCustomizado.quantidade"
-          placeholder="1"
-          (ionInput)="calcularSubtotalCustomizado()">
-        </ion-input>
-      </ion-item>
+        <div class="form-group" *ngIf="produtoCustomizado.subtotal > 0">
+          <ion-item lines="none" class="subtotal-item">
+            <ion-label>Subtotal</ion-label>
+            <span class="subtotal-value">R$ {{produtoCustomizado.subtotal.toFixed(2).replace('.', ',')}}</span>
+          </ion-item>
+        </div>
 
-      <ion-item *ngIf="produtoCustomizado.subtotal > 0">
-        <ion-label position="stacked">Subtotal</ion-label>
-        <ion-input readonly [value]="'R$ ' + produtoCustomizado.subtotal.toFixed(2).replace('.', ',')"></ion-input>
-      </ion-item>
-
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="adicionarProdutoCustomizado()"
-        [disabled]="!produtoCustomizado.nome || !produtoCustomizado.unidade || !produtoCustomizado.quantidade || (!produtoCustomizado.usarValorTotal && !produtoCustomizado.valorUnitario) || (produtoCustomizado.usarValorTotal && !produtoCustomizado.valorTotal)">
-        <ion-icon name="add" slot="start"></ion-icon>
-        Adicionar Produto
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-
-
+        <ion-button
+          expand="block"
+          class="nd-btn-primary"
+          (click)="adicionarProdutoCustomizado()"
+          [disabled]="!produtoCustomizado.nome || !produtoCustomizado.unidade || !produtoCustomizado.quantidade || (produtoCustomizado.usarValorTotal && !produtoCustomizado.valorUnitario)">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Adicionar Produto
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
   <!-- Seção do Orçamento -->
-  <ion-card *ngIf="itensOrcamento.length > 0">
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="document"></ion-icon>
-        Orçamento Atual - Show {{showAtual}}
-        <ion-badge color="primary">{{itensOrcamento.length}} itens</ion-badge>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let item of itensOrcamento; trackBy: trackByItemId" class="item-orcamento">
-          <div class="item-content">
-            <div class="item-info">
-              <h4>{{item.produto_nome}}</h4>
-              <p class="categoria">{{item.categoria_nome}}</p>
-              <p class="preco-unitario">R$ {{item.preco_unitario | number:'1.2-2'}} / {{item.unidade}}</p>
+  <div class="nd-section" *ngIf="itensOrcamento.length > 0">
+    <div class="section-header">
+      <ion-icon name="document-text"></ion-icon>
+      <h2>Itens do Orçamento</h2>
+    </div>
 
-              <!-- Seção de desconto por item -->
-              <div class="desconto-item" style="margin-top: 8px;">
-                <ion-grid>
-                  <ion-row>
-                    <ion-col size="6">
-                      <ion-item lines="none" style="--padding-start: 0; --padding-end: 0;">
-                        <ion-label position="stacked" style="font-size: 12px;">Desconto %</ion-label>
-                        <ion-input
-                          type="number"
-                          [value]="item.desconto_porcentagem || 0"
-                          (ionInput)="aplicarDescontoItem(item.produto_id, 'porcentagem', +($event.target.value ?? 0))"
-                          placeholder="0"
-                          style="font-size: 14px;">
-                        </ion-input>
-                      </ion-item>
-                    </ion-col>
-                    <ion-col size="6">
-                      <ion-item lines="none" style="--padding-start: 0; --padding-end: 0;">
-                        <ion-label position="stacked" style="font-size: 12px;">Desconto R$</ion-label>
-                        <ion-input
-                          type="number"
-                          [value]="item.desconto_valor || 0"
-                          (ionInput)="aplicarDescontoItem(item.produto_id, 'valor', +($event.target.value ?? 0))"
-                          placeholder="0.00"
-                          style="font-size: 14px;">
-                        </ion-input>
-                      </ion-item>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-              </div>
+    <ion-card class="nd-card">
+      <ion-card-content class="items-list">
+        <div class="item-card" *ngFor="let item of itensOrcamento; trackBy: trackByItemId">
+          <div class="item-header">
+            <h3>{{item.produto_nome}}</h3>
+            <span class="item-category">{{item.categoria_nome}}</span>
+          </div>
+
+          <div class="item-details">
+            <div class="detail-row">
+              <span class="label">Quantidade:</span>
+              <span class="value">{{item.quantidade}} {{item.unidade}}</span>
             </div>
-            <div class="item-controls">
-              <ion-button
-                fill="outline"
-                size="small"
-                (click)="atualizarQuantidade(item.produto_id, (item.quantidade ?? 0) - 1)">
-                <ion-icon name="remove"></ion-icon>
-              </ion-button>
-              <span class="quantidade">{{item.quantidade}}</span>
-              <ion-button
-                fill="outline"
-                size="small"
-                (click)="atualizarQuantidade(item.produto_id, item.quantidade + 1)">
-                <ion-icon name="add"></ion-icon>
-              </ion-button>
-              <div class="valores-item">
-                <span class="subtotal" *ngIf="!item.subtotal_com_desconto || item.subtotal_com_desconto === item.subtotal">
-                  R$ {{item.subtotal | number:'1.2-2'}}
-                </span>
-                <div *ngIf="item.subtotal_com_desconto && item.subtotal_com_desconto !== item.subtotal" class="subtotal-com-desconto">
-                  <span class="subtotal-original" style="text-decoration: line-through; color: #999; font-size: 12px;">
-                    R$ {{item.subtotal | number:'1.2-2'}}
-                  </span>
-                  <span class="subtotal-final" style="color: #2dd36f; font-weight: bold;">
-                    R$ {{item.subtotal_com_desconto | number:'1.2-2'}}
-                  </span>
-                </div>
-              </div>
+
+            <div class="detail-row" *ngIf="item.preco_unitario > 0">
+              <span class="label">Valor unitário:</span>
+              <span class="value">R$ {{item.preco_unitario | number:'1.2-2'}}</span>
+            </div>
+
+            <div class="detail-row total-row">
+              <span class="label">Subtotal:</span>
+              <span class="value total-value">R$ {{item.subtotal | number:'1.2-2'}}</span>
             </div>
           </div>
-        </ion-item>
-      </ion-list>
 
-      <div class="totais">
-        <ion-item>
-          <ion-label>Subtotal:</ion-label>
-          <ion-label slot="end">R$ {{subtotal | number:'1.2-2'}}</ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-label>Desconto:</ion-label>
-          <ion-select
-            [(ngModel)]="descontoTipo"
-            (ionChange)="calcularTotal()"
-            slot="end"
-            interface="popover"
-            style="min-width: 100px;">
-            <ion-select-option value="valor">R$</ion-select-option>
-            <ion-select-option value="porcentagem">%</ion-select-option>
-          </ion-select>
-          <ion-input
-            type="number"
-            [(ngModel)]="desconto"
-            (ionInput)="calcularTotal()"
-            [placeholder]="descontoTipo === 'valor' ? '0.00' : '0'"
-            slot="end"
-            style="min-width: 80px;">
-          </ion-input>
-        </ion-item>
-        <ion-item class="total-item">
-          <ion-label><strong>TOTAL:</strong></ion-label>
-          <ion-label slot="end"><strong>R$ {{total | number:'1.2-2'}}</strong></ion-label>
-        </ion-item>
-      </div>
-    </ion-card-content>
-  </ion-card>
+          <div class="item-actions">
+            <ion-button fill="clear" size="small" color="danger" (click)="removerItem(item.produto_id)">
+              <ion-icon name="trash" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
 
-  <!-- Seção de Dados do Cliente -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="person"></ion-icon>
-        Dados do Cliente
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Nome</ion-label>
-        <ion-input [(ngModel)]="cliente.nome" placeholder="Nome completo do cliente"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Empresa *</ion-label>
-        <ion-input [(ngModel)]="cliente.empresa" placeholder="Nome da empresa"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">E-mail *</ion-label>
-        <ion-input
-          type="email"
-          [(ngModel)]="cliente.email"
-          (ionInput)="validarEmailInput($event)"
-          placeholder="email@exemplo.com">
-        </ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Telefone *</ion-label>
-        <ion-input
-          type="tel"
-          [(ngModel)]="cliente.telefone"
-          (ionInput)="formatarTelefone($event)"
-          placeholder="(11) 99999-9999"
-          maxlength="15">
-        </ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Endereço</ion-label>
-        <ion-input [(ngModel)]="cliente.endereco" placeholder="Endereço completo"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">CPF/CNPJ</ion-label>
-        <ion-input [(ngModel)]="cliente.cpf_cnpj" placeholder="000.000.000-00 ou 00.000.000/0000-00"></ion-input>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
+        <!-- Resumo de Totais -->
+        <div class="totals-section">
+          <div class="total-row-calc">
+            <span>Subtotal:</span>
+            <span>R$ {{subtotal | number:'1.2-2'}}</span>
+          </div>
 
-  <!-- Seção de Configuração de Shows -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="star"></ion-icon>
-        Configuração de Shows
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Quantidade de Shows *</ion-label>
-        <ion-select
-          [(ngModel)]="quantidadeShows"
-          (ionChange)="definirQuantidadeShows($event.detail.value)"
-          placeholder="Selecione a quantidade">
-          <ion-select-option value="1">1 Show</ion-select-option>
-          <ion-select-option value="2">2 Shows</ion-select-option>
-          <ion-select-option value="3">3 Shows</ion-select-option>
-          <ion-select-option value="4">4 Shows</ion-select-option>
-          <ion-select-option value="5">5 Shows</ion-select-option>
-          <ion-select-option value="6">6 Shows</ion-select-option>
-          <ion-select-option value="7">7 Shows</ion-select-option>
-          <ion-select-option value="8">8 Shows</ion-select-option>
-          <ion-select-option value="9">9 Shows</ion-select-option>
-          <ion-select-option value="10">10 Shows</ion-select-option>
-        </ion-select>
-      </ion-item>
+          <div class="discount-row">
+            <span>Desconto:</span>
+            <div class="discount-inputs">
+              <ion-select
+                [(ngModel)]="descontoTipo"
+                (ionChange)="calcularTotal()"
+                interface="popover"
+                class="nd-select">
+                <ion-select-option value="valor">R$</ion-select-option>
+                <ion-select-option value="porcentagem">%</ion-select-option>
+              </ion-select>
+              <ion-input
+                type="number"
+                [(ngModel)]="desconto"
+                (ionInput)="calcularTotal()"
+                [placeholder]="descontoTipo === 'valor' ? '0.00' : '0'"
+                class="nd-input">
+              </ion-input>
+            </div>
+          </div>
 
-      <!-- Navegação entre shows -->
-      <ion-item *ngIf="quantidadeShows > 1">
-        <ion-label position="stacked">Show Atual</ion-label>
-        <ion-segment
-          [(ngModel)]="showAtual"
-          (ionChange)="navegarParaShow(+($event.detail.value ?? 0))"
-        >
-          <ng-container *ngFor="let show of shows; let i = index">
-            <ion-segment-button [value]="i + 1">
-              <ion-label>Show {{i + 1}}</ion-label>
-            </ion-segment-button>
-          </ng-container>
-        </ion-segment>
-      </ion-item>
+          <div class="total-final-row">
+            <span class="final-label">TOTAL DO ORÇAMENTO:</span>
+            <span class="final-value">R$ {{total | number:'1.2-2'}}</span>
+          </div>
 
-      <ion-note color="medium">
-        <p><ion-icon name="information-circle" color="primary"></ion-icon> <strong>Informações importantes:</strong></p>
-        <p>• Cada show terá suas próprias datas e produtos</p>
-        <p>• O PDF será gerado com uma página para cada show</p>
-        <p>• Você pode navegar entre shows para editar cada um</p>
-      </ion-note>
-    </ion-card-content>
-  </ion-card>
+          <div class="form-group" style="margin-top: 20px;">
+            <ion-item lines="none">
+              <ion-label position="stacked">Informe o Valor Total do Orçamento</ion-label>
+              <ion-input
+                type="number"
+                [(ngModel)]="valorTotalInformado"
+                (ionInput)="formatarValorTotal($event)"
+                placeholder="0,00"
+                class="nd-input">
+              </ion-input>
+            </ion-item>
+            <div style="padding: 10px 0; text-align: right; color: var(--nd-primary); font-weight: 600;" *ngIf="valorTotalInformado > 0">
+              R$ {{valorTotalInformado | number:'1.3-2':'pt-BR'}}
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
   <!-- Seção de Dados do Evento -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="calendar"></ion-icon>
-        Dados do Evento - Show {{showAtual}}
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="stacked">Nome do Evento *</ion-label>
-        <ion-input [(ngModel)]="nomeEvento" placeholder="Ex: Festa de Aniversário, Casamento, etc."></ion-input>
-      </ion-item>
+  <div class="nd-section">
+    <div class="section-header">
+      <ion-icon name="calendar"></ion-icon>
+      <h2>Dados do Evento</h2>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Datas do Evento *</ion-label>
+    <ion-card class="nd-card">
+      <ion-card-content>
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">Nome do Evento *</ion-label>
+            <ion-input
+              [(ngModel)]="nomeEvento"
+              placeholder="Ex: Festa de Aniversário, Casamento, etc."
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">Quantidade de Shows *</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="quantidadeShows"
+              (ionInput)="definirQuantidadeShows(quantidadeShows)"
+              placeholder="Ex: 1, 2, 3..."
+              min="1"
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Seção de Dados do Cliente -->
+  <div class="nd-section">
+    <div class="section-header">
+      <ion-icon name="person"></ion-icon>
+      <h2>Dados do Cliente</h2>
+    </div>
+
+    <ion-card class="nd-card">
+      <ion-card-content>
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">Nome</ion-label>
+            <ion-input
+              [(ngModel)]="cliente.nome"
+              placeholder="Nome completo do cliente"
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">Empresa *</ion-label>
+            <ion-input
+              [(ngModel)]="cliente.empresa"
+              placeholder="Nome da empresa"
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">E-mail *</ion-label>
+            <ion-input
+              type="email"
+              [(ngModel)]="cliente.email"
+              (ionInput)="validarEmailInput($event)"
+              placeholder="email@exemplo.com"
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-group">
+          <ion-item lines="none">
+            <ion-label position="stacked">Telefone *</ion-label>
+            <ion-input
+              type="tel"
+              [(ngModel)]="cliente.telefone"
+              (ionInput)="formatarTelefone($event)"
+              placeholder="(11) 99999-9999"
+              maxlength="15"
+              class="nd-input">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <ion-item lines="none">
+              <ion-label position="stacked">Endereço</ion-label>
+              <ion-input
+                [(ngModel)]="cliente.endereco"
+                placeholder="Endereço"
+                class="nd-input">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <div class="form-group">
+            <ion-item lines="none">
+              <ion-label position="stacked">CPF/CNPJ</ion-label>
+              <ion-input
+                [(ngModel)]="cliente.cpf_cnpj"
+                placeholder="000.000.000-00"
+                class="nd-input">
+              </ion-input>
+            </ion-item>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Seção de Observações -->
+  <div class="nd-section">
+    <div class="section-header">
+      <ion-icon name="document"></ion-icon>
+      <h2>Observações</h2>
+    </div>
+
+    <ion-card class="nd-card">
+      <ion-card-content>
+        <ion-item lines="none">
+          <ion-textarea
+            [(ngModel)]="observacoes"
+            placeholder="Observações adicionais para o orçamento..."
+            rows="4"
+            class="nd-textarea">
+          </ion-textarea>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Seção de Configurações -->
+  <div class="nd-section">
+    <div class="section-header">
+      <ion-icon name="settings"></ion-icon>
+      <h2>Configurações</h2>
+    </div>
+
+    <ion-card class="nd-card">
+      <ion-card-content>
+        <ion-item lines="none">
+          <ion-checkbox
+            [(ngModel)]="incluirValorUnitario"
+            [ngModelOptions]="{standalone: true}"
+            class="nd-checkbox">
+          </ion-checkbox>
+          <ion-label>Incluir valor unitário no PDF/Word</ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Seção de Ações -->
+  <div class="nd-section" *ngIf="itensOrcamento.length > 0">
+    <div class="section-header">
+      <ion-icon name="document-outline"></ion-icon>
+      <h2>Exportar Orçamento</h2>
+    </div>
+
+    <ion-card class="nd-card">
+      <ion-card-content class="actions-grid">
+        <ion-button
+          expand="block"
+          class="nd-btn-primary"
+          (click)="gerarOrcamento()">
+          <ion-icon name="calculator" slot="start"></ion-icon>
+          Gerar Orçamento
+        </ion-button>
+
         <ion-button
           expand="block"
           fill="outline"
-          (click)="abrirSeletorDatas()">
-          <ion-icon name="calendar" slot="start"></ion-icon>
-          {{datasEvento.length > 0 ? 'Selecionar Datas (' + datasEvento.length + ')' : 'Selecionar Datas'}}
+          class="nd-btn-secondary"
+          (click)="gerarWord()"
+          *ngIf="ultimoOrcamentoId">
+          <ion-icon name="document" slot="start"></ion-icon>
+          Gerar Word
         </ion-button>
-      </ion-item>
 
-      <!-- Exibir datas selecionadas -->
-      <ion-item *ngIf="datasEvento.length > 0">
-        <ion-label position="stacked">Datas Selecionadas</ion-label>
-        <div class="datas-selecionadas">
-          <ion-chip *ngFor="let data of datasEvento; let i = index" color="primary">
-            <ion-label>{{formatarData(data)}}</ion-label>
-            <ion-icon name="close" (click)="removerData(i)"></ion-icon>
-          </ion-chip>
-        </div>
-      </ion-item>
+        <ion-button
+          expand="block"
+          fill="outline"
+          class="nd-btn-secondary"
+          (click)="gerarPDFCompleto()"
+          *ngIf="ultimoOrcamentoId">
+          <ion-icon name="document-text" slot="start"></ion-icon>
+          Exportar PDF
+        </ion-button>
 
-      <ion-note color="medium">
-        <p><ion-icon name="information-circle" color="primary"></ion-icon> <strong>Informações importantes:</strong></p>
-        <p>• Selecione uma ou mais datas para o evento</p>
-        <p>• Nome do evento é obrigatório</p>
-        <p>• As datas serão exibidas formatadas no PDF</p>
-      </ion-note>
-    </ion-card-content>
-  </ion-card>
+        <ion-button
+          expand="block"
+          fill="outline"
+          class="nd-btn-secondary"
+          (click)="gerarRecibo()"
+          *ngIf="ultimoOrcamentoId">
+          <ion-icon name="receipt" slot="start"></ion-icon>
+          Gerar Recibo
+        </ion-button>
 
-  <!-- Seção de Observações -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="document-text"></ion-icon>
-        Observações
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-textarea
-          [(ngModel)]="observacoes"
-          placeholder="Observações adicionais para o orçamento..."
-          rows="3">
-        </ion-textarea>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="danger"
+          (click)="limparOrcamento()">
+          <ion-icon name="trash" slot="start"></ion-icon>
+          Limpar Orçamento
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-  <!-- Botões de Ação -->
-  <ion-card *ngIf="itensOrcamento.length > 0">
-    <ion-card-content>
-      <!-- Informações do Show Atual -->
-      <div class="show-info" *ngIf="quantidadeShows > 1">
-        <h3>Show {{showAtual}} de {{quantidadeShows}}</h3>
-        <p><strong>Total do Show {{showAtual}}:</strong> R$ {{total.toFixed(2).replace('.', ',')}}</p>
-        <p><strong>Total Geral (Todos os Shows):</strong> R$ {{calcularTotalGeral().toFixed(2).replace('.', ',')}}</p>
-      </div>
-
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="gerarOrcamento()"
-        class="action-button">
-        <ion-icon name="calculator" slot="start"></ion-icon>
-        Gerar Orçamento {{quantidadeShows > 1 ? '(Todos os Shows)' : ''}}
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="secondary"
-        (click)="gerarPDFCompleto()"
-        class="action-button"
-        *ngIf="ultimoOrcamentoId">
-        <ion-icon name="document-text" slot="start"></ion-icon>
-        PDF Completo (com valores unitários)
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="tertiary"
-        (click)="gerarPDFSimples()"
-        class="action-button"
-        *ngIf="ultimoOrcamentoId">
-        <ion-icon name="document" slot="start"></ion-icon>
-        PDF Simples (apenas total)
-      </ion-button>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="medium"
-        (click)="limparOrcamento()"
-        class="action-button">
-        <ion-icon name="trash" slot="start"></ion-icon>
-        Limpar Orçamento
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+  <!-- Espaço final -->
+  <div style="height: 40px;"></div>
 </ion-content>
-
-<!-- Modal para seleção de datas múltiplas -->
-<ion-modal [isOpen]="modalDatasAberto" (didDismiss)="fecharModalDatas()">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Selecionar Datas do Evento</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="fecharModalDatas()">
-            <ion-icon name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="ion-padding">
-      <ion-item>
-        <ion-label position="stacked">Selecione uma data</ion-label>
-        <ion-datetime
-          [(ngModel)]="dataSelecionada"
-          presentation="date"
-          [min]="dataMinima"
-          (ionChange)="adicionarDataSelecionada($event)">
-        </ion-datetime>
-      </ion-item>
-
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="secondary"
-        (click)="adicionarDataSelecionada(null)"
-        [disabled]="!dataSelecionada">
-        <ion-icon name="add" slot="start"></ion-icon>
-        Adicionar Data Selecionada
-      </ion-button>
-
-      <div *ngIf="datasEvento.length > 0" class="datas-preview">
-        <h3>Datas Selecionadas:</h3>
-        <ion-chip *ngFor="let data of datasEvento; let i = index" color="primary">
-          <ion-label>{{formatarData(data)}}</ion-label>
-          <ion-icon name="close" (click)="removerData(i)"></ion-icon>
-        </ion-chip>
-      </div>
-
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="confirmarDatas()"
-        [disabled]="datasEvento.length === 0">
-        Confirmar Datas ({{datasEvento.length}})
-      </ion-button>
-    </ion-content>
-  </ng-template>
-</ion-modal>

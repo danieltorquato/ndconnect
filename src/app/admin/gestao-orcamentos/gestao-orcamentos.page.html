@@ -95,6 +95,16 @@
             PDF
           </ion-button>
 
+          <ion-button
+            *ngIf="orcamento.status === 'aprovado' || orcamento.status === 'vendido'"
+            fill="clear"
+            size="small"
+            color="success"
+            (click)="gerarRecibo(orcamento)">
+            <ion-icon name="document-text" slot="start"></ion-icon>
+            Recibo
+          </ion-button>
+
           <ion-button fill="clear" size="small" (click)="abrirModalStatus(orcamento)">
             <ion-icon name="create" slot="start"></ion-icon>
             Status

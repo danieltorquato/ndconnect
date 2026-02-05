@@ -1,0 +1,197 @@
+:root {
+  --nd-primary: #0C2B59;
+  --nd-secondary: #E8622D;
+  --nd-accent: #F7A64C;
+  --nd-light: #FFFFFF;
+  --nd-dark: #0C2B59;
+  --nd-medium: #64748b;
+}
+
+ion-content {
+  --background: #f3f4f6;
+}
+
+.acoes-recibo {
+  margin-bottom: 16px;
+
+  ion-button {
+    margin-bottom: 8px;
+  }
+}
+
+.recibo-container {
+  max-width: 800px;
+  margin: 0 auto 24px auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(12, 43, 89, 0.15);
+  overflow: hidden;
+  border: 1px solid rgba(12, 43, 89, 0.1);
+}
+
+.recibo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
+  color: #ffffff;
+}
+
+.recibo-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recibo-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.recibo-header-title h1 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+}
+
+.recibo-header-title p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.recibo-header-right {
+  text-align: right;
+  font-size: 12px;
+}
+
+.recibo-header-right .label {
+  display: block;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.recibo-header-right .valor {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.recibo-body {
+  padding: 24px;
+}
+
+.secao {
+  margin-bottom: 18px;
+}
+
+.secao-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--nd-primary);
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.linha {
+  font-size: 13px;
+  color: var(--nd-medium);
+  margin: 2px 0;
+}
+
+.linha strong {
+  color: var(--nd-dark);
+}
+
+.valor-destaque {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--nd-secondary);
+  margin-top: 4px;
+}
+
+.texto-principal {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--nd-dark);
+  margin-top: 8px;
+}
+
+.rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 32px;
+  font-size: 12px;
+  color: var(--nd-medium);
+}
+
+.assinatura {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.linha-assinatura {
+  border-top: 1px solid rgba(12, 43, 89, 0.4);
+  width: 260px;
+  margin: 0 auto 6px auto;
+}
+
+.assinatura-nome {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nd-dark);
+}
+
+.assinatura-label {
+  font-size: 11px;
+  color: var(--nd-medium);
+}
+
+.recibo-footer {
+  padding: 10px 24px 14px 24px;
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.03) 0%, rgba(232, 98, 45, 0.06) 100%);
+  border-top: 1px solid rgba(12, 43, 89, 0.08);
+  font-size: 11px;
+  color: var(--nd-medium);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  font-weight: 500;
+  color: var(--nd-primary);
+}
+
+.footer-right {
+  text-align: right;
+}
+
+@media print {
+  ion-header,
+  .acoes-recibo {
+    display: none !important;
+  }
+
+  ion-content {
+    --background: #ffffff;
+  }
+
+  .recibo-container {
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    margin: 0;
+  }
+}
+

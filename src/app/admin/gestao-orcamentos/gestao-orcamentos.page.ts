@@ -333,6 +333,25 @@ export class GestaoOrcamentosPage implements OnInit {
     await alert.present();
   }
 
+  gerarRecibo(orcamento: Orcamento) {
+    if (!orcamento) {
+      return;
+    }
+
+    this.router.navigate(['/recibo-orcamento'], {
+      queryParams: {
+        id: orcamento.id,
+        numero: orcamento.numero_orcamento,
+        cliente_nome: orcamento.cliente_nome,
+        email: orcamento.email,
+        telefone: orcamento.telefone,
+        total: orcamento.total,
+        data_orcamento: orcamento.data_orcamento,
+        observacoes: orcamento.observacoes || ''
+      }
+    });
+  }
+
   async mostrarAlerta(header: string, message: string) {
     const alert = await this.alertController.create({
       header: header,

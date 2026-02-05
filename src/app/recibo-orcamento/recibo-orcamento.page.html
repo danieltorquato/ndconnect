@@ -1,0 +1,109 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="voltar()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Recibo do Orçamento</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Ações -->
+  <div class="acoes-recibo">
+    <ion-button expand="block" color="success" (click)="compartilharWhatsApp()">
+      <ion-icon name="logo-whatsapp" slot="start"></ion-icon>
+      Enviar por WhatsApp
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="primary" (click)="compartilharEmail()">
+      <ion-icon name="mail" slot="start"></ion-icon>
+      Enviar por E-mail
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="secondary" (click)="salvarComoPDF()">
+      <ion-icon name="download" slot="start"></ion-icon>
+      Salvar como PDF
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="medium" (click)="imprimirRecibo()">
+      <ion-icon name="print" slot="start"></ion-icon>
+      Imprimir
+    </ion-button>
+  </div>
+
+  <!-- Layout do Recibo (mantido o visual) -->
+  <div class="recibo-container">
+    <div class="recibo-header">
+      <div class="recibo-header-left">
+        <img src="assets/img/logo.jpeg" alt="N.D Connect" class="recibo-logo" />
+        <div class="recibo-header-title">
+          <h1>N.D CONNECT</h1>
+          <p>Equipamentos para eventos • Palcos • Geradores • Som • Luz • Painéis LED</p>
+        </div>
+      </div>
+      <div class="recibo-header-right">
+        <span class="label">Recibo</span>
+        <span class="valor">{{ valorFormatado }}</span>
+        <span style="margin-top: 4px;">Orçamento nº {{ dados.numero || '---' }}</span>
+      </div>
+    </div>
+    <div class="recibo-body">
+      <div class="secao">
+        <div class="secao-titulo">Dados do Pagador</div>
+        <div class="linha">
+          <strong>Nome / Empresa:</strong> {{ dados.clienteNome || '____________________' }}
+        </div>
+        <div class="linha" *ngIf="dados.email">
+          <strong>E-mail:</strong> {{ dados.email }}
+        </div>
+        <div class="linha" *ngIf="dados.telefone">
+          <strong>Telefone:</strong> {{ dados.telefone }}
+        </div>
+      </div>
+
+      <div class="secao">
+        <div class="secao-titulo">Detalhes do Recebimento</div>
+        <div class="linha" *ngIf="dataOrcamentoFormatada">
+          <strong>Data do Orçamento:</strong> {{ dataOrcamentoFormatada }}
+        </div>
+        <div class="linha">
+          <strong>Data do Recibo:</strong> {{ (today | date: 'dd/MM/yyyy') || '' }}
+        </div>
+        <div class="texto-principal">
+          Recebemos de <strong>{{ dados.clienteNome || '____________________' }}</strong>
+          a importância de <strong>{{ valorFormatado }}</strong>, referente aos serviços prestados
+          conforme Orçamento nº <strong>{{ dados.numero || '---' }}</strong>.
+        </div>
+      </div>
+
+      <div class="secao">
+        <div class="secao-titulo">Valor Recebido</div>
+        <div class="valor-destaque">{{ valorFormatado }}</div>
+        <div class="linha" style="margin-top: 8px;" *ngIf="dados.observacoes">
+          <strong>Observações:</strong> {{ dados.observacoes }}
+        </div>
+      </div>
+
+      <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <div class="assinatura-nome">N.D CONNECT - EQUIPAMENTOS PARA EVENTOS</div>
+        <div class="assinatura-label">Responsável</div>
+      </div>
+
+      <div class="rodape">
+        <div>Este recibo é válido como comprovante de pagamento.</div>
+        <div>{{ (today | date: 'dd/MM/yyyy') || '' }}</div>
+      </div>
+    </div>
+    <div class="recibo-footer">
+      <div class="footer-left">N.D CONNECT - Equipamentos para Eventos</div>
+      <div class="footer-right">
+        <div>Contato: (11) 99999-9999</div>
+        <div>E-mail: contato@ndconnect.com.br</div>
+      </div>
+    </div>
+  </div>
+</ion-content>
+

@@ -7,6 +7,10 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
   {
+    path: 'recibo-orcamento',
+    loadComponent: () => import('./recibo-orcamento/recibo-orcamento.page').then(m => m.ReciboOrcamentoPage)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
   },

@@ -582,3 +582,438 @@ ion-note {
     }
   }
 }
+
+// ============ NOVO LAYOUT ND CONNECT ============
+
+.nd-content {
+  --background: #f8f9fa;
+}
+
+// Hero Section
+.nd-hero {
+  padding: 16px;
+  margin-bottom: 8px;
+
+  .hero-card {
+    background: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-secondary) 100%);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(12, 43, 89, 0.2);
+
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: white;
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      .stat-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .hero-separator {
+      width: 2px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 1px;
+    }
+  }
+}
+
+// Seções
+.nd-section {
+  padding: 16px;
+  margin-bottom: 0;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 0 12px 0;
+    border-bottom: 2px solid var(--nd-primary);
+
+    ion-icon {
+      color: var(--nd-primary);
+      font-size: 1.6rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--nd-primary);
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+// Cards
+.nd-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(12, 43, 89, 0.1);
+  border: none;
+  --background: white;
+  margin-bottom: 16px;
+
+  ion-card-content {
+    padding: 0;
+  }
+}
+
+// Formulários
+.form-group {
+  margin-bottom: 16px;
+
+  ion-item {
+    --background: white;
+    --color: var(--nd-dark);
+    border-bottom: 1px solid #e5e7eb;
+
+    ion-label {
+      font-weight: 500;
+      color: var(--nd-primary);
+      margin-bottom: 8px;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
+
+  &.checkbox-group {
+    ion-item {
+      --inner-padding-end: 0;
+      --padding-start: 0;
+      --padding-end: 0;
+
+      ion-label {
+        margin-left: 12px;
+        font-weight: 400;
+        color: var(--nd-dark);
+      }
+    }
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  .form-group {
+    margin-bottom: 0;
+  }
+}
+
+.product-form {
+  padding: 20px;
+}
+
+.nd-input {
+  --background: #f5f6f7;
+  --color: var(--nd-dark);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+
+  &:focus {
+    --background: white;
+    border-color: var(--nd-secondary);
+  }
+}
+
+.nd-textarea {
+  --background: #f5f6f7;
+  --color: var(--nd-dark);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+
+  &:focus {
+    --background: white;
+    border-color: var(--nd-secondary);
+  }
+}
+
+.nd-checkbox {
+  --background: var(--nd-secondary);
+  --border-radius: 4px;
+  --checkmark-color: white;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+}
+
+.nd-select {
+  --background: #f5f6f7;
+  --color: var(--nd-dark);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+// Botões
+.nd-btn-primary {
+  --background: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-secondary) 100%);
+  --color: white;
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --box-shadow: 0 4px 12px rgba(12, 43, 89, 0.3);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+
+  &:active {
+    --box-shadow: 0 2px 6px rgba(12, 43, 89, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.nd-btn-secondary {
+  --border-color: var(--nd-primary);
+  --color: var(--nd-primary);
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+
+  ion-icon {
+    color: var(--nd-primary);
+  }
+}
+
+// Itens do Orçamento
+.items-list {
+  padding: 0;
+}
+
+.item-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: white;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--nd-secondary);
+    box-shadow: 0 2px 8px rgba(232, 98, 45, 0.1);
+  }
+
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+
+    h3 {
+      margin: 0;
+      color: var(--nd-primary);
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .item-category {
+      background: linear-gradient(135deg, var(--nd-primary) 0%, var(--nd-secondary) 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+  }
+
+  .item-details {
+    margin-bottom: 12px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.95rem;
+
+    .label {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .value {
+      color: var(--nd-dark);
+      font-weight: 500;
+    }
+
+    &.total-row {
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+      margin-top: 12px;
+
+      .total-value {
+        background: var(--nd-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  .item-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
+// Seção de Totais
+.subtotal-item {
+  --background: #f5f6f7;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+
+  .subtotal-value {
+    font-weight: 700;
+    background: var(--nd-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.totals-section {
+  background: linear-gradient(135deg, rgba(12, 43, 89, 0.05) 0%, rgba(232, 98, 45, 0.05) 100%);
+  border: 1px solid rgba(12, 43, 89, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+
+  .total-row-calc,
+  .discount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(12, 43, 89, 0.1);
+
+    span:first-child {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    span:last-child {
+      color: var(--nd-dark);
+      font-weight: 600;
+    }
+  }
+
+  .discount-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    .discount-inputs {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+
+      .nd-select,
+      .nd-input {
+        flex: 1;
+      }
+    }
+  }
+
+  .total-final-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    margin-top: 8px;
+    border-top: 2px solid var(--nd-secondary);
+
+    .final-label {
+      color: var(--nd-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.95rem;
+    }
+
+    .final-value {
+      background: var(--nd-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+  }
+}
+
+// Grid de Ações
+.actions-grid {
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+
+  ion-button {
+    margin-bottom: 0;
+  }
+}
+
+// Responsivo
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+  }
+
+  .nd-hero .hero-card {
+    flex-direction: column;
+    gap: 16px;
+
+    .hero-separator {
+      width: 50px;
+      height: 2px;
+    }
+  }
+}

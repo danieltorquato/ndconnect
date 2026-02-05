@@ -1,13 +1,15 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, IonModal, IonChip, IonSegmentButton } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonIcon, IonBadge, IonButtons, IonCheckbox } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash, arrowBack } from 'ionicons/icons';
+import { add, remove, calculator, document, person, call, mail, location, search, warning, share, download, logoWhatsapp, list, close, copy, checkmark, checkmarkCircle, informationCircle, star, home, calendar, documentText, trash, arrowBack, settings, addCircle, documentOutline, receipt } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DOCUMENT } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { Document as DocxDocument, Packer, Paragraph, TextRun, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, ShadingType, ImageRun } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface Produto {
   id: number;
@@ -86,7 +88,7 @@ interface Cliente {
   templateUrl: './orcamento.page.html',
   styleUrls: ['./orcamento.page.scss'],
   standalone: true,
-  imports: [IonSegmentButton, IonChip, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonList, IonIcon, IonGrid, IonRow, IonCol, IonBadge, IonDatetime, IonNote, IonButtons, CommonModule, FormsModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardContent, IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonSelect, IonSelectOption, IonIcon, IonBadge, IonCheckbox, IonButtons, CommonModule, FormsModule],
 })
 export class OrcamentoPage implements OnInit {
   categorias: Categoria[] = [];
@@ -112,11 +114,14 @@ export class OrcamentoPage implements OnInit {
   descontoTipo: 'valor' | 'porcentagem' = 'valor';
   subtotal: number = 0;
   total: number = 0;
+  valorTotalInformado: number = 0; // Campo para o usuário informar o valor total do orçamento
+  incluirValorUnitario: boolean = false; // Por padrão, não inclui valor unitário
   dataEvento: string = '';
   nomeEvento: string = '';
   ultimoOrcamentoId: number | null = null;
   dataMinima: string = '';
   leadIdExistente: number | null = null; // Para controlar se veio da gestão de leads
+  urlLogoOrcamento: string = 'https://ndconnect.com.br/assets/img/logo.jpeg'; // URL da logo para inserir no orçamento Word
 
   // Novas propriedades para produtos customizados
   produtoCustomizado: ProdutoCustomizado = {
@@ -144,11 +149,11 @@ export class OrcamentoPage implements OnInit {
 
   constructor(
     private http: HttpClient,
-    @Inject(DOCUMENT) private document: Document,
+    @Inject(DOCUMENT) private documentRef: Document,
     private router: Router,
     private route: ActivatedRoute
   ) {
-    addIcons({arrowBack,list,add,remove,person,star,informationCircle,calendar,close,documentText,calculator,trash,search,warning,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,home});
+    addIcons({arrowBack,list,addCircle,add,documentText,trash,calendar,person,document,settings,documentOutline,calculator,receipt,remove,informationCircle,close,star,search,warning,call,mail,location,share,download,logoWhatsapp,copy,checkmark,checkmarkCircle,home});
   }
 
   ngOnInit() {
@@ -268,116 +273,80 @@ export class OrcamentoPage implements OnInit {
       return false;
     }
 
-    if (this.datasEvento.length === 0) {
-      window.alert('Selecione pelo menos uma data para o evento');
+    if (this.quantidadeShows < 1) {
+      window.alert('Informe uma quantidade válida de shows');
       return false;
-    }
-
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
-
-    for (let dataStr of this.datasEvento) {
-      const dataEvento = new Date(dataStr);
-      dataEvento.setHours(0, 0, 0, 0);
-
-      if (dataEvento < hoje) {
-        window.alert('Nenhuma data do evento pode ser anterior a hoje');
-        return false;
-      }
     }
 
     return true;
   }
 
-  // Métodos para múltiplas datas
-  abrirSeletorDatas() {
-    this.modalDatasAberto = true;
-  }
-
-  fecharModalDatas() {
-    this.modalDatasAberto = false;
-  }
-
-  adicionarDataSelecionada(event: any) {
-    let dataParaAdicionar = '';
-
-    if (event && event.detail && event.detail.value) {
-      dataParaAdicionar = event.detail.value;
-    } else if (this.dataSelecionada) {
-      dataParaAdicionar = this.dataSelecionada;
-    }
-
-    if (dataParaAdicionar) {
-      // Verificar se a data já não foi adicionada
-      if (!this.datasEvento.includes(dataParaAdicionar)) {
-        this.datasEvento.push(dataParaAdicionar);
-        console.log('Data adicionada:', dataParaAdicionar);
-        console.log('Datas atuais:', this.datasEvento);
-      } else {
-        this.mostrarNotificacao('Esta data já foi selecionada', 'info');
+  // Método para formatar o valor total informado como moeda
+  formatarValorTotal(event: any) {
+    // O campo é do tipo number, então não precisa de formatação adicional
+    // A formatação visual é feita com o pipe number no template
+    const valor = event.target.value;
+    if (valor !== '') {
+      this.valorTotalInformado = parseFloat(valor);
+      if (isNaN(this.valorTotalInformado)) {
+        this.valorTotalInformado = 0;
       }
-    }
-  }
-
-  onDataSelecionadaChange(event: any) {
-    // Este método será chamado quando o ion-datetime com multiple=true for alterado
-    // O valor será um array de strings no formato ISO
-    console.log('Evento de mudança de data:', event);
-
-    if (event && event.detail && event.detail.value) {
-      const valor = event.detail.value;
-      console.log('Valor recebido:', valor);
-
-      if (Array.isArray(valor)) {
-        this.datasEvento = [...valor];
-      } else {
-        this.datasEvento = [valor];
-      }
-
-      console.log('Datas atualizadas:', this.datasEvento);
-    }
-  }
-
-  confirmarDatas() {
-    if (this.datasEvento.length > 0) {
-      this.fecharModalDatas();
-      this.mostrarNotificacao(`${this.datasEvento.length} data(s) selecionada(s)`, 'success');
-    }
-  }
-
-  removerData(index: number) {
-    this.datasEvento.splice(index, 1);
-  }
-
-  formatarData(dataStr: string): string {
-    const data = new Date(dataStr);
-    return data.toLocaleDateString('pt-BR');
-  }
-
-  formatarDatasParaPDF(): string {
-    if (this.datasEvento.length === 0) return '---';
-
-    const datasFormatadas = this.datasEvento.map(data => {
-      const d = new Date(data);
-      return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    });
-
-    if (datasFormatadas.length === 1) {
-      return datasFormatadas[0];
-    } else if (datasFormatadas.length === 2) {
-      return `${datasFormatadas[0]} e ${datasFormatadas[1]}`;
     } else {
-      const ultimaData = datasFormatadas.pop();
-      return `${datasFormatadas.join(', ')} e ${ultimaData}`;
+      this.valorTotalInformado = 0;
     }
+  }
+
+  // Métodos para múltiplas datas removidos - não há mais seleção de datas
+
+  // Método para obter imagem via backend (sem problemas de CORS)
+  async obterImagemBase64(url: string): Promise<Uint8Array | null> {
+    if (!url) return null;
+
+    try {
+      const endpointUrl = `${this.apiUrl}/get_imagem_base64.php?url=${encodeURIComponent(url)}`;
+      console.log('Requisitando:', endpointUrl);
+
+      const response = await fetch(endpointUrl);
+      const texto = await response.text();
+
+      console.log('Resposta do servidor:', texto);
+
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+
+      if (!texto.includes('"success":true')) {
+        console.warn('IMPORTANTE: Upload o arquivo get_imagem_base64.php para https://ndconnect.com.br/api/');
+        return null;
+      }
+
+      const resultado = JSON.parse(texto);
+      if (!resultado.data || !resultado.data.includes(',')) {
+        return null;
+      }
+
+      // O backend retorna data URL, precisamos extrair o base64
+      const base64Data = resultado.data.split(',')[1];
+      const uint8Array = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+      return uint8Array;
+    } catch (erro) {
+      console.error('Erro ao carregar imagem:', erro);
+      console.warn('IMPORTANTE: Para usar imagens, faça upload de get_imagem_base64.php para https://ndconnect.com.br/api/');
+      return null;
+    }
+  }
+
+  // Método auxiliar para criar TextRun com fonte Arial profissional
+  criarTextRun(props: any): TextRun {
+    return new TextRun({
+      ...props,
+      font: 'Arial'
+    });
   }
 
   calcularSubtotalCustomizado() {
-    if (this.produtoCustomizado.usarValorTotal) {
-      // Se está usando valor total, usar o valor total diretamente
-      this.produtoCustomizado.subtotal = this.produtoCustomizado.valorTotal;
-    } else if (this.produtoCustomizado.valorUnitario && this.produtoCustomizado.quantidade) {
-      // Se está usando valor unitário, calcular subtotal
+    if (this.produtoCustomizado.usarValorTotal && this.produtoCustomizado.valorUnitario && this.produtoCustomizado.quantidade) {
+      // Se marcou para informar valor unitário, calcular com quantidade
       this.produtoCustomizado.subtotal = this.produtoCustomizado.valorUnitario * this.produtoCustomizado.quantidade;
     } else {
       this.produtoCustomizado.subtotal = 0;
@@ -400,14 +369,9 @@ export class OrcamentoPage implements OnInit {
       return;
     }
 
-    // Validar se tem algum valor definido
-    if (!this.produtoCustomizado.usarValorTotal && !this.produtoCustomizado.valorUnitario) {
-      window.alert('Informe o valor unitário ou marque para usar valor total');
-      return;
-    }
-
-    if (this.produtoCustomizado.usarValorTotal && !this.produtoCustomizado.valorTotal) {
-      window.alert('Informe o valor total');
+    // Validar se tem valor unitário definido quando checkbox está marcado
+    if (this.produtoCustomizado.usarValorTotal && !this.produtoCustomizado.valorUnitario) {
+      window.alert('Informe o valor unitário');
       return;
     }
 
@@ -419,12 +383,12 @@ export class OrcamentoPage implements OnInit {
       produto_nome: this.produtoCustomizado.nome,
       categoria_nome: 'Customizado',
       quantidade: this.produtoCustomizado.quantidade,
-      preco_unitario: this.produtoCustomizado.usarValorTotal ? 0 : (this.produtoCustomizado.valorUnitario || 0),
+      preco_unitario: this.produtoCustomizado.usarValorTotal ? (this.produtoCustomizado.valorUnitario || 0) : 0,
       subtotal: this.produtoCustomizado.subtotal,
       unidade: this.produtoCustomizado.unidade,
       produto_customizado: true,
       nome_customizado: this.produtoCustomizado.nome,
-      valor_unitario_customizado: this.produtoCustomizado.usarValorTotal ? undefined : this.produtoCustomizado.valorUnitario,
+      valor_unitario_customizado: this.produtoCustomizado.usarValorTotal ? this.produtoCustomizado.valorUnitario : undefined,
       unidade_customizada: this.produtoCustomizado.unidade
     };
 
@@ -439,7 +403,7 @@ export class OrcamentoPage implements OnInit {
       unidade: '',
       quantidade: 1,
       subtotal: 0,
-      usarValorTotal: false
+      usarValorTotal: false // Por padrão, sem checkbox (não informar valor unitário)
     };
 
     this.mostrarNotificacao('Produto customizado adicionado!', 'success');
@@ -662,6 +626,278 @@ export class OrcamentoPage implements OnInit {
     }
   }
 
+  gerarRecibo() {
+    if (this.itensOrcamento.length === 0) {
+      this.mostrarNotificacao('Adicione itens ao orçamento primeiro', 'error');
+      return;
+    }
+
+    if (!this.ultimoOrcamentoId) {
+      this.mostrarNotificacao('Gere um orçamento primeiro', 'error');
+      return;
+    }
+
+    const valorTotal = this.total.toFixed(2).replace('.', ',');
+    const hoje = new Date();
+    const dataHoje = hoje.toLocaleDateString('pt-BR');
+    const clienteNome = this.cliente.nome || this.cliente.empresa || '____________________';
+    const empresa = this.cliente.empresa || '';
+    const cpfCnpj = this.cliente.cpf_cnpj || '';
+
+    const origem = window.location.origin;
+
+    const html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Recibo - N.D Connect</title>
+  <style>
+    :root {
+      --nd-primary: #0C2B59;
+      --nd-secondary: #E8622D;
+      --nd-accent: #F7A64C;
+      --nd-light: #FFFFFF;
+      --nd-dark: #0C2B59;
+      --nd-medium: #64748b;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f3f4f6;
+      color: var(--nd-dark);
+    }
+    .recibo-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(12, 43, 89, 0.15);
+      overflow: hidden;
+      border: 1px solid rgba(12, 43, 89, 0.1);
+    }
+    .recibo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, var(--nd-secondary) 0%, var(--nd-accent) 100%);
+      color: #ffffff;
+    }
+    .recibo-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .recibo-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.7);
+    }
+    .recibo-header-title h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+    }
+    .recibo-header-title p {
+      margin: 2px 0 0 0;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    .recibo-header-right {
+      text-align: right;
+      font-size: 12px;
+    }
+    .recibo-header-right span.label {
+      display: block;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+      opacity: 0.8;
+    }
+    .recibo-header-right span.valor {
+      display: block;
+      margin-top: 4px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .recibo-body {
+      padding: 24px;
+    }
+    .secao {
+      margin-bottom: 18px;
+    }
+    .secao-titulo {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--nd-primary);
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .linha {
+      font-size: 13px;
+      color: var(--nd-medium);
+      margin: 2px 0;
+    }
+    .linha strong {
+      color: var(--nd-dark);
+    }
+    .valor-destaque {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--nd-secondary);
+      margin-top: 4px;
+    }
+    .texto-principal {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--nd-dark);
+      margin-top: 8px;
+    }
+    .rodape {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--nd-medium);
+    }
+    .assinatura {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .linha-assinatura {
+      border-top: 1px solid rgba(12, 43, 89, 0.4);
+      width: 260px;
+      margin: 0 auto 6px auto;
+    }
+    .assinatura-nome {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--nd-dark);
+    }
+    .assinatura-label {
+      font-size: 11px;
+      color: var(--nd-medium);
+    }
+    .recibo-footer {
+      padding: 10px 24px 14px 24px;
+      background: linear-gradient(135deg, rgba(12,43,89,0.03) 0%, rgba(232,98,45,0.06) 100%);
+      border-top: 1px solid rgba(12, 43, 89, 0.08);
+      font-size: 11px;
+      color: var(--nd-medium);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left {
+      font-weight: 500;
+      color: var(--nd-primary);
+    }
+    .footer-right {
+      text-align: right;
+    }
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .recibo-container {
+        box-shadow: none;
+        border-radius: 0;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="recibo-container">
+    <div class="recibo-header">
+      <div class="recibo-header-left">
+        <img src="${origem}/assets/img/logo.jpeg" alt="N.D Connect" class="recibo-logo">
+        <div class="recibo-header-title">
+          <h1>N.D CONNECT</h1>
+          <p>Equipamentos para eventos • Palcos • Geradores • Som • Luz • Painéis LED</p>
+        </div>
+      </div>
+      <div class="recibo-header-right">
+        <span class="label">Recibo</span>
+        <span class="valor">R$ ${valorTotal}</span>
+        <span style="margin-top:4px;">Orçamento nº ${String(this.ultimoOrcamentoId).padStart(6, '0')}</span>
+      </div>
+    </div>
+    <div class="recibo-body">
+      <div class="secao">
+        <div class="secao-titulo">Dados do Pagador</div>
+        <div class="linha"><strong>Nome / Empresa:</strong> ${empresa || clienteNome}</div>
+        ${cpfCnpj ? `<div class="linha"><strong>CPF/CNPJ:</strong> ${cpfCnpj}</div>` : ''}
+        ${this.cliente.endereco ? `<div class="linha"><strong>Endereço:</strong> ${this.cliente.endereco}</div>` : ''}
+      </div>
+
+      <div class="secao">
+        <div class="secao-titulo">Detalhes do Recebimento</div>
+        <div class="linha"><strong>Data do Recibo:</strong> ${dataHoje}</div>
+        ${this.nomeEvento ? `<div class="linha"><strong>Evento:</strong> ${this.nomeEvento}</div>` : ''}
+        <div class="texto-principal">
+          Recebemos de <strong>${empresa || clienteNome}</strong> a importância de
+          <strong>R$ ${valorTotal}</strong>, referente aos serviços de locação/fornecimento de equipamentos e/ou
+          estrutura para evento, conforme Orçamento nº <strong>${String(this.ultimoOrcamentoId).padStart(6, '0')}</strong>.
+        </div>
+      </div>
+
+      <div class="secao">
+        <div class="secao-titulo">Valor Recebido</div>
+        <div class="valor-destaque">R$ ${valorTotal}</div>
+        ${this.observacoes ? `<div class="linha" style="margin-top:8px;"><strong>Observações:</strong> ${this.observacoes}</div>` : ''}
+      </div>
+
+      <div class="assinatura">
+        <div class="linha-assinatura"></div>
+        <div class="assinatura-nome">N.D CONNECT - EQUIPAMENTOS PARA EVENTOS</div>
+        <div class="assinatura-label">Responsável</div>
+      </div>
+
+      <div class="rodape">
+        <div>Este recibo é válido como comprovante de pagamento.</div>
+        <div>${dataHoje}</div>
+      </div>
+    </div>
+    <div class="recibo-footer">
+      <div class="footer-left">N.D CONNECT - Equipamentos para Eventos</div>
+      <div class="footer-right">
+        <div>Contato: (11) 99999-9999</div>
+        <div>E-mail: contato@ndconnect.com.br</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      window.print();
+    };
+  </script>
+</body>
+</html>
+    `;
+
+    const reciboWindow = window.open('', '_blank', 'width=900,height=1000');
+    if (!reciboWindow) {
+      this.mostrarNotificacao('Permita pop-ups para visualizar o recibo em PDF.', 'error');
+      return;
+    }
+
+    reciboWindow.document.open();
+    reciboWindow.document.write(html);
+    reciboWindow.document.close();
+  }
+
   gerarOrcamento() {
     // Salvar o show atual antes de gerar
     this.salvarShowAtual();
@@ -681,6 +917,9 @@ export class OrcamentoPage implements OnInit {
       return; // Se a validação falhar, não continuar
     }
 
+    // Usar valorTotalInformado se preenchido, senão usar total calculado
+    const totalFinal = this.valorTotalInformado > 0 ? this.valorTotalInformado : this.total;
+
     const orcamento = {
       cliente: this.cliente,
       itens: this.itensOrcamento,
@@ -688,7 +927,8 @@ export class OrcamentoPage implements OnInit {
       desconto: this.desconto,
       desconto_tipo: this.descontoTipo,
       subtotal: this.subtotal,
-      total: this.total,
+      total: totalFinal,
+      valor_total_informado: this.valorTotalInformado,
       data_orcamento: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
       data_evento: JSON.stringify(this.datasEvento), // Múltiplas datas como JSON
       nome_evento: this.nomeEvento,
@@ -702,6 +942,10 @@ export class OrcamentoPage implements OnInit {
       next: (response) => {
         if (response.success) {
           this.ultimoOrcamentoId = response.data.id;
+          // Atualizar o total com o valor informado se foi fornecido
+          if (this.valorTotalInformado > 0) {
+            this.total = this.valorTotalInformado;
+          }
 
           // Criar lead automaticamente apenas se NÃO veio da gestão de leads
           if (!this.leadIdExistente) {
@@ -745,6 +989,591 @@ export class OrcamentoPage implements OnInit {
     // Redirecionar para simple_pdf.php com parâmetro para PDF simples
     const url = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}&tipo=simples`;
     window.open(url, '_blank');
+  }
+
+  async gerarWord() {
+    if (!this.ultimoOrcamentoId) {
+      this.mostrarNotificacao('Gere um orçamento primeiro', 'error');
+      return;
+    }
+
+    try {
+      this.mostrarNotificacao('Gerando arquivo Word...', 'info');
+
+      const children: any[] = [];
+
+      // Carregar imagem se URL estiver preenchida
+      let imagemBuffer: Uint8Array | null = null;
+      if (this.urlLogoOrcamento) {
+        console.log('Carregando imagem de:', this.urlLogoOrcamento);
+        imagemBuffer = await this.obterImagemBase64(this.urlLogoOrcamento);
+        console.log('Imagem carregada:', imagemBuffer ? 'Sucesso' : 'Falhou');
+      }
+
+      // CABEÇALHO COM TABELA ÚNICA
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "0b2b58" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "0b2b58" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "0b2b58" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "0b2b58" },
+            insideHorizontal: { style: BorderStyle.NONE },
+            insideVertical: { style: BorderStyle.NONE }
+          },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: `ORÇAMENTO - ${String(this.ultimoOrcamentoId).padStart(5, '0')}/${new Date().getFullYear()}`,
+                          bold: true,
+                          color: "FFFFFF",
+                          size: 26,
+                          font: 'Arial'
+                        })
+                      ],
+                      alignment: AlignmentType.CENTER
+                    })
+                  ],
+                  shading: { type: ShadingType.SOLID, color: "0b2b58" },
+                  margins: { top: 100, bottom: 50, left: 100, right: 100 }
+                })
+              ]
+            }),
+            // Linha para a logo - após número do orçamento
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: imagemBuffer ? [
+                        new ImageRun({
+                          data: imagemBuffer,
+                          transformation: {
+                            width: 89,
+                            height: 40
+                          }
+                        })
+                      ] : [
+                        new TextRun({
+                          text: "[Logo]",
+                          color: "FFFFFF",
+                          size: 18,
+                          font: 'Arial'
+                        })
+                      ],
+                      alignment: AlignmentType.CENTER
+                    })
+                  ],
+                  shading: { type: ShadingType.SOLID, color: "0b2b58" },
+                  margins: { top: 50, bottom: 50, left: 100, right: 100 }
+                })
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "N.D CONNECT",
+                          bold: true,
+                          color: "FFFFFF",
+                          size: 32,
+                          font: 'Arial'
+                        })
+                      ],
+                      alignment: AlignmentType.CENTER
+                    })
+                  ],
+                  shading: { type: ShadingType.SOLID, color: "0b2b58" },
+                  margins: { top: 100, bottom: 50, left: 100, right: 100 }
+                })
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "N.D CONNECT LTDA - SOLUÇÕES EM EVENTOS",
+                          bold: true,
+                          color: "FFFFFF",
+                          size: 24,
+                          font: 'Arial'
+                        })
+                      ],
+                      alignment: AlignmentType.CENTER
+                    })
+                  ],
+                  shading: { type: ShadingType.SOLID, color: "0b2b58" },
+                  margins: { top: 50, bottom: 50, left: 100, right: 100 }
+                })
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Contato: (11) 98147-0530 | Email: contato@ndconnect.com.br",
+                          color: "FFFFFF",
+                          size: 20,
+                          font: 'Arial'
+                        })
+                      ],
+                      alignment: AlignmentType.CENTER
+                    })
+                  ],
+                  shading: { type: ShadingType.SOLID, color: "0b2b58" },
+                  margins: { top: 50, bottom: 20, left: 100, right: 100 }
+                })
+              ]
+            }),
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "CNPJ: 62.496.094/0001-99",
+                          color: "FFFFFF",
+                          size: 20,
+                          font: 'Arial'
+                        })
+                      ],
+                      alignment: AlignmentType.CENTER
+                    })
+                  ],
+                  shading: { type: ShadingType.SOLID, color: "0b2b58" },
+                  margins: { top: 20, bottom: 100, left: 100, right: 100 }
+                })
+              ]
+            })
+          ]
+        })
+      );
+
+      children.push(new Paragraph({ text: "", spacing: { after: 200 } }));
+
+      // TABELA DE PRODUTOS
+      const produtosTableRows: TableRow[] = [];
+
+      // Cabeçalho da tabela
+      produtosTableRows.push(
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text: "Descrição", bold: true, font: 'Arial' })], alignment: AlignmentType.LEFT })],
+              shading: { type: ShadingType.SOLID, color: "0b2b58" }
+            }),
+            new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text: "Qtd", bold: true, font: 'Arial' })], alignment: AlignmentType.CENTER })],
+              shading: { type: ShadingType.SOLID, color: "0b2b58" }
+            }),
+            new TableCell({
+              children: [new Paragraph({ children: [new TextRun({ text: "Valor", bold: true, font: 'Arial' })], alignment: AlignmentType.CENTER })],
+              shading: { type: ShadingType.SOLID, color: "0b2b58" }
+            })
+          ]
+        })
+      );
+
+      // Linhas de produtos
+      this.itensOrcamento.forEach((item) => {
+        produtosTableRows.push(
+          new TableRow({
+            children: [
+              new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text: item.produto_nome, font: 'Arial' })] })]
+              }),
+              new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text: `${item.quantidade} ${item.unidade}`, font: 'Arial' })], alignment: AlignmentType.CENTER })]
+              }),
+              new TableCell({
+                children: [new Paragraph({ children: [new TextRun({ text: item.preco_unitario > 0 ? `R$ ${(item.subtotal).toFixed(2).replace('.', ',')}` : "", font: 'Arial' })], alignment: AlignmentType.CENTER })]
+              })
+            ]
+          })
+        );
+      });
+
+      children.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: {
+            top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "D3D3D3" },
+            insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "D3D3D3" }
+          },
+          rows: produtosTableRows
+        })
+      );
+
+      // LINHA DIVISÓRIA LARANJA
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: "" })],
+          border: {
+            bottom: {
+              color: "E8622D",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 24
+            }
+          },
+          spacing: { before: 150, after: 150 }
+        })
+      );
+
+      // TOTAL
+      const totalParaExibir = this.valorTotalInformado > 0 ? this.valorTotalInformado : this.total;
+      const totalFormatado = this.formatarMoeda(totalParaExibir);
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `TOTAL DO ORÇAMENTO: R$ ${totalFormatado} (${this.converterParaPalavras(Math.floor(totalParaExibir))} reais.)`,
+              bold: true,
+              size: 24,
+              color: "666666",
+              font: 'Arial'
+            })
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 100, after: 300 }
+        })
+      );
+
+      // CRIAR BOXES PARA CADA SHOW
+      for (let i = 1; i <= this.quantidadeShows; i++) {
+        // Título do cronograma
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Cronograma - ${this.nomeEvento || 'EVENTO'} - SHOW ${i}`,
+                bold: true,
+                size: 24,
+                color: "0b2b58"
+              })
+            ],
+            spacing: { before: 200, after: 100 }
+          })
+        );
+
+        // Box amarelo com informações estruturadas
+        const boxTexto: any[] = [];
+
+        boxTexto.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Data do evento: ___/___/______ - das ___:___ às ___:___`,
+                size: 22,
+                font: 'Arial'
+              })
+            ],
+            spacing: { after: 100 }
+          })
+        );
+
+        boxTexto.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Local: ________________________________________________________`,
+                size: 22,
+                font: 'Arial'
+              })
+            ],
+            spacing: { after: 150 }
+          })
+        );
+
+        boxTexto.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `Cronograma de montagem:`,
+                bold: true,
+                size: 22,
+                font: 'Arial'
+              })
+            ],
+            spacing: { after: 100 }
+          })
+        );
+
+        // Linhas em branco para os itens
+        const categorias = [...new Set(this.itensOrcamento.map(item => item.categoria_nome || 'Outros'))];
+        categorias.forEach((categoria) => {
+          boxTexto.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `• ${categoria}: ________________________________________________________`,
+                  size: 20,
+                  font: 'Arial'
+                })
+              ],
+              spacing: { after: 80 }
+            })
+          );
+        });
+
+        boxTexto.push(
+          new Paragraph({
+            children: [new TextRun({ text: "" })],
+            spacing: { after: 150 }
+          })
+        );
+
+        children.push(
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            borders: {
+              top: { style: BorderStyle.NONE },
+              bottom: { style: BorderStyle.NONE },
+              left: { style: BorderStyle.NONE },
+              right: { style: BorderStyle.NONE },
+              insideHorizontal: { style: BorderStyle.NONE },
+              insideVertical: { style: BorderStyle.NONE }
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    children: boxTexto,
+                    shading: { type: ShadingType.SOLID, color: "fff8dc" },
+                    margins: { top: 150, bottom: 150, left: 150, right: 150 }
+                  })
+                ]
+              })
+            ]
+          })
+        );
+
+        children.push(new Paragraph({ text: "", spacing: { after: 300 } }));
+      }
+
+      // OBSERVAÇÕES
+      if (this.observacoes) {
+        children.push(new Paragraph({ text: "", spacing: { after: 150 } }));
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "OBSERVAÇÕES:",
+                bold: true,
+                size: 24,
+                color: "0b2b58",
+                font: 'Arial'
+              })
+            ],
+            spacing: { after: 150 }
+          })
+        );
+
+        const observacoesFormatadas = this.observacoes.split('\n').map((linha, index) =>
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: linha || "",
+                size: 22
+              })
+            ],
+            spacing: { before: index === 0 ? 0 : 50, after: 50 }
+          })
+        );
+
+        children.push(
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            borders: {
+              top: { style: BorderStyle.NONE },
+              bottom: { style: BorderStyle.NONE },
+              left: { style: BorderStyle.NONE },
+              right: { style: BorderStyle.NONE },
+              insideHorizontal: { style: BorderStyle.NONE },
+              insideVertical: { style: BorderStyle.NONE }
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    children: observacoesFormatadas,
+                    shading: { type: ShadingType.SOLID, color: "fff8dc" },
+                    margins: { top: 150, bottom: 150, left: 150, right: 150 }
+                  })
+                ]
+              })
+            ]
+          })
+        );
+      }
+
+      // ASSINATURA E FECHAMENTO
+      children.push(new Paragraph({ text: "", spacing: { after: 400 } }));
+
+      // Linha de assinatura
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "_".repeat(80),
+              size: 20,
+              font: 'Arial'
+            })
+          ],
+          spacing: { after: 50 }
+        })
+      );
+
+      // Texto assinatura contratante
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "Assinatura do contratante",
+              size: 20,
+              font: 'Arial'
+            })
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 300 }
+        })
+      );
+
+      // Linha em branco
+      children.push(new Paragraph({ text: "", spacing: { after: 300 } }));
+
+      // Fechamento
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "Atenciosamente,",
+              size: 22,
+              font: 'Arial'
+            })
+          ],
+          alignment: AlignmentType.RIGHT,
+          spacing: { after: 100 }
+        })
+      );
+
+      children.push(new Paragraph({ text: "", spacing: { after: 100 } }));
+
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "N.D Connect",
+              bold: true,
+              size: 22,
+              font: 'Arial'
+            })
+          ],
+          alignment: AlignmentType.RIGHT,
+          spacing: { after: 0 }
+        })
+      );
+
+      // Criar documento
+      const doc = new DocxDocument({
+        sections: [{
+          properties: {
+            page: {
+              margin: {
+                top: 720,
+                right: 720,
+                bottom: 720,
+                left: 720
+              }
+            }
+          },
+          children: children
+        }]
+      });
+
+      // Gerar e baixar o arquivo
+      const blob = await Packer.toBlob(doc);
+      const nomeCliente = (this.cliente.empresa || this.cliente.nome || 'cliente').split(' ')[0].toLowerCase();
+      saveAs(blob, `orcamento_${nomeCliente}_${this.ultimoOrcamentoId}.docx`);
+
+      this.mostrarNotificacao('Arquivo Word gerado com sucesso!', 'success');
+
+    } catch (error) {
+      console.error('Erro ao gerar Word:', error);
+      this.mostrarNotificacao('Erro ao gerar arquivo Word', 'error');
+    }
+  }
+
+  // Formatar valor em moeda brasileira (R$ 1.234,56)
+  formatarMoeda(valor: number): string {
+    return valor.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  converterParaPalavras(numero: number): string {
+    const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove'];
+    const dezenas = ['dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
+    const dezenasRedondas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+    const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+    const escalas = ['', 'mil', 'milhão', 'bilhão', 'trilhão'];
+
+    if (numero === 0) return 'zero';
+    if (numero === 100) return 'cem';
+
+    const grupos = [];
+    let grupoIdx = 0;
+
+    while (numero > 0) {
+      const grupo = numero % 1000;
+      if (grupo !== 0) {
+        const partes = [];
+        const c = Math.floor(grupo / 100);
+        const d = Math.floor((grupo % 100) / 10);
+        const u = grupo % 10;
+
+        if (c > 0) partes.push(centenas[c]);
+
+        if (d === 1) {
+          partes.push(dezenas[u]); // 10-19
+        } else {
+          if (d > 0) partes.push(dezenasRedondas[d]);
+          if (u > 0) partes.push(unidades[u]);
+        }
+
+        const textoGrupo = partes.join(' e ');
+        if (grupoIdx > 0) {
+          grupos.unshift(textoGrupo + ' ' + escalas[grupoIdx]);
+        } else {
+          grupos.unshift(textoGrupo);
+        }
+      }
+      numero = Math.floor(numero / 1000);
+      grupoIdx++;
+    }
+
+    return grupos.join(' e ').trim();
   }
 
   criarLeadDoOrcamento(orcamentoId: number) {
@@ -802,7 +1631,7 @@ Segue o orçamento solicitado:
 
 📋 *Orçamento Nº ${this.ultimoOrcamentoId}*
 💰 *Valor Total: R$ ${this.total.toFixed(2).replace('.', ',')}*
-📅 *Data do Evento: ${this.formatarDatasParaPDF()}*
+📅 *Data do Evento: ${new Date().toLocaleDateString('pt-BR')}*
 
 📄 *Visualizar PDF:* ${pdfUrl}
 
@@ -849,14 +1678,14 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
       const pdfUrl = `${this.apiUrl}/pdf_real.php?id=${this.ultimoOrcamentoId}`;
 
       // Criar link temporário para download
-      const link = this.document.createElement('a');
+      const link = this.documentRef.createElement('a');
       link.href = pdfUrl;
       const primeiroNome = (this.cliente.nome || this.cliente.empresa).split(' ')[0].toLowerCase();
       link.download = `orcamento_${primeiroNome}_${this.ultimoOrcamentoId}.pdf`;
       link.target = '_blank';
-      this.document.body.appendChild(link);
+      this.documentRef.body.appendChild(link);
       link.click();
-      this.document.body.removeChild(link);
+      this.documentRef.body.removeChild(link);
 
       // Feedback de sucesso após um pequeno delay
       setTimeout(() => {
@@ -892,7 +1721,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
     try {
       const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
       const titulo = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}`;
-      const texto = `Orçamento de R$ ${this.total.toFixed(2).replace('.', ',')} - Evento: ${this.nomeEvento || 'Evento'} em ${this.formatarDatasParaPDF()}`;
+      const texto = `Orçamento de R$ ${this.total.toFixed(2).replace('.', ',')} - Evento: ${this.nomeEvento || 'Evento'}`;
 
       await navigator.share({
         title: titulo,
@@ -931,7 +1760,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
 
     try {
       const pdfUrl = `${this.apiUrl}/simple_pdf.php?id=${this.ultimoOrcamentoId}`;
-      const textoCompleto = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}\nValor: R$ ${this.total.toFixed(2).replace('.', ',')}\nEvento: ${this.nomeEvento || 'Evento'} em ${this.formatarDatasParaPDF()}\n\nVisualizar: ${pdfUrl}`;
+      const textoCompleto = `Orçamento N.D Connect - ${this.ultimoOrcamentoId}\nValor: R$ ${this.total.toFixed(2).replace('.', ',')}\nEvento: ${this.nomeEvento || 'Evento'}\n\nVisualizar: ${pdfUrl}`;
 
       if (navigator.clipboard) {
         navigator.clipboard.writeText(textoCompleto).then(() => {
@@ -949,12 +1778,12 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
 
   copiarLinkFallback(textoCompleto: string) {
     // Fallback para navegadores mais antigos
-    const textArea = this.document.createElement('textarea');
+    const textArea = this.documentRef.createElement('textarea');
     textArea.value = textoCompleto;
-    this.document.body.appendChild(textArea);
+    this.documentRef.body.appendChild(textArea);
     textArea.select();
-    this.document.execCommand('copy');
-    this.document.body.removeChild(textArea);
+    this.documentRef.execCommand('copy');
+    this.documentRef.body.removeChild(textArea);
     this.mostrarNotificacao('Link copiado para a área de transferência!', 'success');
   }
 
@@ -965,7 +1794,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
 
   mostrarNotificacao(mensagem: string, tipo: 'success' | 'error' | 'info' = 'info') {
     // Criar elemento de notificação
-    const notificacao = this.document.createElement('div');
+    const notificacao = this.documentRef.createElement('div');
     notificacao.className = `notificacao notificacao-${tipo}`;
     notificacao.innerHTML = `
       <div class="notificacao-content">
@@ -994,7 +1823,7 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
     `;
 
     // Adicionar ao DOM
-    this.document.body.appendChild(notificacao);
+    this.documentRef.body.appendChild(notificacao);
 
     // Animar entrada
     setTimeout(() => {
@@ -1005,8 +1834,8 @@ ${this.observacoes ? `\n📝 *Observações:*\n${this.observacoes}` : ''}
     setTimeout(() => {
       notificacao.style.transform = 'translateX(100%)';
       setTimeout(() => {
-        if (this.document.body.contains(notificacao)) {
-          this.document.body.removeChild(notificacao);
+        if (this.documentRef.body.contains(notificacao)) {
+          this.documentRef.body.removeChild(notificacao);
         }
       }, 300);
     }, 3000);
@@ -1134,7 +1963,7 @@ Esperamos que esteja bem! Segue em anexo o orçamento solicitado para seu evento
 📋 *DETALHES DO ORÇAMENTO*
 • Número: ${this.ultimoOrcamentoId.toString().padStart(6, '0')}
 • Valor Total: R$ ${this.total.toFixed(2).replace('.', ',')}
-• Data do Evento: ${this.formatarDatasParaPDF()}
+• Evento: ${this.nomeEvento || 'Evento'}
 
 📦 *ITENS INCLUÍDOS*
 ${this.itensOrcamento.map(item => `• ${item.produto_nome} (${item.quantidade}x) - R$ ${(item.preco_unitario * item.quantidade).toFixed(2).replace('.', ',')}`).join('\n')}
